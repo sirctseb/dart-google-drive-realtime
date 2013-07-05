@@ -29,10 +29,12 @@ class EventTarget extends jsw.TypedProxy {
           handler = new js.Callback.many((e) {
             eventSink.add(transformEvent == null ? e : transformEvent(e));
           });
-          _addEventListener(eventType, handler);
+          if(js.context["handlers"] == null) js.context.handlers = js.map({});
+          js.context['handlers'][handler.hashCode.toString()] = handler;
+          _addEventListener(eventType, js.context['handlers'][handler.hashCode.toString()]);
         },
         unsubscribe: (EventSink eventSink) {
-          _removeEventListener(eventType, handler);
+          _removeEventListener(eventType, js.context['handlers'][handler.hashCode.toString()]);
           handler.dispose();
         }
     );
