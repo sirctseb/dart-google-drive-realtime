@@ -48,9 +48,9 @@ onFileLoaded(docProxy) {
         // test that undo/redo state is what we expect
         expect(doc.model.canUndo, true);
         expect(doc.model.canRedo, false);
-        ssUndo.cancel();
-      }));
+      }, count: 2));
       doc.model.redo();
+      ssUndo.cancel();
       expect(doc.model.root['text'].getText(), 'redid');
       doc.model.undo();
     });
@@ -90,13 +90,13 @@ onFileLoaded(docProxy) {
       ssInsert = string.onTextInserted.listen(expectAsync1((rt.TextInsertedEvent e) {
         expect(e.index, 4);
         expect(e.text, ' append ');
-        ssInsert.cancel();
-        ssDelete.cancel();
       }));
       ssDelete = string.onTextDeleted.listen(expectAsync1((rt.TextDeletedEvent e) {
         fail("delete should not be call");
       }, count: 0));
       string.insertString(4, ' append ');
+      ssInsert.cancel();
+      ssDelete.cancel();
     });
     test('onTextDeleted', () {
       StreamSubscription ssInsert;
@@ -107,10 +107,10 @@ onFileLoaded(docProxy) {
       ssDelete = string.onTextDeleted.listen(expectAsync1((rt.TextDeletedEvent e) {
         expect(e.index, 4);
         expect(e.text, 'te');
-        ssInsert.cancel();
-        ssDelete.cancel();
       }));
       string.removeRange(4, 6);
+      ssInsert.cancel();
+      ssDelete.cancel();
     });
   });
 
@@ -154,18 +154,18 @@ onFileLoaded(docProxy) {
       ss = list.onValuesAdded.listen(expectAsync1((rt.ValuesAddedEvent e) {
         expect(e.index, 1);
         expect(e.values, ['s2']);
-        ss.cancel();
       }));
       list.push('s2');
+      ss.cancel();
     });
     test('onValuesRemoved', () {
       StreamSubscription ss;
       ss = list.onValuesRemoved.listen(expectAsync1((rt.ValuesRemovedEvent e) {
         expect(e.index, 0);
         expect(e.values, ['s1']);
-        ss.cancel();
       }));
       list.clear();
+      ss.cancel();
     });
     test('onValuesSet', () {
       StreamSubscription ss;
@@ -173,9 +173,9 @@ onFileLoaded(docProxy) {
         expect(e.index, 0);
         expect(e.oldValues, ['s1']);
         expect(e.newValues, ['s2']);
-        ss.cancel();
       }));
       list[0] = 's2';
+      ss.cancel();
     });
   });
 }
