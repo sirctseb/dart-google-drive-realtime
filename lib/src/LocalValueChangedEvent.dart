@@ -48,5 +48,7 @@ class LocalValueChangedEvent implements rt.ValueChangedEvent {
   dynamic _oldValue;
   String _property;
   String _type;
-  LocalValueChangedEvent._(this._newValue, this._oldValue, this._property) : _type = rt.EventType.VALUE_CHANGED.value;
+  LocalValueChangedEvent._(this._newValue, this._oldValue, this._property) {
+    _type = ModelEventType.VALUE_CHANGED.value;
+  }
 }
