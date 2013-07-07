@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class LocalModelMap<V> extends ModelMap<V> {
+class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V> {
   // TODO add promotes back in here
 
   @override int get length => _map.length;
@@ -71,4 +71,16 @@ class LocalModelMap<V> extends ModelMap<V> {
   // TODO should be use a subscribestreamprovider? I don't think we need to
   // TODO we are using a broadcast stream so that new listeners don't get back events. is this the correct approach?
   StreamController<rt.ValueChangedEvent> _onValueChanged = new StreamController<rt.ValueChangedEvent>.broadcast(sync: true);
+
+  void addAll(Map<String, V> other) {
+    other.forEach((key,val) => this[key] = val);
+  }
+
+  bool containsValue(V value) => Maps.containsValue(this, value);
+
+  void forEach(void f(String key, V value)) => Maps.forEach(this, f);
+
+  V putIfAbsent(String key, V ifAbsent()) => Maps.putIfAbsent(this, key, ifAbsent);
+
+  int get size => length;
 }
