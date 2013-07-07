@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class LocalModelList<E> extends ModelList<E> {
+class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList <E> {
   
   E operator[](int index) => _list[index];
 
@@ -55,6 +55,16 @@ class LocalModelList<E> extends ModelList<E> {
   int lastIndexOf(E value, [Comparator comparator]) {
     _list.lastIndexOf(value);
   }
+
+  /// Deprecated : use `xxx[index]` instead
+  @deprecated E get(int index) => this[index];
+
+  int indexOf(E value, [Comparator comparator]) {
+    return _list.indexOf(value);
+  }
+
+  /// Deprecated : use `xxx[index] = value` instead
+  @deprecated void set(int index, E value) { this[index] = value; }
 
   int get length => _list.length;
 
@@ -129,4 +139,5 @@ class LocalModelList<E> extends ModelList<E> {
     = new StreamController<rt.ValuesRemovedEvent>.broadcast(sync: true);
   StreamController<rt.ValuesSetEvent> _onValuesSet
     = new StreamController<rt.ValuesSetEvent>.broadcast(sync: true);
+
 }
