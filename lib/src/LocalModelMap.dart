@@ -53,7 +53,7 @@ class LocalModelMap<V> extends ModelMap<V> {
   // TODO figure out what type to return
   List<List<V>> get items => _map.keys.map((key) => [key, _map[key]]).toList();
   // TODO return TypePromotingList object
-  @override List<String> get keys => _map.keys;
+  @override List<String> get keys => _map.keys.toList();
   /// deprecated : use `xxx[key] = value`
   @deprecated V set(String key, V value) {
     this[key] = value;
