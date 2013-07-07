@@ -14,21 +14,19 @@
 
 part of realtime_data_model;
 
-// as a shortcut to defining a separate interface with two subclasses for realtime and local,
-// we can just implement the realtime interface if it doesn't require special realtime members
-class LocalValueChangedEvent extends LocalEvent implements rt.ValueChangedEvent {
-  // TODO why doesn't fromProxy cause a problem?
+abstract class LocalEvent implements rt.BaseModelEvent {
+  /// Local events have no js Proxy object
+  final js.Proxy $unsafe = null;
 
-  bool get bubbles => null; // TODO implement this getter
+  /// Local events are always isLocal
+  final bool isLocal = true;
 
-  final newValue;
+  /// Local events have no session
+  final String sessionId = null;
 
-  final oldValue;
+  /// Local events have no js Proxy object
+  dynamic toJs() => null;
 
-  final String property;
-
-  final String type;
-
-  LocalValueChangedEvent._(this.newValue, this.oldValue, this.property)
-    : type = ModelEventType.VALUE_CHANGED.value;
+  /// Local events have no user
+  final String userId = null;
 }
