@@ -25,7 +25,7 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   int get length => _string.length;
 
   void append(String text) {
-    _string = "${_string}text";
+    _string = "${_string}$text";
     // add event to stream
     // TODO check index value computation
     _onTextInserted.add(new LocalTextInsertedEvent._(_string.length - text.length, text));
@@ -33,7 +33,7 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   String get text => _string;
   void insertString(int index, String text) {
     // TODO make sure end is exclusive in substring
-    _string = "${_string.substring(0, index)}text${_string.substring(index)}";
+    _string = "${_string.substring(0, index)}$text${_string.substring(index)}";
     _onTextInserted.add(new LocalTextInsertedEvent._(index, text));
   }
   // TODO implement references
