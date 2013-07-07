@@ -15,7 +15,6 @@
 part of realtime_data_model;
 
 class LocalValuesAddedEvent extends LocalEvent implements rt.ValuesAddedEvent {
-  /// Local events have no js Proxy
 
   bool get bubbles => null; // TODO implement this getter
 
