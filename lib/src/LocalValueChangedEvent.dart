@@ -19,36 +19,30 @@ part of realtime_data_model;
 class LocalValueChangedEvent implements rt.ValueChangedEvent {
   // TODO why doesn't fromProxy cause a problem?
 
-  js.Proxy get $unsafe => null;
+  final js.Proxy $unsafe = null;
 
   bool get bubbles => null; // TODO implement this getter
 
   /// Local event are always isLocal
-  bool get isLocal => true;
+  final bool isLocal = true;
 
-  get newValue => _newValue;
+  final newValue;
 
-  get oldValue => _oldValue;
+  final oldValue;
 
-  String get property => _property;
+  final String property;
 
   /// Local events have no session
-  String get sessionId => null;
+  final String sessionId = null;
 
   /// Local events have no [Proxy] backer 
   dynamic toJs() => null;
 
-  String get type => _type;
+  final String type;
 
   /// Local events have no userId
-  String get userId => null;
-  
-  // backing fields
-  dynamic _newValue;
-  dynamic _oldValue;
-  String _property;
-  String _type;
-  LocalValueChangedEvent._(this._newValue, this._oldValue, this._property) {
-    _type = ModelEventType.VALUE_CHANGED.value;
-  }
+  final String userId = null;
+
+  LocalValueChangedEvent._(this.newValue, this.oldValue, this.property)
+    : type = ModelEventType.VALUE_CHANGED.value;
 }
