@@ -20,10 +20,9 @@ class LocalValuesAddedEvent extends LocalEvent implements rt.ValuesAddedEvent {
 
   final int index;
 
-  final String type;
+  final String type = ModelEventType.VALUES_ADDED.value;
 
   final List values;
   
-  LocalValuesAddedEvent._(this.index, this.values)
-    : type = ModelEventType.VALUES_ADDED.value;
+  LocalValuesAddedEvent._(this.index, this.values);
 }

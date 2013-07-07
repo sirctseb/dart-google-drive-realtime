@@ -24,8 +24,7 @@ class LocalValuesSetEvent extends LocalEvent implements rt.ValuesSetEvent {
 
   final List oldValues;
 
-  final String type;
+  final String type = ModelEventType.VALUES_SET.value;
   
-  LocalValuesSetEvent._(this.index, this.newValues, this.oldValues)
-    : type = ModelEventType.VALUES_SET.value;
+  LocalValuesSetEvent._(this.index, this.newValues, this.oldValues);
 }

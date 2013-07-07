@@ -19,10 +19,9 @@ class LocalValuesRemovedEvent extends LocalEvent implements rt.ValuesRemovedEven
 
   final int index;
 
-  final String type;
+  final String type = ModelEventType.VALUES_REMOVED.value;
 
   final List values;
   
-  LocalValuesRemovedEvent._(this.index, this.values)
-    : type = ModelEventType.VALUES_REMOVED.value;
+  LocalValuesRemovedEvent._(this.index, this.values);
 }
