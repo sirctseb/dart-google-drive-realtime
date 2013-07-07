@@ -78,7 +78,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     _list.add(value);
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
-    _onValuesAdded.add(new LocalValuesAddedEvent._(_list.length, [value]));
+    _onValuesAdded.add(new LocalValuesAddedEvent._(_list.length - 1, [value]));
     return _list.length;
   }
 
@@ -86,7 +86,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     _list.addAll(values);
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
-    _onValuesAdded.add(new LocalValuesAddedEvent._(_list.length - values.length + 1, values));
+    _onValuesAdded.add(new LocalValuesAddedEvent._(_list.length - values.length, values));
   }
 
   IndexReference registerReference(int index, bool canBeDeleted) {
