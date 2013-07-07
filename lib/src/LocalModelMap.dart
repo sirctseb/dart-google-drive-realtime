@@ -70,5 +70,5 @@ class LocalModelMap<V> extends ModelMap<V> {
   // stream controller
   // TODO should be use a subscribestreamprovider? I don't think we need to
   // TODO we are using a broadcast stream so that new listeners don't get back events. is this the correct approach?
-  StreamController<rt.ValueChangedEvent> _onValueChanged = new StreamController<rt.ValueChangedEvent>.broadcast();
+  StreamController<rt.ValueChangedEvent> _onValueChanged = new StreamController<rt.ValueChangedEvent>.broadcast(sync: true);
 }
