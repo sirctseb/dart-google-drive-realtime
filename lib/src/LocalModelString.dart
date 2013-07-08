@@ -44,9 +44,13 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     _onTextDeleted.add(new LocalTextDeletedEvent._(startIndex, removed));
   }
   void set text(String text) {
-    // TODO compute edit
-    // TODO event
+    // TODO implement better algorithm
+    var oldString = _string;
     _string = text;
+    // trivial edit decomposition algorithm
+    // add event to stream
+    _onTextDeleted.add(new LocalTextDeletedEvent._(0, oldString));
+    _onTextInserted.add(new LocalTextInsertedEvent._(0, text));
   }
 
   Stream<LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
