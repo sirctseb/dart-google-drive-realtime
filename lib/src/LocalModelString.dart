@@ -27,12 +27,10 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   void append(String text) {
     _string = "${_string}$text";
     // add event to stream
-    // TODO check index value computation
     _onTextInserted.add(new LocalTextInsertedEvent._(_string.length - text.length, text));
   }
   String get text => _string;
   void insertString(int index, String text) {
-    // TODO make sure end is exclusive in substring
     _string = "${_string.substring(0, index)}$text${_string.substring(index)}";
     _onTextInserted.add(new LocalTextInsertedEvent._(index, text));
   }
@@ -41,8 +39,6 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   void removeRange(int startIndex, int endIndex) {
     // get removed text for event
     var removed = _string.substring(startIndex, endIndex);
-    // TODO make sure end is exclusive in substring
-    // TODO test edge case where endIndex is last index. I think this will crash
     _string = "${_string.substring(0, startIndex)}${_string.substring(endIndex)}";
     // add event to stream
     _onTextDeleted.add(new LocalTextDeletedEvent._(startIndex, removed));
@@ -53,7 +49,6 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     _string = text;
   }
 
-  // TODO need local events
   Stream<LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
   Stream<LocalTextDeletedEvent> get onTextDeleted => _onTextDeleted.stream;
   
