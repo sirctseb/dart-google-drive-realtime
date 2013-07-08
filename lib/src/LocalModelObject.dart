@@ -21,8 +21,9 @@ class LocalModelObject implements rt.CollaborativeObject {
 
   final String id;
 
-  // TODO will be LocalObjectChangedEvent
-  Stream<rt.ObjectChangedEvent> get onObjectChanged => null; // TODO implement this getter
+  StreamController<LocalObjectChangedEvent> _onObjectChanged
+    = new StreamController<LocalObjectChangedEvent>.broadcast(sync: true);
+  Stream<LocalObjectChangedEvent> get onObjectChanged => _onObjectChanged.stream;
 
   // TODO implement custom objects
   Stream<rt.ValueChangedEvent> get onValueChanged => null; // TODO implement this getter
