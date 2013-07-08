@@ -14,24 +14,14 @@
 
 part of realtime_data_model;
 
-class LocalModelObject implements rt.CollaborativeObject {
+class LocalObjectChangedEvent extends LocalEvent {
+
+  final List<LocalEvent> events;
+
+  // TODO I think this may be true for ObjectChanged and false for everything else?
+  bool get bubbles => null; // TODO implement this getter
+
+  final String type = ModelEventType.OBJECT_CHANGED.value;
   
-  /// Local objects have no js Proxy
-  final js.Proxy $unsafe = null;
-
-  final String id;
-
-  // TODO will be LocalObjectChangedEvent
-  Stream<rt.ObjectChangedEvent> get onObjectChanged => null; // TODO implement this getter
-
-  // TODO implement custom objects
-  Stream<rt.ValueChangedEvent> get onValueChanged => null; // TODO implement this getter
-
-  /// Local objects have no js Proxy
-  dynamic toJs() => null;
-  
-  static int _idNum = 0;
-  static String get nextId => (_idNum++).toString();
-  
-  LocalModelObject() : id = nextId;
+  LocalObjectChangedEvent._(this.events);
 }
