@@ -23,6 +23,6 @@ class LocalValuesAddedEvent extends LocalEvent implements rt.ValuesAddedEvent {
   final String type = ModelEventType.VALUES_ADDED.value;
 
   final List values;
-  
-  LocalValuesAddedEvent._(this.index, this.values);
+
+  LocalValuesAddedEvent._(this.index, this.values, _target) : super._(_target);
 }

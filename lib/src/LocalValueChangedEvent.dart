@@ -29,5 +29,5 @@ class LocalValueChangedEvent extends LocalEvent implements rt.ValueChangedEvent 
 
   final String type = ModelEventType.VALUE_CHANGED.value;
 
-  LocalValueChangedEvent._(this.newValue, this.oldValue, this.property);
+  LocalValueChangedEvent._(this.newValue, this.oldValue, this.property, _target) : super._(_target);
 }

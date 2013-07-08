@@ -29,4 +29,9 @@ abstract class LocalEvent implements rt.BaseModelEvent {
 
   /// Local events have no user
   final String userId = null;
+
+  // the object that generated the event
+  final LocalModelObject _target;
+
+  LocalEvent._(this._target);
 }

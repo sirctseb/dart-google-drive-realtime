@@ -15,7 +15,7 @@
 part of realtime_data_model;
 
 class LocalValuesSetEvent extends LocalEvent implements rt.ValuesSetEvent {
-  
+
   bool get bubbles => null; // TODO implement this getter
 
   final int index;
@@ -25,6 +25,6 @@ class LocalValuesSetEvent extends LocalEvent implements rt.ValuesSetEvent {
   final List oldValues;
 
   final String type = ModelEventType.VALUES_SET.value;
-  
-  LocalValuesSetEvent._(this.index, this.newValues, this.oldValues);
+
+  LocalValuesSetEvent._(this.index, this.newValues, this.oldValues, _target) : super._(_target);
 }

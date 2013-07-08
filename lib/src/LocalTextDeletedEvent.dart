@@ -22,6 +22,6 @@ class LocalTextDeletedEvent extends LocalEvent implements rt.TextDeletedEvent {
   final String text;
 
   final String type = ModelEventType.TEXT_DELETED.value;
-  
-  LocalTextDeletedEvent._(this.index, this.text);
+
+  LocalTextDeletedEvent._(this.index, this.text, _target) : super._(_target);
 }

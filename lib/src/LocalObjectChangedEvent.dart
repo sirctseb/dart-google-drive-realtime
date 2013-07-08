@@ -22,6 +22,6 @@ class LocalObjectChangedEvent extends LocalEvent implements rt.ObjectChangedEven
   bool get bubbles => null; // TODO implement this getter
 
   final String type = ModelEventType.OBJECT_CHANGED.value;
-  
-  LocalObjectChangedEvent._(this.events);
+
+  LocalObjectChangedEvent._(this.events, _target) : super._(_target);
 }

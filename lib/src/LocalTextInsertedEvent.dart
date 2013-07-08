@@ -15,7 +15,7 @@
 part of realtime_data_model;
 
 class LocalTextInsertedEvent extends LocalEvent implements rt.TextInsertedEvent {
-  
+
   bool get bubbles => null; // TODO implement this getter
 
   final int index;
@@ -23,6 +23,6 @@ class LocalTextInsertedEvent extends LocalEvent implements rt.TextInsertedEvent 
   final String text;
 
   final String type = ModelEventType.TEXT_INSERTED.value;
-  
-  LocalTextInsertedEvent._(this.index, this.text);
+
+  LocalTextInsertedEvent._(this.index, this.text, _target) : super._(_target);
 }
