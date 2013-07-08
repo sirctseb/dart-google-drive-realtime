@@ -15,14 +15,17 @@
 part of realtime_data_model;
 
 class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList <E> {
-  
+
   E operator[](int index) => _list[index];
 
   void operator[]=(int index, E value) {
     if (index < 0 || index >= length) throw new RangeError.value(index);
     // get old value
     var oldValue = _list[index];
+
+    // set actual value
     _list[index] = value;
+
     // add event to stream
     // TODO might still be worth checking for listener to save on these
     _onValuesSet.add(new LocalValuesSetEvent._(index, [value], [oldValue]));
@@ -129,7 +132,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     // TODO clone values?
     _onValuesSet.add(new LocalValuesSetEvent._(index, values, current));
   }
-  
+
   // backing field
   final List _list = [];
   // stream controllers
@@ -140,6 +143,29 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
   StreamController<rt.ValuesSetEvent> _onValuesSet
     = new StreamController<rt.ValuesSetEvent>.broadcast(sync: true);
 
+  // map from object ids of contained elements to subscriptions to their object changed streams
+  Map<String, StreamSubscription<LocalObjectChangedEvent>> _ssMap =
+    new Map<String, StreamSubscription<LocalObjectChangedEvent>>();
+  // check if value is a model object and start propagating object changed events
+  void _propagateChanges(dynamic element) {
+    // start propagating changes if element is model object and not already subscribed
+    if(element is LocalModelObject && !_ssMap.containsKey((element as LocalModelObject).id)) {
+      _ssMap[(element as LocalModelObject).id] =
+        (element as LocalModelObject).onObjectChanged.listen((e) {
+          _onObjectChanged.add(e);
+        });
+    }
+  }
+  // check if value is a model object and stop propagating object changed events
+  void _stopPropagatingChanges(dynamic element) {
+    // stop propagation if overwritten element is model object and it is no longer anywhere in the list
+    // TODO this depends on this method being called _after_ the element is removed from _list
+    if(element is LocalModelObject && !_list.contains(element)) {
+      _ssMap[(element as LocalModelObject).id].cancel();
+      _ssMap.remove((element as LocalModelObject).id);
+    }
+  }
+
   LocalModelList() {
     // TODO pipe to _onObjectChanged when https://code.google.com/p/dart/issues/detail?id=10677 is fixed
     onValuesAdded.transform(_toObjectEvent)
@@ -148,6 +174,19 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
       .listen((e) => _onObjectChanged.add(e));
     onValuesSet.transform(_toObjectEvent)
       .listen((e) => _onObjectChanged.add(e));
+
+    // listen for events to add or cancel object changed propagation
+    // TODO this could be shoved into the above handlers too
+    onValuesAdded.listen((LocalValuesAddedEvent e) {
+      e.values.forEach((element) => _propagateChanges(element));
+    });
+    onValuesRemoved.listen((LocalValuesRemovedEvent e){
+      e.values.forEach((element) => _stopPropagatingChanges(element));
+    });
+    onValuesSet.listen((LocalValuesSetEvent e) {
+      e.oldValues.forEach((element) => _stopPropagatingChanges(element));
+      e.newValues.forEach((element) => _propagateChanges(element));
+    });
   }
 
 }
