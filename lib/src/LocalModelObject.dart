@@ -22,9 +22,9 @@ class EventToLocalObjectChangedEvent<T> extends StreamEventTransformer<T, LocalO
 }
 class LocalModelObject implements rt.CollaborativeObject {
   // transformer for subclasses to use for creating object changed events
-  static EventToLocalObjectChangedEvent _toObjectEvent
+  EventToLocalObjectChangedEvent _toObjectEvent
     = new EventToLocalObjectChangedEvent();
-  
+
   /// Local objects have no js Proxy
   final js.Proxy $unsafe = null;
 
@@ -39,9 +39,9 @@ class LocalModelObject implements rt.CollaborativeObject {
 
   /// Local objects have no js Proxy
   dynamic toJs() => null;
-  
+
   static int _idNum = 0;
   static String get nextId => (_idNum++).toString();
-  
+
   LocalModelObject() : id = nextId;
 }
