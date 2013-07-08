@@ -14,7 +14,16 @@
 
 part of realtime_data_model;
 
+/// A class to easily transform events into LocalObjectChangedEvents
+class EventToLocalObjectChangedEvent<T> extends StreamEventTransformer<T, LocalObjectChangedEvent> {
+  void handleData(T data, EventSink<T> sink) {
+    sink.add(new LocalObjectChangedEvent._([data]));
+  }
+}
 class LocalModelObject implements rt.CollaborativeObject {
+  // transformer for subclasses to use for creating object changed events
+  static EventToLocalObjectChangedEvent _toObjectEvent
+    = new EventToLocalObjectChangedEvent();
   
   /// Local objects have no js Proxy
   final js.Proxy $unsafe = null;
