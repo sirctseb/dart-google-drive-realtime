@@ -27,16 +27,16 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   void append(String text) {
     _string = "${_string}$text";
     // add event to stream
-    var insertEvent = new LocalTextInsertedEvent._(_string.length - text.length, text);
+    var insertEvent = new LocalTextInsertedEvent._(_string.length - text.length, text, this);
     _onTextInserted.add(insertEvent);
-    _onObjectChanged.add(new LocalObjectChangedEvent._([insertEvent]));
+    _onObjectChanged.add(new LocalObjectChangedEvent._([insertEvent], this));
   }
   String get text => _string;
   void insertString(int index, String text) {
     _string = "${_string.substring(0, index)}$text${_string.substring(index)}";
-    var insertEvent = new LocalTextInsertedEvent._(index, text);
+    var insertEvent = new LocalTextInsertedEvent._(index, text, this);
     _onTextInserted.add(insertEvent);
-    _onObjectChanged.add(new LocalObjectChangedEvent._([insertEvent]));
+    _onObjectChanged.add(new LocalObjectChangedEvent._([insertEvent], this));
   }
   // TODO implement references
   IndexReference registerReference(int index, bool canBeDeleted) => null;
@@ -45,9 +45,9 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     var removed = _string.substring(startIndex, endIndex);
     _string = "${_string.substring(0, startIndex)}${_string.substring(endIndex)}";
     // add event to stream
-    var deleteEvent = new LocalTextDeletedEvent._(startIndex, removed);
+    var deleteEvent = new LocalTextDeletedEvent._(startIndex, removed, this);
     _onTextDeleted.add(deleteEvent);
-    _onObjectChanged.add(new LocalObjectChangedEvent._([deleteEvent]));
+    _onObjectChanged.add(new LocalObjectChangedEvent._([deleteEvent], this));
   }
   void set text(String text) {
     // TODO implement better algorithm
@@ -55,13 +55,13 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     _string = text;
     // trivial edit decomposition algorithm
     // add event to stream
-    var deleteEvent = new LocalTextDeletedEvent._(0, oldString);
-    var insertEvent = new LocalTextInsertedEvent._(0, text);
+    var deleteEvent = new LocalTextDeletedEvent._(0, oldString, this);
+    var insertEvent = new LocalTextInsertedEvent._(0, text, this);
     _onTextDeleted.add(deleteEvent);
     _onTextInserted.add(insertEvent);
     // TODO is there something fancy we can do with the transformer and a pipe to combine these
     // TODO instead of littering them through the methods like this?
-    _onObjectChanged.add(new LocalObjectChangedEvent._([deleteEvent, insertEvent]));
+    _onObjectChanged.add(new LocalObjectChangedEvent._([deleteEvent, insertEvent], this));
   }
 
   Stream<LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;

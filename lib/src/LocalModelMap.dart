@@ -26,7 +26,7 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
     var oldValue = this[key];
     _map[key] = value;
     // send the event
-    _onValueChanged.add(new LocalValueChangedEvent._(value, oldValue, key));
+    _onValueChanged.add(new LocalValueChangedEvent._(value, oldValue, key, this));
     // stop propagating changes if we're writing over a model object
     if(_ssMap.containsKey(key)) {
       _ssMap[key].cancel();
@@ -47,7 +47,7 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   // TODO event
   @override V remove(String key) {
     // create the event
-    var event = new LocalValueChangedEvent._(null, _map[key], key);
+    var event = new LocalValueChangedEvent._(null, _map[key], key, this);
     // do the remove
     _map.remove(key);
     // send the event
