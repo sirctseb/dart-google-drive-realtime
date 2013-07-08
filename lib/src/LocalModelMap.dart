@@ -27,6 +27,17 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
     _map[key] = value;
     // send the event
     _onValueChanged.add(new LocalValueChangedEvent._(value, oldValue, key));
+    // stop propagating changes if we're writing over a model object
+    if(_ssMap.containsKey(key)) {
+      _ssMap[key].cancel();
+    }
+    // propagate changes on model data objects
+    // TODO pipe?
+    if(value is LocalModelObject) {
+      _ssMap[key] = (value as LocalModelObject).onObjectChanged.listen((e) {
+        _onObjectChanged.add(e);
+      });
+    }
   }
 
   void clear() {
@@ -41,6 +52,11 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
     _map.remove(key);
     // send the event
     _onValueChanged.add(event);
+    // stop propagating changes if we're writing over a model object
+    if(_ssMap.containsKey(key)) {
+      _ssMap[key].cancel();
+      _ssMap.remove(key);
+    }
   }
   /// deprecated : use `xxx.remove(key)`
   @deprecated V delete(String key) => remove(key);
@@ -67,6 +83,9 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
 
   // backing map instance
   Map<String, V> _map = new Map<String, V>();
+  // map of subscriptions for object changed events for model objects contained in this
+  Map<String, StreamSubscription<LocalObjectChangedEvent>> _ssMap
+    = new Map<String, StreamSubscription<LocalObjectChangedEvent>>();
   // stream controller
   // TODO should be use a subscribestreamprovider? I don't think we need to
   // TODO we are using a broadcast stream so that new listeners don't get back events. is this the correct approach?
