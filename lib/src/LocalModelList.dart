@@ -140,4 +140,14 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
   StreamController<rt.ValuesSetEvent> _onValuesSet
     = new StreamController<rt.ValuesSetEvent>.broadcast(sync: true);
 
+  LocalModelList() {
+    // TODO pipe to _onObjectChanged when https://code.google.com/p/dart/issues/detail?id=10677 is fixed
+    onValuesAdded.transform(_toObjectEvent)
+      .listen((e) => _onObjectChanged.add(e));
+    onValuesRemoved.transform(_toObjectEvent)
+      .listen((e) => _onObjectChanged.add(e));
+    onValuesSet.transform(_toObjectEvent)
+      .listen((e) => _onObjectChanged.add(e));
+  }
+
 }
