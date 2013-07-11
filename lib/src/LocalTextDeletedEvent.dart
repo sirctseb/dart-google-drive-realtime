@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class LocalTextDeletedEvent extends LocalEvent implements rt.TextDeletedEvent {
+class LocalTextDeletedEvent extends LocalUndoableEvent implements rt.TextDeletedEvent {
   bool get bubbles => null; // TODO implement this getter
 
   final int index;
@@ -24,4 +24,13 @@ class LocalTextDeletedEvent extends LocalEvent implements rt.TextDeletedEvent {
   final String type = ModelEventType.TEXT_DELETED.value;
 
   LocalTextDeletedEvent._(this.index, this.text, _target) : super._(_target);
+
+  // undo the change
+  void _undo() {
+    (_target as LocalModelString).insertString(index, text);
+  }
+  // apply the change
+  void _redo() {
+    (_target as LocalModelString).removeRange(index, index + text.length);
+  }
 }

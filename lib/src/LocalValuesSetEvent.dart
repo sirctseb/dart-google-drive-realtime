@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class LocalValuesSetEvent extends LocalEvent implements rt.ValuesSetEvent {
+class LocalValuesSetEvent extends LocalUndoableEvent implements rt.ValuesSetEvent {
 
   bool get bubbles => null; // TODO implement this getter
 
@@ -27,4 +27,13 @@ class LocalValuesSetEvent extends LocalEvent implements rt.ValuesSetEvent {
   final String type = ModelEventType.VALUES_SET.value;
 
   LocalValuesSetEvent._(this.index, this.newValues, this.oldValues, _target) : super._(_target);
+
+  // undo the change
+  void _undo() {
+    (_target as LocalModelList).replaceRange(index, oldValues);
+  }
+  // apply the change
+  void _redo() {
+    (_target as LocalModelList).replaceRange(index, newValues);
+  }
 }

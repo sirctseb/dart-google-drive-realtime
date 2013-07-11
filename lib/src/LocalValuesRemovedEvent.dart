@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class LocalValuesRemovedEvent extends LocalEvent implements rt.ValuesRemovedEvent {
+class LocalValuesRemovedEvent extends LocalUndoableEvent implements rt.ValuesRemovedEvent {
   bool get bubbles => null; // TODO implement this getter
 
   final int index;
@@ -24,4 +24,13 @@ class LocalValuesRemovedEvent extends LocalEvent implements rt.ValuesRemovedEven
   final List values;
 
   LocalValuesRemovedEvent._(this.index, this.values, _target) : super._(_target);
+
+  // undo the change
+  void _undo() {
+    (_target as LocalModelList).insertAll(index, values);
+  }
+  // apply the change
+  void _redo() {
+    (_target as LocalModelList).removeRange(index, index + values.length);
+  }
 }

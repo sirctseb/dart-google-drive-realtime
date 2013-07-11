@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class LocalTextInsertedEvent extends LocalEvent implements rt.TextInsertedEvent {
+class LocalTextInsertedEvent extends LocalUndoableEvent implements rt.TextInsertedEvent {
 
   bool get bubbles => null; // TODO implement this getter
 
@@ -25,4 +25,13 @@ class LocalTextInsertedEvent extends LocalEvent implements rt.TextInsertedEvent 
   final String type = ModelEventType.TEXT_INSERTED.value;
 
   LocalTextInsertedEvent._(this.index, this.text, _target) : super._(_target);
+
+  // undo the change
+  void _undo() {
+    (_target as LocalModelString).removeRange(index, index + text.length);
+  }
+  // apply the change
+  void _redo() {
+    (_target as LocalModelString).insertString(index, text);
+  }
 }
