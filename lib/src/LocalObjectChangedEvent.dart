@@ -23,5 +23,11 @@ class LocalObjectChangedEvent extends LocalEvent implements rt.ObjectChangedEven
 
   final String type = ModelEventType.OBJECT_CHANGED.value;
 
-  LocalObjectChangedEvent._(this.events, _target) : super._(_target);
+  static LocalObjectChangedEvent _terminalEvent = null;
+
+  LocalObjectChangedEvent._(this.events, _target) : super._(_target) {
+    if(_terminalEvent == null) {
+      _terminalEvent = this;
+    }
+  }
 }
