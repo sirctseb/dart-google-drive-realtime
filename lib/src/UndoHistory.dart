@@ -54,7 +54,7 @@ class UndoHistory {
         _addUndoEvents(e.events);
       } else {
         // add event to current undo set
-        _addUndoEvents(e.events, newSet: e._undoSetRoot);
+        _addUndoEvents(e.events, newSet: true);//e._undoSetRoot);
         // TODO if new undo set, truncate history after this
       }
     });
