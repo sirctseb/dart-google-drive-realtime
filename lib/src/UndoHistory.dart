@@ -63,7 +63,6 @@ class UndoHistory {
   void undo() {
     // set undo latch
     _undoLatch = true;
-//    print("index is currently $_index and we are undoing");
     // decrement index
     _index--;
     // save current events
