@@ -27,12 +27,12 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   void append(String text) {
     // add event to stream
     var insertEvent = new LocalTextInsertedEvent._(_string.length, text, this);
-    _emitChangedEvent([_onTextInserted], [insertEvent]);
+    _emitEventsAndChanged([_onTextInserted], [insertEvent]);
   }
   String get text => _string;
   void insertString(int index, String text) {
     var insertEvent = new LocalTextInsertedEvent._(index, text, this);
-    _emitChangedEvent([_onTextInserted], [insertEvent]);
+    _emitEventsAndChanged([_onTextInserted], [insertEvent]);
   }
   // TODO implement references
   IndexReference registerReference(int index, bool canBeDeleted) => null;
@@ -41,14 +41,14 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     var removed = _string.substring(startIndex, endIndex);
     // add event to stream
     var deleteEvent = new LocalTextDeletedEvent._(startIndex, removed, this);
-    _emitChangedEvent([_onTextDeleted], [deleteEvent]);
+    _emitEventsAndChanged([_onTextDeleted], [deleteEvent]);
   }
   void set text(String text) {
     // trivial edit decomposition algorithm
     // add event to stream
     var deleteEvent = new LocalTextDeletedEvent._(0, _string, this);
     var insertEvent = new LocalTextInsertedEvent._(0, text, this);
-    _emitChangedEvent([_onTextDeleted, _onTextInserted], [deleteEvent, insertEvent]);
+    _emitEventsAndChanged([_onTextDeleted, _onTextInserted], [deleteEvent, insertEvent]);
   }
 
   Stream<LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;

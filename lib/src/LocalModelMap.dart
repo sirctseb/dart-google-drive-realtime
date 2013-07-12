@@ -24,7 +24,7 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   @override void operator []=(String key, V value) {
     // send the event
     var event = new LocalValueChangedEvent._(value, _map[key], key, this);
-    _emitChangedEvent([_onValueChanged], [event]);
+    _emitEventsAndChanged([_onValueChanged], [event]);
   }
 
   void clear() {
@@ -36,7 +36,7 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
     // create the event
     var event = new LocalValueChangedEvent._(null, _map[key], key, this);
     // send the event
-    _emitChangedEvent([_onValueChanged], [event]);
+    _emitEventsAndChanged([_onValueChanged], [event]);
   }
   /// deprecated : use `xxx.remove(key)`
   @deprecated V delete(String key) => remove(key);
