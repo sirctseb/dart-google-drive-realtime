@@ -52,9 +52,16 @@ class LocalModelObject implements rt.CollaborativeObject {
   LocalModelObject() : id = nextId;
 
   // create an emit a LocalObjectChangedEvent from a list of events
-  void _emitChangedEvent(List<LocalUndoableEvent> events) {
+  void _emitChangedEvent(List<StreamController> controllers, List<LocalUndoableEvent> events) {
+    // construct change event before firing actual events
     var event = new LocalObjectChangedEvent._(events,this);
+    for(int i = 0; i < events.length; i++) {
+      // fire actual events
+      controllers[i].add(events[i]);
+    }
+    // fire change event on normal stream
     _onObjectChanged.add(event);
+    // fire on propagation stream
     _onPostObjectChangedController.add(event);
   }
 }

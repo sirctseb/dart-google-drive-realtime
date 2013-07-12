@@ -28,15 +28,13 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     _string = "${_string}$text";
     // add event to stream
     var insertEvent = new LocalTextInsertedEvent._(_string.length - text.length, text, this);
-    _onTextInserted.add(insertEvent);
-    _emitChangedEvent([insertEvent]);
+    _emitChangedEvent([_onTextInserted], [insertEvent]);
   }
   String get text => _string;
   void insertString(int index, String text) {
     _string = "${_string.substring(0, index)}$text${_string.substring(index)}";
     var insertEvent = new LocalTextInsertedEvent._(index, text, this);
-    _onTextInserted.add(insertEvent);
-    _emitChangedEvent([insertEvent]);
+    _emitChangedEvent([_onTextInserted], [insertEvent]);
   }
   // TODO implement references
   IndexReference registerReference(int index, bool canBeDeleted) => null;
@@ -46,8 +44,7 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     _string = "${_string.substring(0, startIndex)}${_string.substring(endIndex)}";
     // add event to stream
     var deleteEvent = new LocalTextDeletedEvent._(startIndex, removed, this);
-    _onTextDeleted.add(deleteEvent);
-    _emitChangedEvent([deleteEvent]);
+    _emitChangedEvent([_onTextDeleted], [deleteEvent]);
   }
   void set text(String text) {
     // TODO implement better algorithm
@@ -57,11 +54,7 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     // add event to stream
     var deleteEvent = new LocalTextDeletedEvent._(0, oldString, this);
     var insertEvent = new LocalTextInsertedEvent._(0, text, this);
-    _onTextDeleted.add(deleteEvent);
-    _onTextInserted.add(insertEvent);
-    // TODO is there something fancy we can do with the transformer and a pipe to combine these
-    // TODO instead of littering them through the methods like this?
-    _emitChangedEvent([deleteEvent, insertEvent]);
+    _emitChangedEvent([_onTextDeleted, _onTextInserted], [deleteEvent, insertEvent]);
   }
 
   Stream<LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;

@@ -29,8 +29,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     // add event to stream
     // TODO might still be worth checking for listener to save on these
     var event = new LocalValuesSetEvent._(index, [value], [oldValue], this);
-    _onValuesSet.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesSet], [event]);
   }
 
   List<E> asArray() => _list;
@@ -41,16 +40,14 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     _list.clear();
     // add event to stream
     var event = new LocalValuesRemovedEvent._(0,list, this);
-    _onValuesRemoved.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesRemoved], [event]);
   }
 
   void insert(int index, E value) {
     _list.insert(index, value);
     // add event to stream
     var event = new LocalValuesAddedEvent._(index, [value], this);
-    _onValuesAdded.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesAdded],[event]);
   }
 
   void insertAll(int index, List<E> values) {
@@ -58,8 +55,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     // add event to stream
     // TODO clone values?
     var event = new LocalValuesAddedEvent._(index, values, this);
-    _onValuesAdded.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesAdded], [event]);
   }
 
   // TODO anything with comparator?
@@ -90,8 +86,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
     var event = new LocalValuesAddedEvent._(_list.length - 1, [value], this);
-    _onValuesAdded.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesAdded], [event]);
     return _list.length;
   }
 
@@ -100,8 +95,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
     var event = new LocalValuesAddedEvent._(_list.length - values.length, values, this);
-    _onValuesAdded.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesAdded], [event]);
   }
 
   IndexReference registerReference(int index, bool canBeDeleted) {
@@ -113,8 +107,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     var removed = _list.removeAt(index);
     // add event to stream
     var event = new LocalValuesRemovedEvent._(index, [removed], this);
-    _onValuesRemoved.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesRemoved], [event]);
   }
 
   void removeRange(int startIndex, int endIndex) {
@@ -124,8 +117,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     _list.removeRange(startIndex, endIndex);
     // add event to stream
     var event = new LocalValuesRemovedEvent._(startIndex, removed, this);
-    _onValuesRemoved.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesRemoved], [event]);
   }
 
   bool removeValue(E value) {
@@ -136,8 +128,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     if(index != -1) {
       // add to stream
       var event = new LocalValuesRemovedEvent._(index, [value], this);
-      _onValuesRemoved.add(event);
-      _emitChangedEvent([event]);
+      _emitChangedEvent([_onValuesRemoved], [event]);
     }
   }
 
@@ -149,8 +140,7 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     // add event to stream
     // TODO clone values?
     var event = new LocalValuesSetEvent._(index, values, current, this);
-    _onValuesSet.add(event);
-    _emitChangedEvent([event]);
+    _emitChangedEvent([_onValuesSet],[event]);
   }
 
   // backing field
