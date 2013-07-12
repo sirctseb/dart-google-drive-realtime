@@ -172,8 +172,11 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     // TODO do we do the same check in map?
     if(element is LocalModelObject && !_ssMap.containsKey((element as LocalModelObject).id)) {
       _ssMap[(element as LocalModelObject).id] =
-        (element as LocalModelObject).onObjectChanged.listen((e) {
+        (element as LocalModelObject)._onPostObjectChanged.listen((e) {
+          // fire on normal object changed stream
           _onObjectChanged.add(e);
+          // fire on propogation stream
+          _onPostObjectChangedController.add(e);
         });
     }
   }

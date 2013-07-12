@@ -33,6 +33,12 @@ class LocalModelObject implements rt.CollaborativeObject {
   StreamController<LocalObjectChangedEvent> _onObjectChanged
     = new StreamController<LocalObjectChangedEvent>.broadcast(sync: true);
   Stream<LocalObjectChangedEvent> get onObjectChanged => _onObjectChanged.stream;
+  // a separate stream to which object changed events are sent after they are
+  // send to _onObjectChanged. this is to propogate up in the correct order
+  // TODO there's almost certainly a better way to do this
+  StreamController<LocalObjectChangedEvent> _onPostObjectChangedController
+    = new StreamController<LocalObjectChangedEvent>.broadcast(sync: true);
+  Stream<LocalObjectChangedEvent> get _onPostObjectChanged => _onPostObjectChangedController.stream;
 
   // TODO implement custom objects
   Stream<rt.ValueChangedEvent> get onValueChanged => null; // TODO implement this getter
@@ -47,6 +53,8 @@ class LocalModelObject implements rt.CollaborativeObject {
 
   // create an emit a LocalObjectChangedEvent from a list of events
   void _emitChangedEvent(List<LocalUndoableEvent> events) {
-    _onObjectChanged.add(new LocalObjectChangedEvent._(events,this));
+    var event = new LocalObjectChangedEvent._(events,this);
+    _onObjectChanged.add(event);
+    _onPostObjectChangedController.add(event);
   }
 }

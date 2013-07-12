@@ -36,8 +36,11 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
     // propagate changes on model data objects
     // TODO pipe?
     if(value is LocalModelObject) {
-      _ssMap[key] = (value as LocalModelObject).onObjectChanged.listen((e) {
+      _ssMap[key] = (value as LocalModelObject)._onPostObjectChanged.listen((e) {
+        // fire normal change event
         _onObjectChanged.add(e);
+        // fire on propagation stream
+        _onPostObjectChangedController.add(e);
       });
     }
   }
