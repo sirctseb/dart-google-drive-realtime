@@ -29,14 +29,14 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     // add event to stream
     var insertEvent = new LocalTextInsertedEvent._(_string.length - text.length, text, this);
     _onTextInserted.add(insertEvent);
-    _onObjectChanged.add(new LocalObjectChangedEvent._([insertEvent], this));
+    _emitChangedEvent([insertEvent]);
   }
   String get text => _string;
   void insertString(int index, String text) {
     _string = "${_string.substring(0, index)}$text${_string.substring(index)}";
     var insertEvent = new LocalTextInsertedEvent._(index, text, this);
     _onTextInserted.add(insertEvent);
-    _onObjectChanged.add(new LocalObjectChangedEvent._([insertEvent], this));
+    _emitChangedEvent([insertEvent]);
   }
   // TODO implement references
   IndexReference registerReference(int index, bool canBeDeleted) => null;
@@ -47,7 +47,7 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     // add event to stream
     var deleteEvent = new LocalTextDeletedEvent._(startIndex, removed, this);
     _onTextDeleted.add(deleteEvent);
-    _onObjectChanged.add(new LocalObjectChangedEvent._([deleteEvent], this));
+    _emitChangedEvent([deleteEvent]);
   }
   void set text(String text) {
     // TODO implement better algorithm
@@ -61,7 +61,7 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     _onTextInserted.add(insertEvent);
     // TODO is there something fancy we can do with the transformer and a pipe to combine these
     // TODO instead of littering them through the methods like this?
-    _onObjectChanged.add(new LocalObjectChangedEvent._([deleteEvent, insertEvent], this));
+    _emitChangedEvent([deleteEvent, insertEvent]);
   }
 
   Stream<LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;

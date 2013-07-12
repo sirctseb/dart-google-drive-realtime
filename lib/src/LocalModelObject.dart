@@ -44,4 +44,9 @@ class LocalModelObject implements rt.CollaborativeObject {
   static String get nextId => (_idNum++).toString();
 
   LocalModelObject() : id = nextId;
+
+  // create an emit a LocalObjectChangedEvent from a list of events
+  void _emitChangedEvent(List<LocalUndoableEvent> events) {
+    _onObjectChanged.add(new LocalObjectChangedEvent._(events,this));
+  }
 }
