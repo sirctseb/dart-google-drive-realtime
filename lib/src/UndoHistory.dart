@@ -28,18 +28,19 @@ abstract class LocalUndoableEvent extends LocalEvent {
 /** [UndoHistory] manages the history of actions performed in the app */
 class UndoHistory {
   /** The list of actions in the undo history */
-  List<List<LocalUndoableEvent>> _history = [];
+  List<List<LocalUndoableEvent>> _history = [[]];
 
   /// The current index into the undo history.
-  int _index = -1;
+  int _index = 0;
 
   // Add a list of events to the current undo index
-  void _addUndoEvents(List<LocalUndoableEvent> events, {bool newSet: false}) {
-    if(newSet) {
+  void _addUndoEvents(Iterable<LocalUndoableEvent> events, {bool terminateSet: false, bool prepend: true}) {
+    _history[_index].addAll(events);
+    if(terminateSet) {
       _history.add([]);
       _index++;
+      LocalObjectChangedEvent._terminalEvent = null;
     }
-    _history[_index].addAll(events);
   }
 
   bool _undoLatch = false;
@@ -48,14 +49,13 @@ class UndoHistory {
     root.onObjectChanged.listen((LocalObjectChangedEvent e) {
       if(_undoLatch) {
         // if undoing, add inverse of events to history
-        _addUndoEvents(e.events);
+        _addUndoEvents(e.events, prepend: true);
       } else if(_undoLatch) {
         // if redoing, add events to history
-        _addUndoEvents(e.events);
+        _addUndoEvents(e.events, prepend: true);
       } else {
         // add event to current undo set
-        _addUndoEvents(e.events, newSet: true);//e._undoSetRoot);
-        // TODO if new undo set, truncate history after this
+        _addUndoEvents(e.events, terminateSet: LocalObjectChangedEvent._terminalEvent == e);
       }
     });
   }
@@ -63,22 +63,22 @@ class UndoHistory {
   void undo() {
     // set undo latch
     _undoLatch = true;
+//    print("index is currently $_index and we are undoing");
+    // decrement index
+    _index--;
     // save current events
     var current = _history[_index];
     // put empty list in place
     _history[_index] = [];
     // undo events
-    current.reversed.forEach((e) => e._undo());
-    // decrement index
-    _index--;
+    current.forEach((e) => e._undo());
     // unset undo latch
     _undoLatch = false;
+    LocalObjectChangedEvent._terminalEvent = null;
   }
   void redo() {
     // set redo latch
     _redoLatch = true;
-    // increment index
-    _index++;
     // save current events
     var current = _history[_index];
     // put empty list in place
@@ -88,8 +88,11 @@ class UndoHistory {
     // TODO are events instigated by undo calls, so they are the inverse of what
     // TODO The original events were. this is not obvious and we should consider
     // TODO changing it to make it clearer
-    current.reversed.forEach((e) => e._undo());
+    current.forEach((e) => e._undo());
+    // increment index
+    _index++;
     // uset redo latch
     _redoLatch = false;
+    LocalObjectChangedEvent._terminalEvent = null;
   }
 }
