@@ -81,7 +81,7 @@ class UndoHistory {
     // save current events
     var current = _history[_index];
     // put empty list in place
-    _history[_index];
+    _history[_index] = [];
     // redo events
     // TODO we call undo instead of redo because the events in the list
     // TODO are events instigated by undo calls, so they are the inverse of what
