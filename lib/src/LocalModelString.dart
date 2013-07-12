@@ -25,14 +25,12 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   int get length => _string.length;
 
   void append(String text) {
-    _string = "${_string}$text";
     // add event to stream
-    var insertEvent = new LocalTextInsertedEvent._(_string.length - text.length, text, this);
+    var insertEvent = new LocalTextInsertedEvent._(_string.length, text, this);
     _emitChangedEvent([_onTextInserted], [insertEvent]);
   }
   String get text => _string;
   void insertString(int index, String text) {
-    _string = "${_string.substring(0, index)}$text${_string.substring(index)}";
     var insertEvent = new LocalTextInsertedEvent._(index, text, this);
     _emitChangedEvent([_onTextInserted], [insertEvent]);
   }
@@ -41,18 +39,14 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   void removeRange(int startIndex, int endIndex) {
     // get removed text for event
     var removed = _string.substring(startIndex, endIndex);
-    _string = "${_string.substring(0, startIndex)}${_string.substring(endIndex)}";
     // add event to stream
     var deleteEvent = new LocalTextDeletedEvent._(startIndex, removed, this);
     _emitChangedEvent([_onTextDeleted], [deleteEvent]);
   }
   void set text(String text) {
-    // TODO implement better algorithm
-    var oldString = _string;
-    _string = text;
     // trivial edit decomposition algorithm
     // add event to stream
-    var deleteEvent = new LocalTextDeletedEvent._(0, oldString, this);
+    var deleteEvent = new LocalTextDeletedEvent._(0, _string, this);
     var insertEvent = new LocalTextInsertedEvent._(0, text, this);
     _emitChangedEvent([_onTextDeleted, _onTextInserted], [deleteEvent, insertEvent]);
   }
@@ -65,6 +59,18 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     if(initialValue != null) {
       // don't emit events
       _string = initialValue;
+    }
+  }
+
+  void _executeEvent(LocalUndoableEvent event) {
+    // handle insert and delete events
+    // TODO deal with type warnings
+    if(event.type == ModelEventType.TEXT_DELETED.value) {
+        _string = "${_string.substring(0, event.index)}${_string.substring(event.index + event.text.length)}";
+    } else if(event.type == ModelEventType.TEXT_INSERTED.value) {
+        _string = "${_string.substring(0, event.index)}${event.text}${_string.substring(event.index)}";
+    } else {
+        super._executeEvent(event);
     }
   }
 

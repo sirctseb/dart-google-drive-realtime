@@ -22,26 +22,9 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   @override V operator [](String key) => _map[key];
   // TODO event
   @override void operator []=(String key, V value) {
-    // get the old value
-    var oldValue = this[key];
-    _map[key] = value;
     // send the event
-    var event = new LocalValueChangedEvent._(value, oldValue, key, this);
+    var event = new LocalValueChangedEvent._(value, _map[key], key, this);
     _emitChangedEvent([_onValueChanged], [event]);
-    // stop propagating changes if we're writing over a model object
-    if(_ssMap.containsKey(key)) {
-      _ssMap[key].cancel();
-    }
-    // propagate changes on model data objects
-    // TODO pipe?
-    if(value is LocalModelObject) {
-      _ssMap[key] = (value as LocalModelObject)._onPostObjectChanged.listen((e) {
-        // fire normal change event
-        _onObjectChanged.add(e);
-        // fire on propagation stream
-        _onPostObjectChangedController.add(e);
-      });
-    }
   }
 
   void clear() {
@@ -52,15 +35,8 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   @override V remove(String key) {
     // create the event
     var event = new LocalValueChangedEvent._(null, _map[key], key, this);
-    // do the remove
-    _map.remove(key);
     // send the event
     _emitChangedEvent([_onValueChanged], [event]);
-    // stop propagating changes if we're writing over a model object
-    if(_ssMap.containsKey(key)) {
-      _ssMap[key].cancel();
-      _ssMap.remove(key);
-    }
   }
   /// deprecated : use `xxx.remove(key)`
   @deprecated V delete(String key) => remove(key);
@@ -120,6 +96,31 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
           _onPostObjectChangedController.add(e);
         });
       });
+    }
+  }
+
+  void _executeEvent(LocalUndoableEvent event_in) {
+    if(event_in.type == ModelEventType.VALUE_CHANGED.value) {
+        var event = event_in as LocalValueChangedEvent;
+        // TODO are we considering null values distinct from unset values?
+        _map[event.property] = event.newValue;
+        // stop propagating changes if we're writing over a model object
+        if(_ssMap.containsKey(event.property)) {
+          _ssMap[event.property].cancel();
+          _ssMap.remove(event.property);
+        }
+        // propagate changes on model data objects
+        // TODO pipe?
+        if(event.newValue is LocalModelObject) {
+          _ssMap[event.property] = (event.newValue as LocalModelObject)._onPostObjectChanged.listen((e) {
+            // fire normal change event
+            _onObjectChanged.add(e);
+            // fire on propagation stream
+            _onPostObjectChangedController.add(e);
+          });
+        }
+    } else {
+        super._executeEvent(event_in);
     }
   }
 }

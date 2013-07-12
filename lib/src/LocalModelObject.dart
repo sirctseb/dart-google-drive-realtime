@@ -56,6 +56,8 @@ class LocalModelObject implements rt.CollaborativeObject {
     // construct change event before firing actual events
     var event = new LocalObjectChangedEvent._(events,this);
     for(int i = 0; i < events.length; i++) {
+      // execute events
+      _executeEvent(events[i]);
       // fire actual events
       controllers[i].add(events[i]);
     }
@@ -63,5 +65,9 @@ class LocalModelObject implements rt.CollaborativeObject {
     _onObjectChanged.add(event);
     // fire on propagation stream
     _onPostObjectChangedController.add(event);
+  }
+
+  void _executeEvent(LocalUndoableEvent event) {
+    // TODO implement custom objects
   }
 }

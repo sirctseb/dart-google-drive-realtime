@@ -20,38 +20,26 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
 
   void operator[]=(int index, E value) {
     if (index < 0 || index >= length) throw new RangeError.value(index);
-    // get old value
-    var oldValue = _list[index];
-
-    // set actual value
-    _list[index] = value;
-
     // add event to stream
-    // TODO might still be worth checking for listener to save on these
-    var event = new LocalValuesSetEvent._(index, [value], [oldValue], this);
+    var event = new LocalValuesSetEvent._(index, [value], [_list[index]], this);
     _emitChangedEvent([_onValuesSet], [event]);
   }
 
   List<E> asArray() => _list;
 
   void clear() {
-    // clone list
-    var list = new List.from(_list);
-    _list.clear();
     // add event to stream
-    var event = new LocalValuesRemovedEvent._(0,list, this);
+    var event = new LocalValuesRemovedEvent._(0, _list, this);
     _emitChangedEvent([_onValuesRemoved], [event]);
   }
 
   void insert(int index, E value) {
-    _list.insert(index, value);
     // add event to stream
     var event = new LocalValuesAddedEvent._(index, [value], this);
     _emitChangedEvent([_onValuesAdded],[event]);
   }
 
   void insertAll(int index, List<E> values) {
-    _list.insertAll(index, values);
     // add event to stream
     // TODO clone values?
     var event = new LocalValuesAddedEvent._(index, values, this);
@@ -82,19 +70,17 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
   Stream<rt.ValuesSetEvent> get onValuesSet => _onValuesSet.stream;
 
   int push(E value) {
-    _list.add(value);
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
-    var event = new LocalValuesAddedEvent._(_list.length - 1, [value], this);
+    var event = new LocalValuesAddedEvent._(_list.length, [value], this);
     _emitChangedEvent([_onValuesAdded], [event]);
     return _list.length;
   }
 
   void pushAll(List<E> values) {
-    _list.addAll(values);
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
-    var event = new LocalValuesAddedEvent._(_list.length - values.length, values, this);
+    var event = new LocalValuesAddedEvent._(_list.length, values, this);
     _emitChangedEvent([_onValuesAdded], [event]);
   }
 
@@ -104,27 +90,20 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
 
   // TODO this is an actual conflict with the List interface and would make it harder to implement it
   void remove(int index) {
-    var removed = _list.removeAt(index);
     // add event to stream
-    var event = new LocalValuesRemovedEvent._(index, [removed], this);
+    var event = new LocalValuesRemovedEvent._(index, [_list[index]], this);
     _emitChangedEvent([_onValuesRemoved], [event]);
   }
 
   void removeRange(int startIndex, int endIndex) {
-    // get range to return it
-    var removed = _list.sublist(startIndex, endIndex);
-    // remove from list
-    _list.removeRange(startIndex, endIndex);
     // add event to stream
-    var event = new LocalValuesRemovedEvent._(startIndex, removed, this);
+    var event = new LocalValuesRemovedEvent._(startIndex, _list.sublist(startIndex, endIndex), this);
     _emitChangedEvent([_onValuesRemoved], [event]);
   }
 
   bool removeValue(E value) {
     // get index of value for event
     int index = _list.indexOf(value);
-    // remove from list
-    _list.remove(value);
     if(index != -1) {
       // add to stream
       var event = new LocalValuesRemovedEvent._(index, [value], this);
@@ -133,13 +112,9 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
   }
 
   void replaceRange(int index, List<E> values) {
-    // get current values for event
-    var current = _list.sublist(index, index + values.length);
-    // replace values in list
-    _list.replaceRange(index, index + values.length, values);
     // add event to stream
     // TODO clone values?
-    var event = new LocalValuesSetEvent._(index, values, current, this);
+    var event = new LocalValuesSetEvent._(index, values, _list.sublist(index, index + values.length), this);
     _emitChangedEvent([_onValuesSet],[event]);
   }
 
@@ -201,4 +176,19 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     });
   }
 
+  // TODO we could alternatively listen for our own events and do the modifications there
+  void _executeEvent(LocalUndoableEvent event_in) {
+    if(event_in.type == ModelEventType.VALUES_SET.value) {
+        var event = event_in as LocalValuesSetEvent;
+        _list.setRange(event.index, event.index + event.newValues.length, event.newValues);
+    } else if(event_in.type == ModelEventType.VALUES_REMOVED.value) {
+        var event = event_in as LocalValuesRemovedEvent;
+        _list.removeRange(event.index, event.index + event.values.length);
+    } else if(event_in.type == ModelEventType.VALUES_ADDED.value) {
+        LocalValuesAddedEvent event = event_in as LocalValuesAddedEvent;
+        _list.insertAll(event.index, event.values);
+    } else {
+      super._executeEvent(event_in);
+    }
+  }
 }
