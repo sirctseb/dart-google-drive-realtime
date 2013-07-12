@@ -15,15 +15,19 @@
 part of realtime_data_model;
 
 class LocalModel implements rt.Model {
-  LocalModel() : root = new LocalModelMap();
-  
+  UndoHistory _undoHistory;
+
+  LocalModel() {
+    _undoHistory = new UndoHistory(root);
+  }
+
   // TODO need to make local event
   StreamController<rt.UndoRedoStateChangedEvent> _onUndoRedoStateChanged =
     new StreamController<rt.UndoRedoStateChangedEvent>.broadcast(sync: true);
 
   // TODO is this ever true?
   bool get isReadOnly => false;
-  
+
   // TODO need to implement undo system
   bool get canUndo => false;
   bool get canRedo => false;
@@ -32,9 +36,9 @@ class LocalModel implements rt.Model {
   // TODO also, what is beginCreationCompoundOperation
   void beginCreationCompoundOperation() {}
   void endCompoundOperation() {}
-  
-  final LocalModelMap root;
-  
+
+  final LocalModelMap root = new LocalModelMap();
+
   // TODO is this ever false?
   // TODO we should probably provide the same initialization callback method as realtime
   bool get isInitialized => true;
@@ -61,13 +65,25 @@ class LocalModel implements rt.Model {
     return map;
   }
   // TODO implement LocalModelString and return here
-  rt.CollaborativeString createString([String initialValue]) {
-    return null;
+  LocalModelString createString([String initialValue]) {
+    var string = new LocalModelString();
+    if(initialValue != null) {
+      string.text = initialValue;
+    }
+    return string;
   }
 
   // TODO implement undo/redo
-  void undo() { }
-  void redo() { }
+  void undo() {
+    // TODO check canUndo
+    // undo events
+    _undoHistory.undo();
+  }
+  void redo() {
+    // TODO check canRedo
+    // redo events
+    _undoHistory.redo();
+  }
 
   // TODO need to make local event
   Stream<rt.UndoRedoStateChangedEvent> get onUndoRedoStateChanged => _onUndoRedoStateChanged.stream;
