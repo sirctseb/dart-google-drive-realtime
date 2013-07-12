@@ -67,6 +67,14 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   Stream<LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
   Stream<LocalTextDeletedEvent> get onTextDeleted => _onTextDeleted.stream;
 
+  LocalModelString([String initialValue]) {
+    // initialize
+    if(initialValue != null) {
+      // don't emit events
+      _string = initialValue;
+    }
+  }
+
   // current string value
   String _string;
 }

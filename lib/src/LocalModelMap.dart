@@ -108,4 +108,20 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   V putIfAbsent(String key, V ifAbsent()) => Maps.putIfAbsent(this, key, ifAbsent);
 
   int get size => length;
+
+  LocalModelMap([Map initialValue]) {
+    // initialize with value
+    if(initialValue != null) {
+      // don't emit events, but do propagate changes
+      _map.addAll(initialValue);
+      _map.forEach((key,value) {
+        _ssMap[key] = (value as LocalModelObject)._onPostObjectChanged.listen((e) {
+          // fire normal change event
+          _onObjectChanged.add(e);
+          // fire on propagation stream
+          _onPostObjectChangedController.add(e);
+        });
+      });
+    }
+  }
 }

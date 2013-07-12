@@ -190,7 +190,14 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     }
   }
 
-  LocalModelList() {
+  LocalModelList([List initialValue]) {
+    // initialize with values
+    if(initialValue != null) {
+      // don't fire events but do propagate changes
+      _list.addAll(initialValue);
+      initialValue.forEach((element) => _propagateChanges(element));
+    }
+
     // listen for events to add or cancel object changed propagation
     onValuesAdded.listen((LocalValuesAddedEvent e) {
       e.values.forEach((element) => _propagateChanges(element));

@@ -50,27 +50,14 @@ class LocalModel implements rt.Model {
     return null;
   }
   LocalModelList createList([List initialValue]) {
-    // TODO take initial values in constructor
-    var list = new LocalModelList();
-    if(initialValue != null)
-      list.pushAll(initialValue);
-    return list;
+    return new LocalModelList(initialValue);
   }
   LocalModelMap createMap([Map initialValue]) {
     // TODO take initial value in constructor
-    var map = new LocalModelMap();
-    if(initialValue != null) {
-      map.addAll(initialValue);
-    }
-    return map;
+    return new LocalModelMap(initialValue);
   }
-  // TODO implement LocalModelString and return here
   LocalModelString createString([String initialValue]) {
-    var string = new LocalModelString();
-    if(initialValue != null) {
-      string.text = initialValue;
-    }
-    return string;
+    return new LocalModelString(initialValue);
   }
 
   // TODO implement undo/redo
