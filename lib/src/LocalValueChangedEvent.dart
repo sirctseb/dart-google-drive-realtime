@@ -31,12 +31,5 @@ class LocalValueChangedEvent extends LocalUndoableEvent implements rt.ValueChang
 
   LocalValueChangedEvent._(this.newValue, this.oldValue, this.property, _target) : super._(_target);
 
-  // undo the change
-  void _undo() {
-    (_target as LocalModelMap)[property] = oldValue;
-  }
-  // apply the change
-  void _redo() {
-    (_target as LocalModelMap)[property] = newValue;
-  }
+  LocalValueChangedEvent get inverse => new LocalValueChangedEvent._(oldValue, newValue, property, _target);
 }

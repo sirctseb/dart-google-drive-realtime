@@ -28,12 +28,5 @@ class LocalValuesSetEvent extends LocalUndoableEvent implements rt.ValuesSetEven
 
   LocalValuesSetEvent._(this.index, this.newValues, this.oldValues, _target) : super._(_target);
 
-  // undo the change
-  void _undo() {
-    (_target as LocalModelList).replaceRange(index, oldValues);
-  }
-  // apply the change
-  void _redo() {
-    (_target as LocalModelList).replaceRange(index, newValues);
-  }
+  LocalValuesSetEvent get inverse => new LocalValuesSetEvent._(index, oldValues, newValues, _target);
 }

@@ -25,12 +25,5 @@ class LocalTextDeletedEvent extends LocalUndoableEvent implements rt.TextDeleted
 
   LocalTextDeletedEvent._(this.index, this.text, _target) : super._(_target);
 
-  // undo the change
-  void _undo() {
-    (_target as LocalModelString).insertString(index, text);
-  }
-  // apply the change
-  void _redo() {
-    (_target as LocalModelString).removeRange(index, index + text.length);
-  }
+  LocalTextInsertedEvent get inverse => new LocalTextInsertedEvent._(index, text, _target);
 }

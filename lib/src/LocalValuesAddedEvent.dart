@@ -26,12 +26,5 @@ class LocalValuesAddedEvent extends LocalUndoableEvent implements rt.ValuesAdded
 
   LocalValuesAddedEvent._(this.index, this.values, _target) : super._(_target);
 
-  // undo the change
-  void _undo() {
-    (_target as LocalModelList).removeRange(index, index + values.length);
-  }
-  // apply the change
-  void _redo() {
-    (_target as LocalModelList).insertAll(index, values);
-  }
+  LocalValuesRemovedEvent get inverse => new LocalValuesRemovedEvent._(index, values, _target);
 }
