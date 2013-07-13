@@ -174,6 +174,10 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
       e.oldValues.forEach((element) => _stopPropagatingChanges(element));
       e.newValues.forEach((element) => _propagateChanges(element));
     });
+
+    _eventStreamControllers[ModelEventType.VALUES_SET.value] = _onValuesSet;
+    _eventStreamControllers[ModelEventType.VALUES_ADDED.value] = _onValuesAdded;
+    _eventStreamControllers[ModelEventType.VALUES_REMOVED.value] = _onValuesRemoved;
   }
 
   // TODO we could alternatively listen for our own events and do the modifications there

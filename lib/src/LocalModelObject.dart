@@ -70,4 +70,9 @@ class LocalModelObject implements rt.CollaborativeObject {
   void _executeEvent(LocalUndoableEvent event) {
     // TODO implement custom objects
   }
+
+
+  // map from event type to stream controller they go on
+  // TODO with this we don't need to pass controllers to _emitEventsAndChanged
+  Map<String, StreamController> _eventStreamControllers = {};
 }

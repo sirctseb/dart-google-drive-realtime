@@ -97,6 +97,8 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
         });
       });
     }
+
+    _eventStreamControllers[ModelEventType.VALUE_CHANGED.value] = _onValueChanged;
   }
 
   void _executeEvent(LocalUndoableEvent event_in) {

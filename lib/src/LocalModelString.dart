@@ -60,6 +60,9 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
       // don't emit events
       _string = initialValue;
     }
+
+    _eventStreamControllers[ModelEventType.TEXT_DELETED.value] = _onTextDeleted;
+    _eventStreamControllers[ModelEventType.TEXT_INSERTED.value] = _onTextInserted;
   }
 
   void _executeEvent(LocalUndoableEvent event) {
