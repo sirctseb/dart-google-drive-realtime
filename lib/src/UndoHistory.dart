@@ -35,8 +35,21 @@ class UndoHistory {
   /// The current index into the undo history.
   int _index = 0;
 
+  // true when the last object changed that wasn't from an undo or redo
+  // was a terminal change
+  bool _lastWasTerminal = false;
+  // accessor to return true if a change event is the first of a set
+  // that is not caused by an undo or redo
+  bool get _firstOfSet => _lastWasTerminal && !_undoLatch && !_redoLatch;
+
   // Add a list of events to the current undo index
   void _addUndoEvents(Iterable<LocalUndoableEvent> events, {bool terminateSet: false, bool prepend: false}) {
+    // if this is the first of a set and we're not undoing or redoing,
+    // truncate the history after this point
+    if(_firstOfSet) {
+      _history.removeRange(_index, _history.length);
+      _history.add([]);
+    }
     if(prepend) {
       _history[_index].insertAll(0, events);
     } else {
@@ -60,7 +73,8 @@ class UndoHistory {
         _addUndoEvents(e.events, prepend: true);
       } else {
         // add event to current undo set
-        _addUndoEvents(e.events, terminateSet: e._isTerminal);
+        _addUndoEvents(e.events.reversed, terminateSet: e._isTerminal);
+        _lastWasTerminal = e._isTerminal;
       }
     });
   }
