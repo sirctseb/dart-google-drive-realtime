@@ -78,5 +78,5 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   }
 
   // current string value
-  String _string;
+  String _string = "";
 }
