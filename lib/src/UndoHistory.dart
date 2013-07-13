@@ -56,7 +56,7 @@ class UndoHistory {
       if(_undoLatch) {
         // if undoing, add inverse of events to history
         _addUndoEvents(e.events, prepend: true);
-      } else if(_undoLatch) {
+      } else if(_redoLatch) {
         // if redoing, add events to history
         _addUndoEvents(e.events, prepend: true);
       } else {
