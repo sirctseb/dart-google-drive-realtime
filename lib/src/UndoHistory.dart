@@ -30,6 +30,8 @@ abstract class LocalUndoableEvent extends LocalEvent {
 /** [UndoHistory] manages the history of actions performed in the app */
 // TODO events grouped into a single object changed event are still grouped
 // TODO during undo in the realtime implementation, but are split up here
+// TODO undo state events are not in the same order with respect to other events
+// TODO as seen by client code. also rt sometimes sends two of the same events
 class UndoHistory {
   /** The list of actions in the undo history */
   List<List<LocalUndoableEvent>> _history = [[]];
