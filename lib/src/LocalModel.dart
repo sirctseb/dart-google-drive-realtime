@@ -27,8 +27,8 @@ class LocalModel implements rt.Model {
   }
 
   // TODO need to make local event
-  StreamController<rt.UndoRedoStateChangedEvent> _onUndoRedoStateChanged =
-    new StreamController<rt.UndoRedoStateChangedEvent>.broadcast(sync: true);
+  StreamController<LocalUndoRedoStateChangedEvent> _onUndoRedoStateChanged =
+    new StreamController<LocalUndoRedoStateChangedEvent>.broadcast(sync: true);
 
   // TODO is this ever true?
   bool get isReadOnly => false;
