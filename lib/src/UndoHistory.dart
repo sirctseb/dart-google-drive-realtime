@@ -40,7 +40,7 @@ class UndoHistory {
   bool _lastWasTerminal = false;
   // accessor to return true if a change event is the first of a set
   // that is not caused by an undo or redo
-  bool get _firstOfSet => _lastWasTerminal && !_undoLatch && !_redoLatch;
+  bool get _firstOfSet => _lastWasTerminal && !_undoScope && !_redoScope;
 
   // Add a list of events to the current undo index
   void _addUndoEvents(Iterable<LocalUndoableEvent> events, {bool terminateSet: false, bool prepend: false}) {
@@ -61,14 +61,14 @@ class UndoHistory {
     }
   }
 
-  bool _undoLatch = false;
-  bool _redoLatch = false;
+  bool _undoScope = false;
+  bool _redoScope = false;
   UndoHistory(LocalModelMap root) {
     root.onObjectChanged.listen((LocalObjectChangedEvent e) {
-      if(_undoLatch) {
+      if(_undoScope) {
         // if undoing, add inverse of events to history
         _addUndoEvents(e.events, prepend: true);
-      } else if(_redoLatch) {
+      } else if(_redoScope) {
         // if redoing, add events to history
         _addUndoEvents(e.events, prepend: true);
       } else {
@@ -81,7 +81,7 @@ class UndoHistory {
 
   void undo() {
     // set undo latch
-    _undoLatch = true;
+    _undoScope = true;
     // decrement index
     _index--;
     // save current events
@@ -97,11 +97,11 @@ class UndoHistory {
       e._target._onPostObjectChangedController.add(event);
     });
     // unset undo latch
-    _undoLatch = false;
+    _undoScope = false;
   }
   void redo() {
     // set redo latch
-    _redoLatch = true;
+    _redoScope = true;
     // save current events
     var inverses = _history[_index].map((e) => e.inverse).toList();
     // put empty list in place
@@ -117,7 +117,7 @@ class UndoHistory {
     // increment index
     _index++;
     // uset redo latch
-    _redoLatch = false;
+    _redoScope = false;
   }
 
   // TODO check on these definitions
