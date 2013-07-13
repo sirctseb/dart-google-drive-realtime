@@ -72,11 +72,17 @@ class UndoHistory {
     // decrement index
     _index--;
     // save current events
-    var current = _history[_index];
+    var inverses = _history[_index].map((e) => e.inverse).toList();
     // put empty list in place
     _history[_index] = [];
-    // undo events
-    current.forEach((e) => e._undo());
+    // do changes and events
+    inverses.forEach((e) => e._executeAndEmit());
+    // do object changed events
+    inverses.forEach((e) {
+      var event = new LocalObjectChangedEvent._([e], e._target);
+      e._target._onObjectChanged.add(event);
+      e._target._onPostObjectChangedController.add(event);
+    });
     // unset undo latch
     _undoLatch = false;
     LocalObjectChangedEvent._terminalEvent = null;
@@ -85,7 +91,7 @@ class UndoHistory {
     // set redo latch
     _redoLatch = true;
     // save current events
-    var current = _history[_index];
+    var inverses = _history[_index].map((e) => e.inverse).toList();
     // put empty list in place
     _history[_index] = [];
     // redo events
@@ -93,7 +99,13 @@ class UndoHistory {
     // TODO are events instigated by undo calls, so they are the inverse of what
     // TODO The original events were. this is not obvious and we should consider
     // TODO changing it to make it clearer
-    current.forEach((e) => e._undo());
+    inverses.forEach((e) => e._executeAndEmit());
+    // do object changed events
+    inverses.forEach((e) {
+      var event = new LocalObjectChangedEvent._([e], e._target);
+      e._target._onObjectChanged.add(event);
+      e._target._onPostObjectChangedController.add(event);
+    });
     // increment index
     _index++;
     // uset redo latch
