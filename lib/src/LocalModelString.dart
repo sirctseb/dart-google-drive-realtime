@@ -69,11 +69,11 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     // handle insert and delete events
     // TODO deal with type warnings
     if(event.type == ModelEventType.TEXT_DELETED.value) {
-        _string = "${_string.substring(0, event.index)}${_string.substring(event.index + event.text.length)}";
+      _string = "${_string.substring(0, event.index)}${_string.substring(event.index + event.text.length)}";
     } else if(event.type == ModelEventType.TEXT_INSERTED.value) {
-        _string = "${_string.substring(0, event.index)}${event.text}${_string.substring(event.index)}";
+      _string = "${_string.substring(0, event.index)}${event.text}${_string.substring(event.index)}";
     } else {
-        super._executeEvent(event);
+      super._executeEvent(event);
     }
   }
 
