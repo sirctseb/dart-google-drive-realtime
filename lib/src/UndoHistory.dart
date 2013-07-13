@@ -17,12 +17,14 @@ part of realtime_data_model;
 /// A [LocalEvent] that can be undone
 // TODO put in it's own file?
 abstract class LocalUndoableEvent extends LocalEvent {
-  // apply the inverse of the change the event represents
-  void _undo();
-  // apply the change the event represents
-  void _redo();
+  // create an event that performs the opposite of this
+  LocalUndoableEvent get inverse;
 
   LocalUndoableEvent._(_target) : super._(_target);
+
+  void _executeAndEmit() {
+    _target._executeAndEmitEvent(this);
+  }
 }
 
 /** [UndoHistory] manages the history of actions performed in the app */
