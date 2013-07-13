@@ -36,8 +36,12 @@ class UndoHistory {
   int _index = 0;
 
   // Add a list of events to the current undo index
-  void _addUndoEvents(Iterable<LocalUndoableEvent> events, {bool terminateSet: false, bool prepend: true}) {
-    _history[_index].addAll(events);
+  void _addUndoEvents(Iterable<LocalUndoableEvent> events, {bool terminateSet: false, bool prepend: false}) {
+    if(prepend) {
+      _history[_index].insertAll(0, events);
+    } else {
+      _history[_index].addAll(events);
+    }
     if(terminateSet) {
       _history.add([]);
       _index++;
