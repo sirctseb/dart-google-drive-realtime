@@ -29,4 +29,10 @@ class LocalIndexReference extends LocalModelObject implements rt.IndexReference 
 
   StreamController<LocalReferenceShiftedEvent> _onReferenceShifted
     = new StreamController<LocalReferenceShiftedEvent>.broadcast(sync: true);
+
+  // update index and send event for a shift
+  void _shift(int delta) {
+    index += delta;
+    _onReferenceShifted.add(new LocalReferenceShiftedEvent._(index, index - delta, referencedObject));
+  }
 }
