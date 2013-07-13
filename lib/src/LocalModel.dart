@@ -29,8 +29,8 @@ class LocalModel implements rt.Model {
   bool get isReadOnly => false;
 
   // TODO need to implement undo system
-  bool get canUndo => false;
-  bool get canRedo => false;
+  bool get canUndo => _undoHistory.canUndo;
+  bool get canRedo => _undoHistory.canRedo;
 
   // TODO need to implement compound operations. meaningful for undo/redo
   // TODO also, what is beginCreationCompoundOperation

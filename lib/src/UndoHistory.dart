@@ -93,10 +93,6 @@ class UndoHistory {
     // put empty list in place
     _history[_index] = [];
     // redo events
-    // TODO we call undo instead of redo because the events in the list
-    // TODO are events instigated by undo calls, so they are the inverse of what
-    // TODO The original events were. this is not obvious and we should consider
-    // TODO changing it to make it clearer
     inverses.forEach((e) => e._executeAndEmit());
     // do object changed events
     inverses.forEach((e) {
@@ -109,4 +105,8 @@ class UndoHistory {
     // uset redo latch
     _redoLatch = false;
   }
+
+  // TODO check on these definitions
+  bool get canUndo => _index > 0;
+  bool get canRedo => _index < _history.length - 1;
 }
