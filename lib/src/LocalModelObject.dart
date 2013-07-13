@@ -51,10 +51,16 @@ class LocalModelObject implements rt.CollaborativeObject {
 
   LocalModelObject() : id = nextId;
 
+  static bool _inEmitEventsAndChangedScope = false;
+
   // create an emit a LocalObjectChangedEvent from a list of events
   void _emitEventsAndChanged(List<StreamController> controllers, List<LocalUndoableEvent> events) {
+    bool terminal = !_inEmitEventsAndChangedScope;
+    if(terminal) {
+      _inEmitEventsAndChangedScope = true;
+    }
     // construct change event before firing actual events
-    var event = new LocalObjectChangedEvent._(events,this);
+    var event = new LocalObjectChangedEvent._(events,this,terminal);
     for(int i = 0; i < events.length; i++) {
       // execute events
       _executeEvent(events[i]);
@@ -65,6 +71,9 @@ class LocalModelObject implements rt.CollaborativeObject {
     _onObjectChanged.add(event);
     // fire on propagation stream
     _onPostObjectChangedController.add(event);
+    if(terminal) {
+      _inEmitEventsAndChangedScope = false;
+    }
   }
   void _executeAndEmitEvent(LocalUndoableEvent event) {
     // make change

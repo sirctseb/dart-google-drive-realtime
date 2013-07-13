@@ -45,7 +45,6 @@ class UndoHistory {
     if(terminateSet) {
       _history.add([]);
       _index++;
-      LocalObjectChangedEvent._terminalEvent = null;
     }
   }
 
@@ -61,7 +60,7 @@ class UndoHistory {
         _addUndoEvents(e.events, prepend: true);
       } else {
         // add event to current undo set
-        _addUndoEvents(e.events, terminateSet: LocalObjectChangedEvent._terminalEvent == e);
+        _addUndoEvents(e.events, terminateSet: e._isTerminal);
       }
     });
   }
@@ -85,7 +84,6 @@ class UndoHistory {
     });
     // unset undo latch
     _undoLatch = false;
-    LocalObjectChangedEvent._terminalEvent = null;
   }
   void redo() {
     // set redo latch
@@ -110,6 +108,5 @@ class UndoHistory {
     _index++;
     // uset redo latch
     _redoLatch = false;
-    LocalObjectChangedEvent._terminalEvent = null;
   }
 }
