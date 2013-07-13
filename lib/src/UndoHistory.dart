@@ -63,11 +63,14 @@ class UndoHistory {
     }
   }
 
+  LocalModel model;
+
   bool _undoScope = false;
   bool _redoScope = false;
   bool _initScope = false;
-  UndoHistory(LocalModelMap root) {
-    root.onObjectChanged.listen((LocalObjectChangedEvent e) {
+
+  UndoHistory(LocalModel this.model) {
+    model.root.onObjectChanged.listen((LocalObjectChangedEvent e) {
       if(_initScope) {
         // don't add to undo history in initialization
       } else if(_undoScope) {

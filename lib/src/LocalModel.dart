@@ -20,7 +20,7 @@ class LocalModel implements rt.Model {
   // TODO sit would be better to include Document in the interface
   // TODO and have the model created automatically with the same callback style
   LocalModel([initialize]) {
-    _undoHistory = new UndoHistory(root);
+    _undoHistory = new UndoHistory(this);
     if(initialize != null) {
       _undoHistory.initializeModel(initialize, this);
     }
