@@ -80,9 +80,19 @@ class UndoHistory {
         // if redoing, add events to history
         _addUndoEvents(e.events, prepend: true);
       } else {
+        // store current undo/redo state
+        bool _canUndo = canUndo;
+        bool _canRedo = canRedo;
+
         // add event to current undo set
         _addUndoEvents(e.events.reversed, terminateSet: e._isTerminal);
         _lastWasTerminal = e._isTerminal;
+
+        // if undo/redo state changed, send event
+        if(_canUndo != canUndo || _canRedo != canRedo) {
+          model._onUndoRedoStateChanged.add(
+              new LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
+        }
       }
     });
   }
@@ -95,6 +105,10 @@ class UndoHistory {
   }
 
   void undo() {
+    // store current undo/redo state
+    bool _canUndo = canUndo;
+    bool _canRedo = canRedo;
+
     // set undo latch
     _undoScope = true;
     // decrement index
@@ -113,8 +127,18 @@ class UndoHistory {
     });
     // unset undo latch
     _undoScope = false;
+
+    // if undo/redo state changed, send event
+    if(_canUndo != canUndo || _canRedo != canRedo) {
+      model._onUndoRedoStateChanged.add(
+        new LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
+    }
   }
   void redo() {
+    // store current undo/redo state
+    bool _canUndo = canUndo;
+    bool _canRedo = canRedo;
+
     // set redo latch
     _redoScope = true;
     // save current events
@@ -133,6 +157,12 @@ class UndoHistory {
     _index++;
     // uset redo latch
     _redoScope = false;
+
+    // if undo/redo state changed, send event
+    if(_canUndo != canUndo || _canRedo != canRedo) {
+      model._onUndoRedoStateChanged.add(
+        new LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
+    }
   }
 
   // TODO check on these definitions
