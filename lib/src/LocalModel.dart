@@ -17,8 +17,11 @@ part of realtime_data_model;
 class LocalModel implements rt.Model {
   UndoHistory _undoHistory;
 
-  LocalModel() {
+  LocalModel([initialize]) {
     _undoHistory = new UndoHistory(root);
+    if(initialize != null) {
+      _undoHistory.initializeModel(initialize, this);
+    }
   }
 
   // TODO need to make local event

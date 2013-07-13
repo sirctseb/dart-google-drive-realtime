@@ -63,9 +63,12 @@ class UndoHistory {
 
   bool _undoScope = false;
   bool _redoScope = false;
+  bool _initScope = false;
   UndoHistory(LocalModelMap root) {
     root.onObjectChanged.listen((LocalObjectChangedEvent e) {
-      if(_undoScope) {
+      if(_initScope) {
+        // don't add to undo history in initialization
+      } else if(_undoScope) {
         // if undoing, add inverse of events to history
         _addUndoEvents(e.events, prepend: true);
       } else if(_redoScope) {
@@ -77,6 +80,13 @@ class UndoHistory {
         _lastWasTerminal = e._isTerminal;
       }
     });
+  }
+
+  void initializeModel(initialize, LocalModel m) {
+    // call initialization callback with _initScope set to true
+    _initScope = true;
+    initialize(m);
+    _initScope = false;
   }
 
   void undo() {
