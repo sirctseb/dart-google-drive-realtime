@@ -17,6 +17,8 @@ part of realtime_data_model;
 class LocalModel implements rt.Model {
   UndoHistory _undoHistory;
 
+  // TODO sit would be better to include Document in the interface
+  // TODO and have the model created automatically with the same callback style
   LocalModel([initialize]) {
     _undoHistory = new UndoHistory(root);
     if(initialize != null) {
