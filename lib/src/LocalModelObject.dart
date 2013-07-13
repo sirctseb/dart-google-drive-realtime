@@ -66,6 +66,12 @@ class LocalModelObject implements rt.CollaborativeObject {
     // fire on propagation stream
     _onPostObjectChangedController.add(event);
   }
+  void _executeAndEmitEvent(LocalUndoableEvent event) {
+    // make change
+    _executeEvent(event);
+    // emit event
+    _eventStreamControllers[event.type].add(event);
+  }
 
   void _executeEvent(LocalUndoableEvent event) {
     // TODO implement custom objects
