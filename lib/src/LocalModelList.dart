@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList <E> {
+class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.CollaborativeList <E> {
 
   E operator[](int index) => _list[index];
 
@@ -82,10 +82,6 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
     // TODO make sure this is the index provided when inserting at the end
     var event = new LocalValuesAddedEvent._(_list.length, values, this);
     _emitEventsAndChanged([_onValuesAdded], [event]);
-  }
-
-  IndexReference registerReference(int index, bool canBeDeleted) {
-    // TODO implement this method
   }
 
   // TODO this is an actual conflict with the List interface and would make it harder to implement it
@@ -187,10 +183,16 @@ class LocalModelList<E> extends LocalModelObject implements rt.CollaborativeList
         _list.setRange(event.index, event.index + event.newValues.length, event.newValues);
     } else if(event_in.type == ModelEventType.VALUES_REMOVED.value) {
         var event = event_in as LocalValuesRemovedEvent;
+        // update list
         _list.removeRange(event.index, event.index + event.values.length);
+        // update references
+        _shiftReferencesOnDelete(event.index, event.values.length);
     } else if(event_in.type == ModelEventType.VALUES_ADDED.value) {
         LocalValuesAddedEvent event = event_in as LocalValuesAddedEvent;
+        // update list
         _list.insertAll(event.index, event.values);
+        // update references
+        _shiftReferencesOnInsert(event.index, event.values.length);
     } else {
       super._executeEvent(event_in);
     }
