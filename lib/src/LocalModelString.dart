@@ -34,8 +34,13 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     var insertEvent = new LocalTextInsertedEvent._(index, text, this);
     _emitEventsAndChanged([_onTextInserted], [insertEvent]);
   }
-  // TODO implement references
-  IndexReference registerReference(int index, bool canBeDeleted) => null;
+  LocalIndexReference registerReference(int index, bool canBeDeleted) {
+    // create the reference
+    var ref = new LocalIndexReference._(index, canBeDeleted, this);
+    // add to list of references
+    _indexReferences.add(ref);
+    return ref;
+  }
   void removeRange(int startIndex, int endIndex) {
     // get removed text for event
     var removed = _string.substring(startIndex, endIndex);
@@ -65,18 +70,45 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     _eventStreamControllers[ModelEventType.TEXT_INSERTED.value] = _onTextInserted;
   }
 
-  void _executeEvent(LocalUndoableEvent event) {
+  void _executeEvent(LocalUndoableEvent event_in) {
     // handle insert and delete events
     // TODO deal with type warnings
-    if(event.type == ModelEventType.TEXT_DELETED.value) {
+    if(event_in.type == ModelEventType.TEXT_DELETED.value) {
+      var event = event_in as LocalTextDeletedEvent;
       _string = "${_string.substring(0, event.index)}${_string.substring(event.index + event.text.length)}";
-    } else if(event.type == ModelEventType.TEXT_INSERTED.value) {
+      // check for reference shifts
+      _indexReferences.forEach((LocalIndexReference ref) {
+        // if index is to the right of deletion, shift by deleted length
+        if(ref.index >= event.index + event.text.length) {
+          ref._shift(ref.index-event.text.length);
+        } else if(ref.index >= event.index) {
+          if(ref.canBeDeleted) {
+            // if within deleted segment and can be deleted, set to -1
+            ref._shift(-1);
+          } else {
+            // otherwise set to index at beginning of deleted segment
+            ref._shift(event.index);
+          }
+        }
+      });
+    } else if(event_in.type == ModelEventType.TEXT_INSERTED.value) {
+      var event = event_in as LocalTextInsertedEvent;
       _string = "${_string.substring(0, event.index)}${event.text}${_string.substring(event.index)}";
+      // check for reference shifts
+      _indexReferences.forEach((LocalIndexReference ref) {
+        // if index is to the right on insert index, increase reference
+        if(ref.index >= event.index) {
+          ref._shift(ref.index + event.text.length);
+        }
+      });
     } else {
-      super._executeEvent(event);
+      super._executeEvent(event_in);
     }
   }
 
   // current string value
   String _string = "";
+
+  // list of index references to this string
+  List<LocalIndexReference> _indexReferences = [];
 }
