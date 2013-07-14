@@ -1,4 +1,4 @@
-// Copyright (c) 2013, Alexandre Ardhuin
+// Copyright (c) 2013, Christopher Best
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class LocalModelString extends LocalModelObject implements rt.CollaborativeString {
+class LocalModelString extends LocalIndexReferenceContainer implements rt.CollaborativeString {
 
   // TODO need local events
   StreamController<LocalTextInsertedEvent> _onTextInserted
@@ -33,13 +33,6 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
   void insertString(int index, String text) {
     var insertEvent = new LocalTextInsertedEvent._(index, text, this);
     _emitEventsAndChanged([_onTextInserted], [insertEvent]);
-  }
-  LocalIndexReference registerReference(int index, bool canBeDeleted) {
-    // create the reference
-    var ref = new LocalIndexReference._(index, canBeDeleted, this);
-    // add to list of references
-    _indexReferences.add(ref);
-    return ref;
   }
   void removeRange(int startIndex, int endIndex) {
     // get removed text for event
@@ -75,32 +68,16 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
     // TODO deal with type warnings
     if(event_in.type == ModelEventType.TEXT_DELETED.value) {
       var event = event_in as LocalTextDeletedEvent;
+      // update string
       _string = "${_string.substring(0, event.index)}${_string.substring(event.index + event.text.length)}";
-      // check for reference shifts
-      _indexReferences.forEach((LocalIndexReference ref) {
-        // if index is to the right of deletion, shift by deleted length
-        if(ref.index >= event.index + event.text.length) {
-          ref._shift(ref.index-event.text.length);
-        } else if(ref.index >= event.index) {
-          if(ref.canBeDeleted) {
-            // if within deleted segment and can be deleted, set to -1
-            ref._shift(-1);
-          } else {
-            // otherwise set to index at beginning of deleted segment
-            ref._shift(event.index);
-          }
-        }
-      });
+      // update references
+      _shiftReferencesOnDelete(event.index, event.text.length);
     } else if(event_in.type == ModelEventType.TEXT_INSERTED.value) {
       var event = event_in as LocalTextInsertedEvent;
+      // update string
       _string = "${_string.substring(0, event.index)}${event.text}${_string.substring(event.index)}";
-      // check for reference shifts
-      _indexReferences.forEach((LocalIndexReference ref) {
-        // if index is to the right on insert index, increase reference
-        if(ref.index >= event.index) {
-          ref._shift(ref.index + event.text.length);
-        }
-      });
+      // update references
+      _shiftReferencesOnInsert(event.index, event.text.length);
     } else {
       super._executeEvent(event_in);
     }
@@ -108,7 +85,4 @@ class LocalModelString extends LocalModelObject implements rt.CollaborativeStrin
 
   // current string value
   String _string = "";
-
-  // list of index references to this string
-  List<LocalIndexReference> _indexReferences = [];
 }
