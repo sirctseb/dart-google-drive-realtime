@@ -22,11 +22,11 @@ dynamic promoteProxy(dynamic object) {
   if(object is js.Proxy) {
     var realtimeNamespace = js.context['gapi']['drive']['realtime'];
     if(js.instanceof(object, realtimeNamespace['CollaborativeMap'])) {
-      return RealtimeMap.cast(object, RealtimeModel._typedTranslator);
+      return new RealtimeMap._fromProxy(object, RealtimeModel._typedTranslator);
     } else if(js.instanceof(object, realtimeNamespace['CollaborativeList'])) {
-      return RealtimeList.cast(object, RealtimeModel._typedTranslator);
+      return new RealtimeList._fromProxy(object, RealtimeModel._typedTranslator);
     } else if(js.instanceof(object, realtimeNamespace['CollaborativeString'])) {
-      return RealtimeString.cast(object);
+      return new RealtimeString._fromProxy(object);
     } else if(js.instanceof(object, js.context['Array'])
                || js.instanceof(object, js.context['Object'])) {
       return json.parse(js.context['JSON']['stringify'](object));
