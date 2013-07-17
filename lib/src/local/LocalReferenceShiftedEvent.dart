@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of realtime_data_model;
+part of local_realtime_data_model;
 
 class LocalReferenceShiftedEvent extends LocalEvent implements rt.ReferenceShiftedEvent {
   bool get bubbles => null; // TODO implement this getter

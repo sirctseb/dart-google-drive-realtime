@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of realtime_data_model;
+part of local_realtime_data_model;
 
 // as a shortcut to defining a separate interface with two subclasses for realtime and local,
 // we can just implement the realtime interface if it doesn't require special realtime members

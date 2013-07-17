@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of realtime_data_model;
+part of local_realtime_data_model;
 
 class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V> {
   // TODO add promotes back in here
