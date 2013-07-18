@@ -16,11 +16,13 @@ library local_realtime_data_model;
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:json' as json;
 
 import 'package:google_drive_realtime/google_drive_realtime.dart' as rt;
 import 'package:js/js.dart' as js;
 import 'package:meta/meta.dart';
 
+part 'LocalDocument.dart';
 part 'LocalEvent.dart';
 part 'LocalIndexReference.dart';
 part 'LocalIndexReferenceContainer.dart';
