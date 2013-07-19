@@ -36,6 +36,7 @@ part 'LocalModelObject.dart';
 part 'LocalModelString.dart';
 part 'LocalObjectChangedEvent.dart';
 part 'LocalReferenceShiftedEvent.dart';
+part 'LocalRetainable.dart';
 part 'LocalTextDeletedEvent.dart';
 part 'LocalTextInsertedEvent.dart';
 part 'LocalUndoRedoStateChangedEvent.dart';

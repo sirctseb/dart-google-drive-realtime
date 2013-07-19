@@ -14,24 +14,8 @@
 
 part of local_realtime_data_model;
 
-abstract class LocalEvent extends LocalRetainable implements rt.BaseModelEvent {
-  /// Local events have no js Proxy object
-  final js.Proxy $unsafe = null;
-
-  /// Local events are always isLocal
-  final bool isLocal = true;
-
-  /// Local events have no session
-  final String sessionId = null;
-
-  /// Local events have no js Proxy object
-  dynamic toJs() => null;
-
-  /// Local events have no user
-  final String userId = null;
-
-  // the object that generated the event
-  final LocalModelObject _target;
-
-  LocalEvent._(this._target);
+/// Local implementation of retain and release
+class LocalRetainable implements rdm.Retainable {
+  void retain() {}
+  void release() {}
 }
