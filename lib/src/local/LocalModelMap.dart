@@ -104,8 +104,13 @@ class LocalModelMap<V> extends LocalModelObject implements rdm.RealtimeMap<V> {
   void _executeEvent(LocalUndoableEvent event_in) {
     if(event_in.type == ModelEventType.VALUE_CHANGED.value) {
         var event = event_in as LocalValueChangedEvent;
-        // TODO are we considering null values distinct from unset values?
-        _map[event.property] = event.newValue;
+        // TODO what if we actually want to set to null?
+        // TODO test if rt returns length 1 or 0 with a single key set to null
+        if(event.newValue == null) {
+          _map.remove(event.property);
+        } else {
+          _map[event.property] = event.newValue;
+        }
         // stop propagating changes if we're writing over a model object
         if(_ssMap.containsKey(event.property)) {
           _ssMap[event.property].cancel();
