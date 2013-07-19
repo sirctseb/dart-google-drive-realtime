@@ -29,10 +29,19 @@ class LocalDocument implements rt.Document {
     }
   }
 
-  // TODO implement
-  Stream<rt.CollaboratorLeftEvent> get onCollaboratorLeft;
-  Stream<rt.CollaboratorJoinedEvent> get onCollaboratorJoined;
-  Stream<rt.DocumentSaveStateChangedEvent> get onDocumentSaveStateChanged;
+  // TODO do anything with collaborators?
+  StreamController<rt.CollaboratorLeftEvent> _onCollaboratorLeft = new StreamController<rt.CollaboratorLeftEvent>.broadcast();
+  StreamController<rt.CollaboratorJoinedEvent> _onCollaboratorJoined = new StreamController<rt.CollaboratorJoinedEvent>.broadcast();
+  // TODO support implementing a document supplier class to retrieve documents and give them back in json
+  StreamController<rt.DocumentSaveStateChangedEvent> _onDocumentSaveStateChanged = new StreamController<rt.DocumentSaveStateChangedEvent>.broadcast();
+  Stream<rt.CollaboratorLeftEvent> get onCollaboratorLeft => _onCollaboratorLeft.stream;
+  Stream<rt.CollaboratorJoinedEvent> get onCollaboratorJoined => _onCollaboratorJoined.stream;
+  Stream<rt.DocumentSaveStateChangedEvent> get onDocumentSaveStateChanged => _onDocumentSaveStateChanged.stream;
   
   LocalDocument(LocalModel this.model);
+
+  /// Local document has no proxy
+  final js.Proxy $unsafe = null;
+  /// Local document has no proxy
+  dynamic toJs() { return null;}
 }
