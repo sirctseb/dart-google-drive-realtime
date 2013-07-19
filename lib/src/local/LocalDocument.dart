@@ -14,9 +14,9 @@
 
 part of local_realtime_data_model;
 
-class LocalDocument implements rt.Document {
+class LocalDocument implements rdm.RealtimeDocument {
   final LocalModel model;
-  
+
   void close() {}
   List<rt.Collaborator> get collaborators => [];
 
@@ -37,7 +37,7 @@ class LocalDocument implements rt.Document {
   Stream<rt.CollaboratorLeftEvent> get onCollaboratorLeft => _onCollaboratorLeft.stream;
   Stream<rt.CollaboratorJoinedEvent> get onCollaboratorJoined => _onCollaboratorJoined.stream;
   Stream<rt.DocumentSaveStateChangedEvent> get onDocumentSaveStateChanged => _onDocumentSaveStateChanged.stream;
-  
+
   LocalDocument(LocalModel this.model);
 
   /// Local document has no proxy

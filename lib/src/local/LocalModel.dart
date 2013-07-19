@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalModel implements rt.Model {
+class LocalModel implements rdm.RealtimeModel {
   UndoHistory _undoHistory;
 
   /// Create a local model with a callback

@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalTextDeletedEvent extends LocalUndoableEvent implements rt.TextDeletedEvent {
+class LocalTextDeletedEvent extends LocalUndoableEvent implements rdm.RealtimeTextDeletedEvent {
   bool get bubbles => null; // TODO implement this getter
 
   final int index;

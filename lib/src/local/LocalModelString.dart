@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalModelString extends LocalIndexReferenceContainer implements rt.CollaborativeString {
+class LocalModelString extends LocalIndexReferenceContainer implements rdm.RealtimeString {
 
   // TODO need local events
   StreamController<LocalTextInsertedEvent> _onTextInserted

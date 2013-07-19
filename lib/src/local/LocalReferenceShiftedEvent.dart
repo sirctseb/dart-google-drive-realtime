@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalReferenceShiftedEvent extends LocalEvent implements rt.ReferenceShiftedEvent {
+class LocalReferenceShiftedEvent extends LocalEvent implements rdm.RealtimeReferenceShiftedEvent {
   bool get bubbles => null; // TODO implement this getter
 
   final int newIndex;

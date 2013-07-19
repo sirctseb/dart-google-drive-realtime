@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalValuesAddedEvent extends LocalUndoableEvent implements rt.ValuesAddedEvent {
+class LocalValuesAddedEvent extends LocalUndoableEvent implements rdm.RealtimeValuesAddedEvent {
 
   bool get bubbles => null; // TODO implement this getter
 

@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalTextInsertedEvent extends LocalUndoableEvent implements rt.TextInsertedEvent {
+class LocalTextInsertedEvent extends LocalUndoableEvent implements rdm.RealtimeTextInsertedEvent {
 
   bool get bubbles => null; // TODO implement this getter
 
