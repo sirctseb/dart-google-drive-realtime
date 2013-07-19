@@ -30,7 +30,7 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rdm.Real
 
   void clear() {
     // add event to stream
-    var event = new LocalValuesRemovedEvent._(0, _list, this);
+    var event = new LocalValuesRemovedEvent._(0, _list.toList(), this);
     _emitEventsAndChanged([_onValuesRemoved], [event]);
   }
 
