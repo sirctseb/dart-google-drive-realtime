@@ -7,7 +7,7 @@ description: |-
 homepage: https://github.com/sirctseb/realtime-data-model
 dependencies:
   js: '>=0.0.22 <1.0.0'
-  meta: any
+  meta: 0.6.8
 dev_dependencies:
   browser: any
   unittest: any
