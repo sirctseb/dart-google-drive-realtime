@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class DocumentSaveStateChangedEvent extends jsw.TypedProxy {
+class DocumentSaveStateChangedEvent extends Retainable {
   static DocumentSaveStateChangedEvent cast(js.Proxy proxy) => proxy == null ? null : new DocumentSaveStateChangedEvent.fromProxy(proxy);
 
   DocumentSaveStateChangedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);

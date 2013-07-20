@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class BaseModelEvent extends jsw.TypedProxy {
+class BaseModelEvent extends Retainable {
   static BaseModelEvent cast(js.Proxy proxy) => proxy == null ? null : new BaseModelEvent.fromProxy(proxy);
 
   BaseModelEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);

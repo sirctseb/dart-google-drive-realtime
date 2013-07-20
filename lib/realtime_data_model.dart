@@ -43,6 +43,7 @@ part 'src/realtime/IndexReference.dart';
 part 'src/realtime/Model.dart';
 part 'src/realtime/ObjectChangedEvent.dart';
 part 'src/realtime/ReferenceShiftedEvent.dart';
+part 'src/realtime/Retainable.dart';
 part 'src/realtime/TextDeletedEvent.dart';
 part 'src/realtime/TextInsertedEvent.dart';
 part 'src/realtime/TypePromoter.dart';
