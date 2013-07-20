@@ -15,7 +15,7 @@ initializeModel(rt.Model model) {
 }
 
 onFileLoaded(rt.Document doc) {
-  js.retain(doc);
+  doc.retain();
 
   useHtmlConfiguration();
 
@@ -56,7 +56,7 @@ onFileLoaded(rt.Document doc) {
 
   group('CollaborativeString', () {
     var string = doc.model.root['text'];
-    js.retain(string);
+    string.retain();
     setUp((){
       string.text = 'unittest';
     });
@@ -114,7 +114,7 @@ onFileLoaded(rt.Document doc) {
 
   group('CollaborativeList', () {
     var list = doc.model.root['list'];
-    js.retain(list);
+    list.retain();
     setUp((){
       list.clear();
       list.push('s1');
@@ -182,7 +182,7 @@ onFileLoaded(rt.Document doc) {
   });
   group('CollaborativeMap', () {
     var map = doc.model.root['map'];
-    js.retain(map);
+    map.retain();
     setUp(() {
       map.clear();
       map['key1'] = 4;
@@ -262,8 +262,8 @@ onFileLoaded(rt.Document doc) {
   group('RealtimeIndexReference', () {
     rt.CollaborativeString string = doc.model.root['text'];
     rt.CollaborativeList list = doc.model.root['list'];
-    js.retain(string);
-    js.retain(list);
+    string.retain();
+    list.retain();
     // TODO are references ever removed?
     test('RealtimeString Reference Value', () {
       string.text = "aaaaaaaaaa";
