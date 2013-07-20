@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of google_drive_realtime;
+part of realtime_data_model;
 
 class DocumentClosedError extends jsw.TypedProxy {
   static DocumentClosedError cast(js.Proxy proxy) => proxy == null ? null : new DocumentClosedError.fromProxy(proxy);

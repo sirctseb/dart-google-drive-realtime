@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library google_drive_realtime;
+library realtime_data_model;
 
 import 'dart:async';
 import 'dart:collection';

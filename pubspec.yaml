@@ -1,8 +1,7 @@
-name: google_drive_realtime
-version: 0.0.9-dev
-author: Alexandre Ardhuin <alexandre.ardhuin@gmail.com>
-description: With that package you will be able to use Google Drive Realtime API from Dart scripts.
-homepage: https://github.com/a14n/dart-google-drive-realtime
+name: realtime_data_model
+version: 0.0.0-dev
+author: Christopher Best <bestchris@gmail.com>
+homepage: https://github.com/sirctseb/dart-google-drive-realtime
 dependencies:
   js: '>=0.0.22 <1.0.0'
   meta: any

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of google_drive_realtime;
+part of realtime_data_model;
 
 class ValuesAddedEvent extends BaseModelEvent {
   static ValuesAddedEvent cast(js.Proxy proxy) => proxy == null ? null : new ValuesAddedEvent.fromProxy(proxy);

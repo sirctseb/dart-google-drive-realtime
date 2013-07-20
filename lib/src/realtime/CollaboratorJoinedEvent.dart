@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of google_drive_realtime;
+part of realtime_data_model;
 
 class CollaboratorJoinedEvent extends jsw.TypedProxy {
   static CollaboratorJoinedEvent deserialize(Document source, dynamic serialized) => CollaboratorJoinedEvent.cast(js.context['CollaboratorJoinedEvent']['deserialize'](source, serialized));

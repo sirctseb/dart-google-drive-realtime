@@ -2,7 +2,7 @@ import 'dart:html';
 import 'dart:async';
 
 import 'package:js/js.dart' as js;
-import 'package:google_drive_realtime/google_drive_realtime.dart' as rt;
+import 'package:realtime_data_model/realtime_data_model.dart' as rt;
 
 initializeModel(js.Proxy modelProxy) {
   var model = rt.Model.cast(modelProxy);

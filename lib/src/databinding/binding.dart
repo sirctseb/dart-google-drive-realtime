@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of google_drive_realtime_databinding;
+part of realtime_data_model_databinding;
 
 class Binding extends jsw.TypedProxy {
   static Binding cast(js.Proxy proxy) => proxy == null ? null : new Binding.fromProxy(proxy);

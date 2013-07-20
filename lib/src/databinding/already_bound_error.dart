@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of google_drive_realtime_databinding;
+part of realtime_data_model_databinding;
 
 class AlreadyBoundError extends jsw.TypedProxy {
   static AlreadyBoundError cast(js.Proxy proxy) => proxy == null ? null : new AlreadyBoundError.fromProxy(proxy);

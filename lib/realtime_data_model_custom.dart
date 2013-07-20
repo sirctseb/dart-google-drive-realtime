@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library google_drive_realtime_custom;
+library realtime_data_model_custom;
 
 import 'dart:async';
 
@@ -20,7 +20,7 @@ import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
 import 'package:meta/meta.dart';
 
-import 'google_drive_realtime.dart';
+import 'realtime_data_model.dart';
 
 final realtimeCustom = js.retain(realtime['custom']);
 

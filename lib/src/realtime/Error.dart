@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of google_drive_realtime;
+part of realtime_data_model;
 
 class Error extends jsw.TypedProxy {
   static Error cast(js.Proxy proxy) => proxy == null ? null : new Error.fromProxy(proxy);

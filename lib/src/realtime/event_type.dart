@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of google_drive_realtime;
+part of realtime_data_model;
 
 class EventType extends IsEnum<String> {
   static final COLLABORATOR_JOINED = new EventType._(realtime['EventType']['COLLABORATOR_JOINED']);
