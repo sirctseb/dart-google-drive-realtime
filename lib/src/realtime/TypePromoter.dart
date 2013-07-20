@@ -21,11 +21,11 @@ dynamic promoteProxy(dynamic object) {
   if(object is js.Proxy) {
     var realtimeNamespace = js.context['gapi']['drive']['realtime'];
     if(js.instanceof(object, realtimeNamespace['CollaborativeMap'])) {
-      return new CollaborativeMap.fromProxy(object);
+      return new CollaborativeMap._fromProxy(object);
     } else if(js.instanceof(object, realtimeNamespace['CollaborativeList'])) {
-      return new CollaborativeList.fromProxy(object);
+      return new CollaborativeList._fromProxy(object);
     } else if(js.instanceof(object, realtimeNamespace['CollaborativeString'])) {
-      return new CollaborativeString.fromProxy(object);
+      return new CollaborativeString._fromProxy(object);
     } else if(js.instanceof(object, js.context['Array'])
                || js.instanceof(object, js.context['Object'])) {
       return json.parse(js.context['JSON']['stringify'](object));
@@ -38,22 +38,22 @@ dynamic promoteProxy(dynamic object) {
 dynamic promoteEventByType(BaseModelEvent event) {
   // TODO we only use this for events that fire on strings, lists, and maps, but maybe we should support the rest?
   if(event.type == EventType.TEXT_DELETED.value) {
-    return new TextDeletedEvent.fromProxy(event.toJs());
+    return new TextDeletedEvent._fromProxy(event.toJs());
   }
   if(event.type == EventType.TEXT_INSERTED.value) {
-    return new TextInsertedEvent.fromProxy(event.toJs());
+    return new TextInsertedEvent._fromProxy(event.toJs());
   }
   if(event.type == EventType.VALUES_ADDED.value) {
-    return new ValuesAddedEvent.fromProxy(event.toJs());
+    return new ValuesAddedEvent._fromProxy(event.toJs());
   }
   if(event.type == EventType.VALUES_REMOVED.value) {
-    return new ValuesRemovedEvent.fromProxy(event.toJs());
+    return new ValuesRemovedEvent._fromProxy(event.toJs());
   }
   if(event.type == EventType.VALUES_SET.value) {
-    return new ValuesSetEvent.fromProxy(event.toJs());
+    return new ValuesSetEvent._fromProxy(event.toJs());
   }
   if(event.type == EventType.VALUE_CHANGED.value) {
-    return new ValueChangedEvent.fromProxy(event.toJs());
+    return new ValueChangedEvent._fromProxy(event.toJs());
   }
   // TODO throw
   return null;

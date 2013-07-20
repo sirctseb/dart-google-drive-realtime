@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class ValuesAddedEvent extends BaseModelEvent {
-  static ValuesAddedEvent cast(js.Proxy proxy) => proxy == null ? null : new ValuesAddedEvent.fromProxy(proxy);
+  static ValuesAddedEvent _cast(js.Proxy proxy) => proxy == null ? null : new ValuesAddedEvent._fromProxy(proxy);
 
-  ValuesAddedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  ValuesAddedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   int get index => $unsafe['index'];
   List<dynamic> get values => jsw.JsArrayToListAdapter.cast($unsafe['values'], CollaborativeContainer._realtimeTranslator);

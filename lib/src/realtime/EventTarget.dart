@@ -15,9 +15,7 @@
 part of realtime_data_model;
 
 class EventTarget extends Retainable {
-  static EventTarget cast(js.Proxy proxy) => proxy == null ? null : new EventTarget.fromProxy(proxy);
-
-  EventTarget.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  EventTarget._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   void _addEventListener(EventType type, dynamic/*Function|Object*/ handler, [bool capture]) => $unsafe.addEventListener(type, handler, capture);
   void _removeEventListener(EventType type, dynamic/*Function|Object*/ handler, [bool capture]) => $unsafe.removeEventListener(type, handler, capture);

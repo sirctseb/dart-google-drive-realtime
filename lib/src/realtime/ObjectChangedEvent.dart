@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class ObjectChangedEvent extends BaseModelEvent {
-  static ObjectChangedEvent cast(js.Proxy proxy) => proxy == null ? null : new ObjectChangedEvent.fromProxy(proxy);
+  static ObjectChangedEvent _cast(js.Proxy proxy) => proxy == null ? null : new ObjectChangedEvent._fromProxy(proxy);
 
-  ObjectChangedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  ObjectChangedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
-  List<BaseModelEvent> get events => jsw.JsArrayToListAdapter.castListOfSerializables($unsafe['events'], BaseModelEvent.cast);
+  List<BaseModelEvent> get events => jsw.JsArrayToListAdapter.castListOfSerializables($unsafe['events'], promoteEventByType);
 }

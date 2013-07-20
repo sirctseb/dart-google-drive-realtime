@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class DocumentSaveStateChangedEvent extends Retainable {
-  static DocumentSaveStateChangedEvent cast(js.Proxy proxy) => proxy == null ? null : new DocumentSaveStateChangedEvent.fromProxy(proxy);
+  static DocumentSaveStateChangedEvent _cast(js.Proxy proxy) => proxy == null ? null : new DocumentSaveStateChangedEvent._fromProxy(proxy);
 
-  DocumentSaveStateChangedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  DocumentSaveStateChangedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   bool get isPending => $unsafe['isPending'];
   bool get isSaving => $unsafe['isSaving'];

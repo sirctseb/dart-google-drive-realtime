@@ -15,14 +15,12 @@
 part of realtime_data_model;
 
 class CollaborativeString extends CollaborativeObject {
-  static CollaborativeString cast(js.Proxy proxy) => proxy == null ? null : new CollaborativeString.fromProxy(proxy);
-
   SubscribeStreamProvider<TextInsertedEvent> _onTextInserted;
   SubscribeStreamProvider<TextDeletedEvent> _onTextDeleted;
 
-  CollaborativeString.fromProxy(js.Proxy proxy) : super.fromProxy(proxy) {
-    _onTextInserted = _getStreamProviderFor(EventType.TEXT_INSERTED, TextInsertedEvent.cast);
-    _onTextDeleted = _getStreamProviderFor(EventType.TEXT_DELETED, TextDeletedEvent.cast);
+  CollaborativeString._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+    _onTextInserted = _getStreamProviderFor(EventType.TEXT_INSERTED, TextInsertedEvent._cast);
+    _onTextDeleted = _getStreamProviderFor(EventType.TEXT_DELETED, TextDeletedEvent._cast);
   }
 
   int get length => $unsafe['length'];
@@ -30,7 +28,7 @@ class CollaborativeString extends CollaborativeObject {
   void append(String text) { $unsafe.append(text); }
   String get text => $unsafe.getText();
   void insertString(int index, String text) { $unsafe.insertString(index, text); }
-  IndexReference registerReference(int index, bool canBeDeleted) => IndexReference.cast($unsafe.registerReference(index, canBeDeleted));
+  IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.registerReference(index, canBeDeleted));
   void removeRange(int startIndex, int endIndex) { $unsafe.removeRange(startIndex, endIndex); }
   void set text(String text) { $unsafe.setText(text); }
 

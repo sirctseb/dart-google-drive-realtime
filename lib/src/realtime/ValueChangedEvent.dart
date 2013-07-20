@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class ValueChangedEvent extends BaseModelEvent {
-  static ValueChangedEvent cast(js.Proxy proxy) => proxy == null ? null : new ValueChangedEvent.fromProxy(proxy);
+  static ValueChangedEvent _cast(js.Proxy proxy) => proxy == null ? null : new ValueChangedEvent._fromProxy(proxy);
 
-  ValueChangedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  ValueChangedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   dynamic get newValue => promoteProxy($unsafe['newValue']);
   dynamic get oldValue => promoteProxy($unsafe['oldValue']);

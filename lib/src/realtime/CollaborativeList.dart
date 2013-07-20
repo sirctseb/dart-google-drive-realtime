@@ -16,16 +16,14 @@ part of realtime_data_model;
 
 // TODO(aa) make this class mixin ListMixin
 class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> */ {
-  static CollaborativeList cast(js.Proxy proxy) => proxy == null ? null : new CollaborativeList.fromProxy(proxy);
-
   SubscribeStreamProvider<ValuesAddedEvent> _onValuesAdded;
   SubscribeStreamProvider<ValuesRemovedEvent> _onValuesRemoved;
   SubscribeStreamProvider<ValuesSetEvent> _onValuesSet;
 
-  CollaborativeList.fromProxy(js.Proxy proxy) : super.fromProxy(proxy) {
-    _onValuesAdded = _getStreamProviderFor(EventType.VALUES_ADDED, ValuesAddedEvent.cast);
-    _onValuesRemoved = _getStreamProviderFor(EventType.VALUES_REMOVED, ValuesRemovedEvent.cast);
-    _onValuesSet = _getStreamProviderFor(EventType.VALUES_SET, ValuesSetEvent.cast);
+  CollaborativeList._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+    _onValuesAdded = _getStreamProviderFor(EventType.VALUES_ADDED, ValuesAddedEvent._cast);
+    _onValuesRemoved = _getStreamProviderFor(EventType.VALUES_REMOVED, ValuesRemovedEvent._cast);
+    _onValuesSet = _getStreamProviderFor(EventType.VALUES_SET, ValuesSetEvent._cast);
   }
 
   dynamic _toJs(E e) => _translator == null ? e : _translator.toJs(e);
@@ -47,7 +45,7 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
   @deprecated E get(int index) => this[index];
   void insert(int index, E value) { $unsafe.insert(index, _toJs(value)); }
   int push(E value) => $unsafe.push(_toJs(value));
-  IndexReference registerReference(int index, bool canBeDeleted) => IndexReference.cast($unsafe.registerReference(index, canBeDeleted));
+  IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.registerReference(index, canBeDeleted));
   void remove(int index) { $unsafe.remove(index); }
   void removeRange(int startIndex, int endIndex) { $unsafe.removeRange(startIndex, endIndex); }
   bool removeValue(E value) => $unsafe.removeValue(_toJs(value));

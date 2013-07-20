@@ -15,13 +15,11 @@
 part of realtime_data_model;
 
 class CollaborativeMap<V> extends CollaborativeContainer implements Map<String, V> {
-  static CollaborativeMap cast(js.Proxy proxy) => proxy == null ? null : new CollaborativeMap.fromProxy(proxy);
-
   SubscribeStreamProvider<ValueChangedEvent> _onValueChanged;
 
-  CollaborativeMap.fromProxy(js.Proxy proxy)
-      : super.fromProxy(proxy) {
-    _onValueChanged = _getStreamProviderFor(EventType.VALUE_CHANGED, ValueChangedEvent.cast);
+  CollaborativeMap._fromProxy(js.Proxy proxy)
+      : super._fromProxy(proxy) {
+    _onValueChanged = _getStreamProviderFor(EventType.VALUE_CHANGED, ValueChangedEvent._cast);
   }
 
   dynamic _toJs(V e) => _translator == null ? e : _translator.toJs(e);

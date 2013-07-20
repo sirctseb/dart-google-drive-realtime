@@ -16,7 +16,7 @@ part of realtime_data_model;
 
 // to add retain and release methods to unify interface with local side
 class Retainable extends jsw.TypedProxy {
-  Retainable.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  Retainable._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
 
   void retain() {
     js.retain($unsafe);

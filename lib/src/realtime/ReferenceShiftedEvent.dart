@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class ReferenceShiftedEvent extends BaseModelEvent {
-  static ReferenceShiftedEvent cast(js.Proxy proxy) => proxy == null ? null : new ReferenceShiftedEvent.fromProxy(proxy);
+  static ReferenceShiftedEvent _cast(js.Proxy proxy) => proxy == null ? null : new ReferenceShiftedEvent._fromProxy(proxy);
 
-  ReferenceShiftedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  ReferenceShiftedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   int get newIndex => $unsafe['newIndex'];
   int get oldIndex => $unsafe['oldIndex'];

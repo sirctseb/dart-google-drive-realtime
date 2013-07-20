@@ -15,21 +15,19 @@
 part of realtime_data_model;
 
 class Document extends EventTarget {
-  static Document cast(js.Proxy proxy) => proxy == null ? null : new Document.fromProxy(proxy);
-
   SubscribeStreamProvider<CollaboratorLeftEvent> _onCollaboratorLeft;
   SubscribeStreamProvider<CollaboratorJoinedEvent> _onCollaboratorJoined;
   SubscribeStreamProvider<DocumentSaveStateChangedEvent> _onDocumentSaveStateChanged;
 
-  Document.fromProxy(js.Proxy proxy) : super.fromProxy(proxy) {
-    _onCollaboratorLeft = _getStreamProviderFor(EventType.COLLABORATOR_LEFT, CollaboratorLeftEvent.cast);
-    _onCollaboratorJoined = _getStreamProviderFor(EventType.COLLABORATOR_JOINED, CollaboratorJoinedEvent.cast);
-    _onDocumentSaveStateChanged = _getStreamProviderFor(EventType.DOCUMENT_SAVE_STATE_CHANGED, DocumentSaveStateChangedEvent.cast);
+  Document._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+    _onCollaboratorLeft = _getStreamProviderFor(EventType.COLLABORATOR_LEFT, CollaboratorLeftEvent._cast);
+    _onCollaboratorJoined = _getStreamProviderFor(EventType.COLLABORATOR_JOINED, CollaboratorJoinedEvent._cast);
+    _onDocumentSaveStateChanged = _getStreamProviderFor(EventType.DOCUMENT_SAVE_STATE_CHANGED, DocumentSaveStateChangedEvent._cast);
   }
 
   void close() { $unsafe.close(); }
-  List<Collaborator> get collaborators => jsw.JsArrayToListAdapter.castListOfSerializables($unsafe.getCollaborators(), Collaborator.cast);
-  Model get model => Model.cast($unsafe.getModel());
+  List<Collaborator> get collaborators => jsw.JsArrayToListAdapter.castListOfSerializables($unsafe.getCollaborators(), Collaborator._cast);
+  Model get model => new Model._fromProxy($unsafe.getModel());
 
   void exportDocument(void successFn([dynamic _]), void failureFn([dynamic _])) => $unsafe.exportDocument(new js.Callback.once(successFn), new js.Callback.once(failureFn));
 

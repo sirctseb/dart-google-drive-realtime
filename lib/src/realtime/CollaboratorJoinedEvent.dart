@@ -15,10 +15,9 @@
 part of realtime_data_model;
 
 class CollaboratorJoinedEvent extends Retainable {
-  static CollaboratorJoinedEvent deserialize(Document source, dynamic serialized) => CollaboratorJoinedEvent.cast(js.context['CollaboratorJoinedEvent']['deserialize'](source, serialized));
-  static CollaboratorJoinedEvent cast(js.Proxy proxy) => proxy == null ? null : new CollaboratorJoinedEvent.fromProxy(proxy);
+  static CollaboratorJoinedEvent _cast(js.Proxy proxy) => proxy == null ? null : new CollaboratorJoinedEvent._fromProxy(proxy);
 
-  CollaboratorJoinedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  CollaboratorJoinedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
-  Collaborator get collaborator => Collaborator.cast($unsafe['collaborator']);
+  Collaborator get collaborator => new Collaborator._fromProxy($unsafe['collaborator']);
 }

@@ -15,12 +15,10 @@
 part of realtime_data_model;
 
 class IndexReference extends CollaborativeObject {
-  static IndexReference cast(js.Proxy proxy) => proxy == null ? null : new IndexReference.fromProxy(proxy);
-
   SubscribeStreamProvider<ReferenceShiftedEvent> _onReferenceShifted;
 
-  IndexReference.fromProxy(js.Proxy proxy) : super.fromProxy(proxy) {
-    _onReferenceShifted = _getStreamProviderFor(EventType.REFERENCE_SHIFTED, ReferenceShiftedEvent.cast);
+  IndexReference._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+    _onReferenceShifted = _getStreamProviderFor(EventType.REFERENCE_SHIFTED, ReferenceShiftedEvent._cast);
   }
 
   bool get canBeDeleted => $unsafe['canBeDeleted'];

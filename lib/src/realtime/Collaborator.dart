@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class Collaborator extends Retainable {
-  static Collaborator cast(js.Proxy proxy) => proxy == null ? null : new Collaborator.fromProxy(proxy);
+  static Collaborator _cast(js.Proxy proxy) => proxy == null ? null : new Collaborator._fromProxy(proxy);
 
-  Collaborator.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  Collaborator._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   String get color => $unsafe['color'];
   String get displayName => $unsafe['displayName'];

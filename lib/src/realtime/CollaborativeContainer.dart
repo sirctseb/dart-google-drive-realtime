@@ -30,7 +30,7 @@ class CollaborativeContainerTranslator<E> extends jsw.Translator<E> {
 }
 
 class CollaborativeContainer<V> extends CollaborativeObject {
-  CollaborativeContainer.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  CollaborativeContainer._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   static final jsw.Translator _realtimeTranslator = new CollaborativeContainerTranslator();
   final jsw.Translator<V> _translator = _realtimeTranslator;

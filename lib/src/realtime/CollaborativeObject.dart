@@ -15,14 +15,12 @@
 part of realtime_data_model;
 
 class CollaborativeObject extends EventTarget {
-  static CollaborativeObject cast(js.Proxy proxy) => proxy == null ? null : new CollaborativeObject.fromProxy(proxy);
-
   SubscribeStreamProvider<ObjectChangedEvent> _onObjectChanged;
   SubscribeStreamProvider<ValueChangedEvent> _onValueChanged;
 
-  CollaborativeObject.fromProxy(js.Proxy proxy) : super.fromProxy(proxy) {
-    _onObjectChanged = _getStreamProviderFor(EventType.OBJECT_CHANGED, ObjectChangedEvent.cast);
-    _onValueChanged = _getStreamProviderFor(EventType.VALUE_CHANGED, ValueChangedEvent.cast);
+  CollaborativeObject._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+    _onObjectChanged = _getStreamProviderFor(EventType.OBJECT_CHANGED, ObjectChangedEvent._cast);
+    _onValueChanged = _getStreamProviderFor(EventType.VALUE_CHANGED, ValueChangedEvent._cast);
   }
 
   String get id => $unsafe['id'];

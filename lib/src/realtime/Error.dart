@@ -15,9 +15,7 @@
 part of realtime_data_model;
 
 class Error extends Retainable {
-  static Error cast(js.Proxy proxy) => proxy == null ? null : new Error.fromProxy(proxy);
-
-  Error.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  Error._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   bool get isFatal => $unsafe['isFatal'];
   String get message => $unsafe['message'];

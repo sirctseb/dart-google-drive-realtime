@@ -63,9 +63,9 @@ String get token => realtime['getToken']();
 Future<Document> load(String docId, [void initializerFn(Model model), void errorFn(Error error)]) {
   final completer = new Completer();
   realtime.load(docId,
-      new js.Callback.once((js.Proxy p) => completer.complete(Document.cast(p))),
-      initializerFn == null ? null : new js.Callback.once((js.Proxy p) => initializerFn(Model.cast(p))),
-      errorFn == null ? null : new js.Callback.once((js.Proxy p) => errorFn(Error.cast(p)))
+      new js.Callback.once((js.Proxy p) => completer.complete(new Document._fromProxy(p))),
+      initializerFn == null ? null : new js.Callback.once((js.Proxy p) => initializerFn(new Model._fromProxy(p))),
+      errorFn == null ? null : new js.Callback.once((js.Proxy p) => errorFn(new Error._fromProxy(p)))
   );
   return completer.future;
 }
@@ -87,13 +87,13 @@ void start(Map realtimeOptions, {bool local: false}) {
     if(realtimeOptions["initializeModel"] != null) {
       var nativeInitializeModel = realtimeOptions["initializeModel"];
       realtimeOptions["initializeModel"] = new js.Callback.once((modelProxy) {
-        nativeInitializeModel(new Model.fromProxy(modelProxy));
+        nativeInitializeModel(new Model._fromProxy(modelProxy));
       });
     }
     if(realtimeOptions["onFileLoaded"] != null) {
       var nativeOnFileLoaded = realtimeOptions["onFileLoaded"];
       realtimeOptions["onFileLoaded"] = new js.Callback.many((docProxy) {
-        nativeOnFileLoaded(new Document.fromProxy(docProxy));
+        nativeOnFileLoaded(new Document._fromProxy(docProxy));
       });
     }
     // create loader and start
