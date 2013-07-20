@@ -25,7 +25,7 @@ class IndexReference extends CollaborativeObject {
 
   bool get canBeDeleted => $unsafe['canBeDeleted'];
   int get index => $unsafe['index'];
-  CollaborativeObject get referencedObject => CollaborativeObject.cast($unsafe['referencedObject']);
+  CollaborativeObject get referencedObject => promoteProxy($unsafe['referencedObject']);
 
   Stream<ReferenceShiftedEvent> get onReferenceShifted => _onReferenceShifted.stream;
 }
