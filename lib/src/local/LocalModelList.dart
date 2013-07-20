@@ -14,8 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalModelList<E> extends LocalIndexReferenceContainer implements rdm.RealtimeList<E> {
-  static Logger _logger = new Logger("realtime_data_model.local.LocalModelList")..level = Level.FINE;
+class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.CollaborativeList<E> {
 
   E operator[](int index) => _list[index];
 

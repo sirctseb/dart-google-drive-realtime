@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalModelMap<V> extends LocalModelObject implements rdm.RealtimeMap<V> {
+class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V> {
   // TODO add promotes back in here
 
   @override int get length => _map.length;

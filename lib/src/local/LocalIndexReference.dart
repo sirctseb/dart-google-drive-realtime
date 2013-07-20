@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalIndexReference extends LocalModelObject implements rdm.RealtimeIndexReference {
+class LocalIndexReference extends LocalModelObject implements rt.IndexReference {
 
   final bool canBeDeleted;
 

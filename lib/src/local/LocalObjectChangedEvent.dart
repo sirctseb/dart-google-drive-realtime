@@ -14,7 +14,7 @@
 
 part of local_realtime_data_model;
 
-class LocalObjectChangedEvent extends LocalEvent implements rdm.RealtimeObjectChangedEvent {
+class LocalObjectChangedEvent extends LocalEvent implements rt.ObjectChangedEvent {
 
   final List<LocalEvent> events;
 

@@ -16,7 +16,7 @@ part of local_realtime_data_model;
 
 // TODO this should not actually extend LocalEvent,
 // TODO and rt.UndoRedoStateChangedEvent should not extend rt.BaseModelEvent
-class LocalUndoRedoStateChangedEvent extends LocalEvent implements rdm.RealtimeUndoRedoStateChangedEvent {
+class LocalUndoRedoStateChangedEvent extends LocalEvent implements rt.UndoRedoStateChangedEvent {
 
   bool get bubbles => null; // TODO implement this getter
 

@@ -18,10 +18,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:json' as json;
 
-import 'package:realtime_data_model/realtime_data_model.dart' as rdm;
-import 'package:logging/logging.dart';
-import 'package:logging_handlers/logging_handlers_shared.dart';
-import 'package:google_drive_realtime/google_drive_realtime.dart' as rt;
+import 'package:realtime_data_model/realtime_data_model.dart' as rt;
 import 'package:js/js.dart' as js;
 import 'package:meta/meta.dart';
 

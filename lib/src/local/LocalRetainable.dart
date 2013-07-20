@@ -15,7 +15,7 @@
 part of local_realtime_data_model;
 
 /// Local implementation of retain and release
-class LocalRetainable implements rdm.Retainable {
+class LocalRetainable {
   void retain() {}
   void release() {}
 }
