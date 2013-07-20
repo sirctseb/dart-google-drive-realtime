@@ -14,18 +14,13 @@
 
 part of realtime_data_model;
 
-class CollaborativeMap<V> extends CollaborativeObject implements Map<String, V> {
-  static CollaborativeMap cast(js.Proxy proxy, [jsw.Translator translator]) => proxy == null ? null : new CollaborativeMap.fromProxy(proxy, translator);
-
-  static CollaborativeMap castMapOfSerializables(js.Proxy proxy, jsw.Mapper<dynamic, js.Serializable> fromJs, {mapOnlyNotNull: false}) => proxy == null ? null : new CollaborativeMap.fromProxy(proxy, new jsw.TranslatorForSerializable(fromJs, mapOnlyNotNull: mapOnlyNotNull));
-
-  final jsw.Translator<V> _translator;
+class CollaborativeMap<V> extends CollaborativeContainer implements Map<String, V> {
+  static CollaborativeMap cast(js.Proxy proxy) => proxy == null ? null : new CollaborativeMap.fromProxy(proxy);
 
   SubscribeStreamProvider<ValueChangedEvent> _onValueChanged;
 
-  CollaborativeMap.fromProxy(js.Proxy proxy, [jsw.Translator<V> translator])
-      : this._translator = translator,
-        super.fromProxy(proxy) {
+  CollaborativeMap.fromProxy(js.Proxy proxy)
+      : super.fromProxy(proxy) {
     _onValueChanged = _getStreamProviderFor(EventType.VALUE_CHANGED, ValueChangedEvent.cast);
   }
 

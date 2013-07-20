@@ -15,18 +15,14 @@
 part of realtime_data_model;
 
 // TODO(aa) make this class mixin ListMixin
-class CollaborativeList<E> extends CollaborativeObject /* with ListMixin<E> */ {
-  static CollaborativeList cast(js.Proxy proxy, [jsw.Translator translator]) => proxy == null ? null : new CollaborativeList.fromProxy(proxy, translator);
-
-  static CollaborativeList castListOfSerializables(js.Proxy proxy, jsw.Mapper<dynamic, js.Serializable> fromJs, {mapOnlyNotNull: false}) => proxy == null ? null : new CollaborativeList.fromProxy(proxy, new jsw.TranslatorForSerializable(fromJs, mapOnlyNotNull: mapOnlyNotNull));
-
-  final jsw.Translator<E> _translator;
+class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> */ {
+  static CollaborativeList cast(js.Proxy proxy) => proxy == null ? null : new CollaborativeList.fromProxy(proxy);
 
   SubscribeStreamProvider<ValuesAddedEvent> _onValuesAdded;
   SubscribeStreamProvider<ValuesRemovedEvent> _onValuesRemoved;
   SubscribeStreamProvider<ValuesSetEvent> _onValuesSet;
 
-  CollaborativeList.fromProxy(js.Proxy proxy, [jsw.Translator<E> translator]) : this._translator = translator, super.fromProxy(proxy) {
+  CollaborativeList.fromProxy(js.Proxy proxy) : super.fromProxy(proxy) {
     _onValuesAdded = _getStreamProviderFor(EventType.VALUES_ADDED, ValuesAddedEvent.cast);
     _onValuesRemoved = _getStreamProviderFor(EventType.VALUES_REMOVED, ValuesRemovedEvent.cast);
     _onValuesSet = _getStreamProviderFor(EventType.VALUES_SET, ValuesSetEvent.cast);

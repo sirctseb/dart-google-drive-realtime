@@ -25,6 +25,7 @@ import 'package:meta/meta.dart';
 import 'src/utils.dart';
 
 part 'src/realtime/BaseModelEvent.dart';
+part 'src/realtime/CollaborativeContainer.dart';
 part 'src/realtime/CollaborativeList.dart';
 part 'src/realtime/CollaborativeMap.dart';
 part 'src/realtime/CollaborativeObject.dart';
