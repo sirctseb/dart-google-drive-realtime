@@ -21,6 +21,7 @@ import 'dart:json' as json;
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
 import 'package:meta/meta.dart';
+import 'package:realtime_data_model/src/local/local_realtime_data_model.dart';
 
 import 'src/utils.dart';
 
@@ -69,5 +70,35 @@ Future<Document> load(String docId, [void initializerFn(Model model), void error
 }
 
 
+/** Starts the realtime system
+ * If local is false, uses realtime-client-utils.js method for creating a new realtime-connected document
+ * If local is true, a new local model will be created
+ */
+void start(Map realtimeOptions, {bool local: false}) {
+  if(local) {
+    var model = new LocalModel(realtimeOptions['initializeModel']);
+    // create a document with the model
+    var document = new LocalDocument(model);
+    // do onFileLoaded callback
+    realtimeOptions["onFileLoaded"](document);
+  } else {
+    // convert callbacks for js
+    if(realtimeOptions["initializeModel"] != null) {
+      var nativeInitializeModel = realtimeOptions["initializeModel"];
+      realtimeOptions["initializeModel"] = new js.Callback.once((modelProxy) {
+        nativeInitializeModel(new Model.fromProxy(modelProxy));
+      });
+    }
+    if(realtimeOptions["onFileLoaded"] != null) {
+      var nativeOnFileLoaded = realtimeOptions["onFileLoaded"];
+      realtimeOptions["onFileLoaded"] = new js.Callback.many((docProxy) {
+        nativeOnFileLoaded(new Document.fromProxy(docProxy));
+      });
+    }
+    // create loader and start
+    var realtimeLoader = new js.Proxy(js.context.rtclient.RealtimeLoader, js.map(realtimeOptions));
+    realtimeLoader.start();
+  }
+}
 
 
