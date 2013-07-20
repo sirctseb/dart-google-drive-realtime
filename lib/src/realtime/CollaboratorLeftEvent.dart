@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class CollaboratorLeftEvent extends jsw.TypedProxy {
+class CollaboratorLeftEvent extends Retainable {
   static CollaboratorLeftEvent deserialize(Document source, dynamic serialized) => CollaboratorLeftEvent.cast(js.context['CollaboratorJoined']['deserialize'](source, serialized));
   static CollaboratorLeftEvent cast(js.Proxy proxy) => proxy == null ? null : new CollaboratorLeftEvent.fromProxy(proxy);
 

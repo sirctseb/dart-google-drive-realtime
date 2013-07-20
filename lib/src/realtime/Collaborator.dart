@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class Collaborator extends jsw.TypedProxy {
+class Collaborator extends Retainable {
   static Collaborator cast(js.Proxy proxy) => proxy == null ? null : new Collaborator.fromProxy(proxy);
 
   Collaborator.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);

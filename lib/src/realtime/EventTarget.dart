@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class EventTarget extends jsw.TypedProxy {
+class EventTarget extends Retainable {
   static EventTarget cast(js.Proxy proxy) => proxy == null ? null : new EventTarget.fromProxy(proxy);
 
   EventTarget.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);

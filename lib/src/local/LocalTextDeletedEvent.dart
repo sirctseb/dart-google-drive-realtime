@@ -1,4 +1,4 @@
-// Copyright (c) 2013, Alexandre Ardhuin
+// Copyright (c) 2013, Christopher Best
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of realtime_data_model;
+part of local_realtime_data_model;
 
-class DocumentSaveStateChangedEvent extends Retainable {
-  static DocumentSaveStateChangedEvent cast(js.Proxy proxy) => proxy == null ? null : new DocumentSaveStateChangedEvent.fromProxy(proxy);
+class LocalTextDeletedEvent extends LocalUndoableEvent implements rt.TextDeletedEvent {
+  bool get bubbles => null; // TODO implement this getter
 
-  DocumentSaveStateChangedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  final int index;
 
-  bool get isPending => $unsafe['isPending'];
-  bool get isSaving => $unsafe['isSaving'];
+  final String text;
+
+  final String type = ModelEventType.TEXT_DELETED.value;
+
+  LocalTextDeletedEvent._(this.index, this.text, _target) : super._(_target);
+
+  LocalTextInsertedEvent get inverse => new LocalTextInsertedEvent._(index, text, _target);
 }

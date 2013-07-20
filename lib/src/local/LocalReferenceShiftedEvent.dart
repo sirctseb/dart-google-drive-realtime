@@ -1,4 +1,4 @@
-// Copyright (c) 2013, Alexandre Ardhuin
+// Copyright (c) 2013, Christopher Best
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of realtime_data_model;
+part of local_realtime_data_model;
 
-class DocumentSaveStateChangedEvent extends Retainable {
-  static DocumentSaveStateChangedEvent cast(js.Proxy proxy) => proxy == null ? null : new DocumentSaveStateChangedEvent.fromProxy(proxy);
+class LocalReferenceShiftedEvent extends LocalEvent implements rt.ReferenceShiftedEvent {
+  bool get bubbles => null; // TODO implement this getter
 
-  DocumentSaveStateChangedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  final int newIndex;
 
-  bool get isPending => $unsafe['isPending'];
-  bool get isSaving => $unsafe['isSaving'];
+  final int oldIndex;
+
+  final String type = ModelEventType.REFERENCE_SHIFTED.value;
+
+  LocalReferenceShiftedEvent._(this.newIndex, this.oldIndex, _target) : super._(_target);
 }
+

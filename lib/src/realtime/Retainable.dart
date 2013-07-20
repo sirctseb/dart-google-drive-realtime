@@ -1,4 +1,4 @@
-// Copyright (c) 2013, Alexandre Ardhuin
+// Copyright (c) 2013, Christopher Best
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
 
 part of realtime_data_model;
 
-class CollaboratorJoinedEvent extends Retainable {
-  static CollaboratorJoinedEvent deserialize(Document source, dynamic serialized) => CollaboratorJoinedEvent.cast(js.context['CollaboratorJoinedEvent']['deserialize'](source, serialized));
-  static CollaboratorJoinedEvent cast(js.Proxy proxy) => proxy == null ? null : new CollaboratorJoinedEvent.fromProxy(proxy);
+// to add retain and release methods to unify interface with local side
+class Retainable extends jsw.TypedProxy {
+  Retainable.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
 
-  CollaboratorJoinedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
-
-  Collaborator get collaborator => Collaborator.cast($unsafe['collaborator']);
+  void retain() {
+    js.retain($unsafe);
+  }
+  void release() {
+    js.release($unsafe);
+  }
 }

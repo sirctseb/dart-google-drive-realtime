@@ -8,16 +8,14 @@ import 'package:realtime_data_model/realtime_data_model_custom.dart' as rtc;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
 
-initializeModel(js.Proxy modelProxy) {
-  var model = rt.Model.cast(modelProxy);
+initializeModel(rt.Model model) {
   model.root['text'] = model.createString('Hello Realtime World!');
   model.root['list'] = model.createList();
   model.root['map'] = model.createMap();
 }
 
-onFileLoaded(docProxy) {
-  var doc = rt.Document.cast(docProxy);
-  js.retain(doc);
+onFileLoaded(rt.Document doc) {
+  doc.retain();
 
   useHtmlConfiguration();
 
@@ -58,7 +56,7 @@ onFileLoaded(docProxy) {
 
   group('CollaborativeString', () {
     var string = doc.model.root['text'];
-    js.retain(string);
+    string.retain();
     setUp((){
       string.text = 'unittest';
     });
@@ -116,7 +114,7 @@ onFileLoaded(docProxy) {
 
   group('CollaborativeList', () {
     var list = doc.model.root['list'];
-    js.retain(list);
+    list.retain();
     setUp((){
       list.clear();
       list.push('s1');
@@ -184,7 +182,7 @@ onFileLoaded(docProxy) {
   });
   group('CollaborativeMap', () {
     var map = doc.model.root['map'];
-    js.retain(map);
+    map.retain();
     setUp(() {
       map.clear();
       map['key1'] = 4;
@@ -264,8 +262,8 @@ onFileLoaded(docProxy) {
   group('RealtimeIndexReference', () {
     rt.CollaborativeString string = doc.model.root['text'];
     rt.CollaborativeList list = doc.model.root['list'];
-    js.retain(string);
-    js.retain(list);
+    string.retain();
+    list.retain();
     // TODO are references ever removed?
     test('RealtimeString Reference Value', () {
       string.text = "aaaaaaaaaa";
@@ -327,7 +325,7 @@ onFileLoaded(docProxy) {
 /**
  * Options for the Realtime loader.
  */
-get realtimeOptions => js.map({
+get realtimeOptions => {
    /**
   * Client ID from the APIs Console.
   */
@@ -341,7 +339,7 @@ get realtimeOptions => js.map({
    /**
   * Function to be called when a Realtime model is first created.
   */
-   'initializeModel': new js.Callback.once(initializeModel),
+   'initializeModel': initializeModel,
 
    /**
   * Autocreate files right after auth automatically.
@@ -356,11 +354,10 @@ get realtimeOptions => js.map({
    /**
   * Function to be called every time a Realtime file is loaded.
   */
-   'onFileLoaded': new js.Callback.many(onFileLoaded)
-});
+   'onFileLoaded': onFileLoaded
+};
 
 
 main() {
-  var realtimeLoader = new js.Proxy(js.context.rtclient.RealtimeLoader, realtimeOptions);
-  realtimeLoader.start();
+  rt.start(realtimeOptions);
 }

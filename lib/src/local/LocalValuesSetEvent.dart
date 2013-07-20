@@ -1,4 +1,4 @@
-// Copyright (c) 2013, Alexandre Ardhuin
+// Copyright (c) 2013, Christopher Best
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of realtime_data_model;
+part of local_realtime_data_model;
 
-class DocumentSaveStateChangedEvent extends Retainable {
-  static DocumentSaveStateChangedEvent cast(js.Proxy proxy) => proxy == null ? null : new DocumentSaveStateChangedEvent.fromProxy(proxy);
+class LocalValuesSetEvent extends LocalUndoableEvent implements rt.ValuesSetEvent {
 
-  DocumentSaveStateChangedEvent.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  bool get bubbles => null; // TODO implement this getter
 
-  bool get isPending => $unsafe['isPending'];
-  bool get isSaving => $unsafe['isSaving'];
+  final int index;
+
+  final List newValues;
+
+  final List oldValues;
+
+  final String type = ModelEventType.VALUES_SET.value;
+
+  LocalValuesSetEvent._(this.index, this.newValues, this.oldValues, _target) : super._(_target);
+
+  LocalValuesSetEvent get inverse => new LocalValuesSetEvent._(index, oldValues, newValues, _target);
 }
