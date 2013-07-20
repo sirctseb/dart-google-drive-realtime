@@ -15,7 +15,7 @@
 part of realtime_data_model;
 
 /// Promote proxied objects to collaborative objects if they are that type
-dynamic promoteProxy(dynamic object) {
+dynamic _promoteProxy(dynamic object) {
   String type;
 
   if(object is js.Proxy) {
@@ -35,7 +35,7 @@ dynamic promoteProxy(dynamic object) {
   return object;
 }
 /// Construct typed event classes based on type
-dynamic promoteEventByType(BaseModelEvent event) {
+dynamic _promoteEventByType(BaseModelEvent event) {
   // TODO we only use this for events that fire on strings, lists, and maps, but maybe we should support the rest?
   if(event.type == EventType.TEXT_DELETED.value) {
     return new TextDeletedEvent._fromProxy(event.toJs());

@@ -17,7 +17,7 @@ part of realtime_data_model;
 // translator to promote to collaborative types
 class CollaborativeContainerTranslator<E> extends jsw.Translator<E> {
   static dynamic _fromJs(dynamic object) {
-    return promoteProxy(object);
+    return _promoteProxy(object);
   }
   static dynamic _toJs(dynamic object) {
     if(object is CollaborativeObject) return object;
