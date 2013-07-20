@@ -16,6 +16,7 @@ library realtime_data_model;
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:json' as json;
 
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
@@ -42,6 +43,7 @@ part 'src/realtime/ObjectChangedEvent.dart';
 part 'src/realtime/ReferenceShiftedEvent.dart';
 part 'src/realtime/TextDeletedEvent.dart';
 part 'src/realtime/TextInsertedEvent.dart';
+part 'src/realtime/TypePromoter.dart';
 part 'src/realtime/ValueChangedEvent.dart';
 part 'src/realtime/ValuesAddedEvent.dart';
 part 'src/realtime/ValuesRemovedEvent.dart';
