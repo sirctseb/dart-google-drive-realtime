@@ -27,7 +27,7 @@ onFileLoaded(docProxy) {
       expect(doc.model.canRedo, false);
     });
     test('undo state after change', () {
-      doc.model.root['text'].setText('redid');
+      doc.model.root['text'].text = 'redid';
       expect(doc.model.canUndo, true);
       expect(doc.model.canRedo, false);
     });
@@ -37,7 +37,7 @@ onFileLoaded(docProxy) {
       expect(doc.model.canRedo, true);
     });
     test('string state after undo', () {
-      expect(doc.model.root['text'].getText(), 'Hello Realtime World!');
+      expect(doc.model.root['text'].text, 'Hello Realtime World!');
     });
     test('string state after redo and event/model state matching', () {
       StreamSubscription ssUndo;
@@ -51,13 +51,13 @@ onFileLoaded(docProxy) {
         ssUndo.cancel();
       }));
       doc.model.redo();
-      expect(doc.model.root['text'].getText(), 'redid');
+      expect(doc.model.root['text'].text, 'redid');
       doc.model.undo();
     });
   });
 
   group('CollaborativeString', () {
-    var string = rt.CollaborativeString.cast(doc.model.root['text']);
+    var string = doc.model.root['text'];
     js.retain(string);
     setUp((){
       string.text = 'unittest';
@@ -115,7 +115,7 @@ onFileLoaded(docProxy) {
   });
 
   group('CollaborativeList', () {
-    var list = rt.CollaborativeList.cast(doc.model.root['list']);
+    var list = doc.model.root['list'];
     js.retain(list);
     setUp((){
       list.clear();
@@ -149,6 +149,10 @@ onFileLoaded(docProxy) {
       expect(list[0], 's1');
       expect(list[1], 's2');
     });
+    test('remove(int index)', () {
+      list.remove(0);
+      expect(list.length, 0);
+    });
     test('onValuesAdded', () {
       StreamSubscription ss;
       ss = list.onValuesAdded.listen(expectAsync1((rt.ValuesAddedEvent e) {
@@ -176,6 +180,146 @@ onFileLoaded(docProxy) {
         ss.cancel();
       }));
       list[0] = 's2';
+    });
+  });
+  group('CollaborativeMap', () {
+    var map = doc.model.root['map'];
+    js.retain(map);
+    setUp(() {
+      map.clear();
+      map['key1'] = 4;
+    });
+    test('operator [](String key)', () {
+      expect(map['key1'], 4);
+      expect(map.length, 1);
+    });
+    test('operator []=(String key, E value)', () {
+      map['key2'] = 5;
+      expect(map['key2'], 5);
+    });
+    test('remove', () {
+      map.remove('key1');
+      expect(map.length, 0);
+      expect(map['key1'], null);
+    });
+    test('clear', () {
+      map.clear();
+      expect(map.length, 0);
+    });
+    test('addAll', () {
+      map.addAll({
+        'key2': 5,
+        'key3': 6
+      });
+      expect(map.length, 3);
+      expect(map['key2'], 5);
+      expect(map['key3'], 6);
+    });
+    test('onValueChanged', () {
+      StreamSubscription ssChanged;
+      ssChanged = map.onValueChanged.listen(expectAsync1((rt.ValueChangedEvent e) {
+        expect(e.property, 'key1');
+        expect(e.newValue, 5);
+        expect(e.oldValue, 4);
+        ssChanged.cancel();
+      }));
+      map['key1'] = 5;
+    });
+    test('onValueChanged add', () {
+      StreamSubscription ssAdd;
+      ssAdd = map.onValueChanged.listen(expectAsync1((rt.ValueChangedEvent e) {
+        expect(e.property, 'prop');
+        expect(e.newValue, 'newVal');
+        expect(e.oldValue, null);
+        ssAdd.cancel();
+      }));
+      map['prop'] = 'newVal';
+    });
+    test('onValueChanged remove', () {
+      StreamSubscription ssRemove;
+      ssRemove = map.onValueChanged.listen(expectAsync1((rt.ValueChangedEvent e) {
+        expect(e.property, 'key1');
+        expect(e.oldValue, 4);
+        expect(e.newValue, null);
+        ssRemove.cancel();
+      }));
+      map.remove('key1');
+    });
+    test('onValueChanged clear', () {
+      map['key2'] = 'val2';
+      StreamSubscription ssClear;
+      ssClear = map.onValueChanged.listen(expectAsync1((rt.ValueChangedEvent e) {
+        expect(e.newValue, null);
+      }, count: 2));
+      map.clear();
+      ssClear.cancel();
+    });
+    test('map length on null assignment', () {
+      // TODO this is different than native maps. but that is a rt problem, not rdm.
+      expect(map.length, 1);
+      map['key1'] = null;
+      expect(map.length, 0);
+    });
+  });
+  group('RealtimeIndexReference', () {
+    rt.CollaborativeString string = doc.model.root['text'];
+    rt.CollaborativeList list = doc.model.root['list'];
+    js.retain(string);
+    js.retain(list);
+    // TODO are references ever removed?
+    test('RealtimeString Reference Value', () {
+      string.text = "aaaaaaaaaa";
+      rt.IndexReference ref = string.registerReference(5, false);
+      expect(ref.index, 5);
+      string.insertString(2, "x");
+      expect(ref.index, 6);
+      doc.model.undo();
+      expect(ref.index, 5);
+      string.insertString(8, "x");
+      expect(ref.index, 5);
+      string.removeRange(0, 2);
+      expect(ref.index, 3);
+      string.removeRange(2, 4);
+      expect(ref.index, 2);
+    });
+    test('RealtimeString Delete Reference', () {
+      rt.IndexReference ref = string.registerReference(5, true);
+      expect(ref.index, 5);
+      string.removeRange(4, 6);
+      expect(ref.index, -1);
+    });
+    test('RealtimeList Reference Value', () {
+      list.clear();
+      list.pushAll([1,2,3,4,5,6,7,8,9,10,11,12]);
+      rt.IndexReference ref = list.registerReference(5, false);
+      expect(ref.index, 5);
+      list.insert(2, 9);
+      expect(ref.index, 6);
+      doc.model.undo();
+      expect(ref.index, 5);
+      list.insert(8, 9);
+      expect(ref.index, 5);
+      list.removeRange(0, 2);
+      expect(ref.index, 3);
+      list.removeRange(2, 4);
+      expect(ref.index, 2);
+    });
+    test('RealtimeList Delete Reference', () {
+      rt.IndexReference ref = list.registerReference(5, true);
+      expect(ref.index, 5);
+      list.removeRange(4, 6);
+      expect(ref.index, -1);
+    });
+    test('RealtimeString Reference Events', () {
+      string.text = "aaaaaaaaaa";
+      rt.IndexReference ref = string.registerReference(5, true);
+      StreamSubscription ssRef;
+      ssRef = ref.onReferenceShifted.listen(expectAsync1((rt.ReferenceShiftedEvent event) {
+        expect(event.oldIndex, 5);
+        expect(event.newIndex, 7);
+        expect(ref.index, 7);
+      }));
+      string.insertString(0, "xx");
     });
   });
 }
