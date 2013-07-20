@@ -1,7 +1,10 @@
 name: realtime_data_model
-version: 0.0.0-dev
+version: 0.0.0
 author: Christopher Best <bestchris@gmail.com>
-homepage: https://github.com/sirctseb/dart-google-drive-realtime
+description: |-
+  Use Google Drive Realtime API with drive documents and locally with the same interface.
+  Based on the google_drive_realtime package.
+homepage: https://github.com/sirctseb/realtime-data-model
 dependencies:
   js: '>=0.0.22 <1.0.0'
   meta: any
