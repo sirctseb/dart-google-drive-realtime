@@ -1,6 +1,6 @@
 Dart Realtime Data Model
-based on [Dart Google Drive Realtime](https://github.com/a14n/dart-google-drive-realtime)
 ==========================
+###based on [Dart Google Drive Realtime](https://github.com/a14n/dart-google-drive-realtime)
 
 This project is a library that constrains the Dart Google Drive Realtime API and provides a local implementation so that applications can write to a single API whether the backing data is a Google Document or a local object.
 It is based on [Dart Google Drive Realtime](https://github.com/a14n/dart-google-drive-realtime).
