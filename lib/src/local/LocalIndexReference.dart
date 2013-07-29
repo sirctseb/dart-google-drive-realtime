@@ -34,6 +34,6 @@ class LocalIndexReference extends LocalModelObject implements rt.IndexReference 
   void _shift(int newIndex) {
     int oldIndex = index;
     index = newIndex;
-    _onReferenceShifted.add(new LocalReferenceShiftedEvent._(index, oldIndex, referencedObject));
+    _onReferenceShifted.add(new LocalReferenceShiftedEvent._(index, oldIndex, this));
   }
 }
