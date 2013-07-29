@@ -89,12 +89,14 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
       // don't emit events, but do propagate changes
       _map.addAll(initialValue);
       _map.forEach((key,value) {
-        _ssMap[key] = (value as LocalModelObject)._onPostObjectChanged.listen((e) {
-          // fire normal change event
-          _onObjectChanged.add(e);
-          // fire on propagation stream
-          _onPostObjectChangedController.add(e);
-        });
+        if(value is LocalModelObject) {
+          _ssMap[key] = (value as LocalModelObject)._onPostObjectChanged.listen((e) {
+            // fire normal change event
+            _onObjectChanged.add(e);
+            // fire on propagation stream
+            _onPostObjectChangedController.add(e);
+          });
+        }
       });
     }
 
