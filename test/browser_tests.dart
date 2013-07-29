@@ -320,6 +320,23 @@ onFileLoaded(rt.Document doc) {
       string.insertString(0, "xx");
     });
   });
+
+  group('Initial Values', () {
+    test('map', () {
+      doc.model.root['filled-map'] = doc.model.createMap({'key1': doc.model.createString(), 'key2': 4});
+      expect(doc.model.root['filled-map']['key1'].text, '');
+      expect(doc.model.root['filled-map']['key2'], 4);
+    });
+    test('list', () {
+      doc.model.root['filled-list'] = doc.model.createList([doc.model.createString(), 4]);
+      expect(doc.model.root['filled-list'][0].text, '');
+      expect(doc.model.root['filled-list'][1], 4);
+    });
+    test('string', () {
+      doc.model.root['filled-string'] = doc.model.createString('content');
+      expect(doc.model.root['filled-string'].text, 'content');
+    });
+  });
 }
 
 /**
