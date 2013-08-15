@@ -101,18 +101,28 @@ abstract class PersistentDocumentProvider extends DocumentProvider {
 
   /// Create a [Document] which is provided to the returned [Future]
   Future<Document> loadDocument([initializeModel(Model)]) {
+    bool doInitialSave = false;
     // get document from peristent storage
     return getDocument().then((retrievedDoc) {
-      // TODO only do initializeModel if document has never been loaded (where is this recorded)?
-      var model = new LocalModel(initializeModel);
-      // TODO put data from retrievedDoc into model
-      // TODO do data load in function passed as initializeModel so we don't get events for them
+      var model;
+      // if retrieved doc is empty, pass normal initializeModel
+      if(retrievedDoc == "") {
+        // TODO only do initializeModel if document has never been loaded (where is this recorded)?
+        model = new LocalModel(initializeModel);
+        doInitialSave = true;
+      } else {
+        // otherwise, initialize with json data
+        model = new LocalModel.fromJSON(json.parse(retrievedDoc));
+      }
       // listen for changes on model
       model.root.onObjectChanged.listen(_onDocumentChange);
       // create batch strategy
       batchStrategy = new DelayStrategy(model, const Duration(seconds: 1));
-      // create and return a document with the model
-      return _document = new LocalDocument(model);
+      // create a document with the model
+      _document = new LocalDocument(model);
+      // if document had not been loaded before, do initial save
+      saveDocument();
+      return _document;
     });
   }
 
