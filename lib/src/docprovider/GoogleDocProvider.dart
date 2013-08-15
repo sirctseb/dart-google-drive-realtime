@@ -16,6 +16,9 @@ part of realtime_data_model;
 
 /// A class to create and load documents from Google Drive
 class GoogleDocProvider extends DocumentProvider {
+  Document get document => _document;
+  Document _document;
+
   /// Load the Google Drive document which is provided to the returned Future.
   /// If this is the first time the document has been loaded, initializeModel is called
   /// with Document.model where it can be initialized.
@@ -46,7 +49,7 @@ class GoogleDocProvider extends DocumentProvider {
       new js.Callback.once((p) {
         // TODO document has to be retained. test if it can be released after complete call
         // TODO it looks like relaese/retain don't ref count. release invalidates immediately
-        completer.complete(new Document._fromProxy(p)..retain());
+        completer.complete(_document = new Document._fromProxy(p)..retain());
       }),
       // pass initializeModel through if supplied
       initializeModel == null ? null : new js.Callback.once((p) => initializeModel(new Model._fromProxy(p))),
@@ -174,5 +177,10 @@ class GoogleDocProvider extends DocumentProvider {
     GoogleDocProvider.auth = auth;
 
     return completer.future;
+  }
+
+  Future<String> exportDocument() {
+    // use drive.realtime.get to get document export
+    drive.realtime.get(fileId).then((js) => json.stringify(js));
   }
 }

@@ -15,16 +15,24 @@
 part of realtime_data_model;
 
 /// A class to create local documents with no persistence
-class LocalDocumentProvider {
+class LocalDocumentProvider extends DocumentProvider {
+  Document get document => _document;
+  Document _document;
+
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
   Future<Document> loadDocument([initializeModel(Model)]) {
     var model = new LocalModel(initializeModel);
     // create a document with the model
     var document = new LocalDocument(model);
+    _document = document;
     var completer = new Completer();
     // complete with document
     completer.complete(document);
     return completer.future;
+  }
+
+  Future<String> exportDocument() {
+    return new Future.value(json.stringify(_document.model.toJSON()));
   }
 }

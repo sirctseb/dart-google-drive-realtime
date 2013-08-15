@@ -79,7 +79,7 @@ class DelayStrategy extends BatchStrategy {
 
 /// A class to provide non Google Drive documents with persistence
 abstract class PersistentDocumentProvider {
-  /// The [Document] provided by this provider. Null until after the futur returned by loadDocument completes
+  /// The [Document] provided by this provider. May be null until after the future returned by loadDocument completes
   Document get document => _document;
   // TODO we could do final if we are willing to have an uninitialized document on the provider before it acutally loads
   Document _document;

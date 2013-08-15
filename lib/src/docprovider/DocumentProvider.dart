@@ -16,8 +16,21 @@ part of realtime_data_model;
 
 /// A class to create and load realtime documents
 abstract class DocumentProvider {
-  /// Load a document which is provided to the returned Future.
-  /// If this is the first time the document has been loaded, initializeModel is called
-  /// with Document.model where it can be initialized.
+  /// The [Document] provided by this provider. Null until after the future returned by loadDocument completes
+  Document get document;
+
+  /**
+   *  Load a document which is provided to the returned Future.
+   * If this is the first time the document has been loaded, initializeModel is called
+   * with Document.model where it can be initialized.
+   */
   Future<Document> loadDocument([initializeModel(Model)]);
+
+  /**
+   * Export document to json format as returned by drive.realtime.get.
+   * See https://developers.google.com/drive/v2/reference/realtime/get
+   * The json format is undocumented as of 2013-8-15
+   */
+  // TODO currently GoogleDocProvider gets from server but Local and Persistent get from local object. is this a problem?
+  Future<String> exportDocument();
 }
