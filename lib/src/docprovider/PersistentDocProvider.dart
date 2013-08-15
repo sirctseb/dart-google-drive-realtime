@@ -120,14 +120,14 @@ abstract class PersistentDocumentProvider {
    * If true, the client has mutations that have not yet been sent to the server.
    * If false, all mutations have been sent to the server, but some may not yet have been acked.
    */
-  bool get isPending;
+  bool get isPending => _isPending;
   bool _isPending = false;
 
   /**
    * If true, the document is in the process of saving.
    * Mutations have been sent to the server, but we have not yet received an ack. If false, nothing is in the process of being sent.
    */
-  bool get isSaving;
+  bool get isSaving => _isSaving;
   bool _isSaving = false;
 
   // handles document change events and calls saveDocument based on buffering strategy
