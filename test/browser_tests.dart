@@ -346,7 +346,7 @@ get realtimeOptions => {
    /**
   * Client ID from the APIs Console.
   */
-  'clientId': 'INSERT YOUR CLIENT ID HERE',
+  'clientId': 'INSERT CLIENT ID HERE',
 
    /**
   * The ID of the button to click to authorize. Must be a DOM element ID.
@@ -376,5 +376,12 @@ get realtimeOptions => {
 
 
 main() {
-  rt.start(realtimeOptions);
+  // set clientId
+  rt.GoogleDocProvider.clientId = 'INSERT CLIENT ID HERE';
+
+//  var docProvider = new rt.GoogleDocProvider('0B0OUnldiyG0hSEU0U3VnalQ1a1U');
+////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
+  var docProvider = new rt.LocalDocumentProvider();
+
+  docProvider.loadDocument(initializeModel).then(onFileLoaded);
 }
