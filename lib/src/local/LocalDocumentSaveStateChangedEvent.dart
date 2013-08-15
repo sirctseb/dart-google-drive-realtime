@@ -23,7 +23,7 @@ class LocalDocumentSaveStateChangedEvent extends LocalEvent implements rt.Docume
 
   final bool isSaving;
 
-  final String type = ModelEventType.DOCUMENT_SAVE_STATE_CHANGED;
+  final String type = ModelEventType.DOCUMENT_SAVE_STATE_CHANGED.value;
 
   // TODO not private because doc providers need to create them
   // TODO these don't need to be private in general because local_rdm is not public anyway
