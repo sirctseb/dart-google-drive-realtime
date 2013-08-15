@@ -23,6 +23,7 @@ import 'package:js/js.dart' as js;
 import 'package:meta/meta.dart';
 
 part 'LocalDocument.dart';
+part 'LocalDocumentSaveStateChangedEvent.dart';
 part 'LocalEvent.dart';
 part 'LocalIndexReference.dart';
 part 'LocalIndexReferenceContainer.dart';
