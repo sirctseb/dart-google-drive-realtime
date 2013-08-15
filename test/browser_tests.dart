@@ -337,6 +337,25 @@ onFileLoaded(rt.Document doc) {
       expect(doc.model.root['filled-string'].text, 'content');
     });
   });
+
+  group('Native Objects', () {
+    test('map', () {
+      doc.model.root['native-map'] = {'map': {'key': 'val'}, 'list': [1,2,3], 'string': 'value'};
+      expect(doc.model.root['native-map']['map']['key'], 'val');
+      expect(doc.model.root['native-map']['list'][1], 2);
+      expect(doc.model.root['native-map']['string'], 'value');
+    });
+    test('list', () {
+      doc.model.root['native-list'] = [{'key': 'value'}, [1,2,3], 'value'];
+      expect(doc.model.root['native-list'][0]['key'], 'value');
+      expect(doc.model.root['native-list'][1][1], 2);
+      expect(doc.model.root['native-list'][2], 'value');
+    });
+    test('string', () {
+      doc.model.root['native-string'] = 'value';
+      expect(doc.model.root['native-string'], 'value');
+    });
+  });
 }
 
 main() {
