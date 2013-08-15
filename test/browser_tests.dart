@@ -339,42 +339,6 @@ onFileLoaded(rt.Document doc) {
   });
 }
 
-/**
- * Options for the Realtime loader.
- */
-get realtimeOptions => {
-   /**
-  * Client ID from the APIs Console.
-  */
-  'clientId': 'INSERT CLIENT ID HERE',
-
-   /**
-  * The ID of the button to click to authorize. Must be a DOM element ID.
-  */
-   'authButtonElementId': 'authorizeButton',
-
-   /**
-  * Function to be called when a Realtime model is first created.
-  */
-   'initializeModel': initializeModel,
-
-   /**
-  * Autocreate files right after auth automatically.
-  */
-   'autoCreate': true,
-
-   /**
-  * Autocreate files right after auth automatically.
-  */
-   'defaultTitle': "New Realtime Quickstart File",
-
-   /**
-  * Function to be called every time a Realtime file is loaded.
-  */
-   'onFileLoaded': onFileLoaded
-};
-
-
 main() {
   // set clientId
   rt.GoogleDocProvider.clientId = 'INSERT CLIENT ID HERE';
