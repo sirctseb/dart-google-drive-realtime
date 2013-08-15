@@ -54,4 +54,7 @@ class LocalIndexReferenceContainer extends LocalModelObject {
 
   // The list of index references registered to this object
   List<LocalIndexReference> _indexReferences = [];
+
+  LocalIndexReferenceContainer();
+  LocalIndexReferenceContainer.fromJSON(Map json) : super.fromJSON(json);
 }

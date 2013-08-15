@@ -154,10 +154,11 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
   LocalModelList([List initialValue]) {
     // initialize with values
     if(initialValue != null) {
-      // don't fire events but do propagate changes
-      _list.addAll(initialValue);
-      initialValue.forEach((element) => _propagateChanges(element));
+      initializeWithValue(initialValue);
     }
+    initializeEvents();
+  }
+  void initializeEvents() {
 
     // listen for events to add or cancel object changed propagation
     onValuesAdded.listen((LocalValuesAddedEvent e) {
@@ -174,6 +175,22 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
     _eventStreamControllers[ModelEventType.VALUES_SET.value] = _onValuesSet;
     _eventStreamControllers[ModelEventType.VALUES_ADDED.value] = _onValuesAdded;
     _eventStreamControllers[ModelEventType.VALUES_REMOVED.value] = _onValuesRemoved;
+  }
+  void initializeWithValue(List initialValue) {
+    // don't fire events but do propagate changes
+    _list.addAll(initialValue);
+    initialValue.forEach((element) => _propagateChanges(element));
+  }
+  LocalModelList.fromJSON(Map json) : super.fromJSON(json) {
+    initializeWithValue(_jsonToRealtimeList(json['value']));
+
+    initializeEvents();
+  }
+  static List _jsonToRealtimeList(List list) {
+    return list.map((val) {
+      if(val.containsKey('json')) return val['json'];
+      return LocalModelObject.parseJSON(val);
+    }).toList();
   }
 
   // TODO we could alternatively listen for our own events and do the modifications there

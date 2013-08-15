@@ -18,11 +18,14 @@ class LocalModel extends LocalRetainable implements rt.Model {
   UndoHistory _undoHistory;
 
   /// Create a local model with a callback
-  LocalModel([initialize]) {
+  LocalModel([initialize]) : root = new LocalModelMap() {
     _undoHistory = new UndoHistory(this);
     if(initialize != null) {
       _undoHistory.initializeModel(initialize, this);
     }
+  }
+  LocalModel.fromJSON(Map json) : root = new LocalModelMap.fromJSON(json['data']) {
+    _undoHistory = new UndoHistory(this);
   }
 
   // TODO need to make local event
@@ -41,7 +44,7 @@ class LocalModel extends LocalRetainable implements rt.Model {
   void beginCreationCompoundOperation() {}
   void endCompoundOperation() {}
 
-  final LocalModelMap root = new LocalModelMap();
+  final LocalModelMap root;
 
   // TODO is this ever false?
   // TODO we should probably provide the same initialization callback method as realtime

@@ -86,20 +86,36 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   LocalModelMap([Map initialValue]) {
     // initialize with value
     if(initialValue != null) {
-      // don't emit events, but do propagate changes
-      _map.addAll(initialValue);
-      _map.forEach((key,value) {
-        if(value is LocalModelObject) {
-          _ssMap[key] = (value as LocalModelObject)._onPostObjectChanged.listen((e) {
-            // fire normal change event
-            _onObjectChanged.add(e);
-            // fire on propagation stream
-            _onPostObjectChangedController.add(e);
-          });
-        }
-      });
+      initializeWithValue(initialValue);
     }
 
+    _eventStreamControllers[ModelEventType.VALUE_CHANGED.value] = _onValueChanged;
+  }
+  void initializeWithValue(Map initialValue) {
+    // don't emit events, but do propagate changes
+    _map.addAll(initialValue);
+    _map.forEach((key,value) {
+      if(value is LocalModelObject) {
+        _ssMap[key] = (value as LocalModelObject)._onPostObjectChanged.listen((e) {
+          // fire normal change event
+          _onObjectChanged.add(e);
+          // fire on propagation stream
+          _onPostObjectChangedController.add(e);
+        });
+      }
+    });
+  }
+  // convert from exported json format to actual realtime model and native objects
+  static Map _jsonToRealtimeMap(Map json) {
+    return new Map.fromIterable(json.keys, value: (key) {
+      // return if native object
+      if(json[key].containsKey('json')) return json[key]['json'];
+      // create realtime object
+      return LocalModelObject.parseJSON(json[key]);
+    });
+  }
+  LocalModelMap.fromJSON(Map json) : super.fromJSON(json) {
+    initializeWithValue(_jsonToRealtimeMap(json['value']));
     _eventStreamControllers[ModelEventType.VALUE_CHANGED.value] = _onValueChanged;
   }
 
