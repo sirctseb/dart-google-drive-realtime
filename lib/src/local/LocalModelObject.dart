@@ -81,4 +81,14 @@ class LocalModelObject extends LocalRetainable implements rt.CollaborativeObject
   // map from event type to stream controller they go on
   // TODO with this we don't need to pass controllers to _emitEventsAndChanged
   Map<String, StreamController> _eventStreamControllers = {};
+
+  /// JSON serialized data
+  Map toJSON() {
+    // TODO implement for custom object
+    return {
+      "id": this.id,
+      "type": "", // TODO
+      "value": {} // TODO
+    };
+  }
 }

@@ -85,4 +85,13 @@ class LocalModelString extends LocalIndexReferenceContainer implements rt.Collab
 
   // current string value
   String _string = "";
+
+  /// JSON serialized data
+  Map toJSON() {
+    return {
+      "id": this.id,
+      "type": "EditableString",
+      "value": this._string
+    };
+  }
 }

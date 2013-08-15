@@ -132,4 +132,17 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
         super._executeEvent(event_in);
     }
   }
+
+  /// JSON serialized data
+  // TODO output numbers as floating point
+  Map toJSON() {
+    return {
+      "id": this.id,
+      "type": "Map",
+      "value": new Map.fromIterable(_map.keys, value: (key) {
+        if(_map[key] is LocalModelObject) return _map[key].toJSON();
+        return {"json": _map[key]};
+      })
+    };
+  }
 }

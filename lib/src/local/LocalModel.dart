@@ -84,4 +84,13 @@ class LocalModel extends LocalRetainable implements rt.Model {
 
   /// Local models have no js Proxy
   dynamic toJs() => null;
+
+  /// JSON serialized data
+  Map toJSON() {
+    return {
+      "appId": "", // TODO
+      "revision": 0, // TODO
+      "data": root.toJSON()
+    };
+  }
 }

@@ -197,4 +197,16 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
       super._executeEvent(event_in);
     }
   }
+
+  /// JSON serialized data
+  Map toJSON() {
+    return {
+      "id": this.id,
+      "type": "List",
+      "value": _list.map((e) {
+        if(e is LocalModelObject) return e.toJSON();
+        return {"json": e};
+      }).toList()
+    };
+  }
 }
