@@ -25,5 +25,7 @@ class LocalDocumentSaveStateChangedEvent extends LocalEvent implements rt.Docume
 
   final String type = ModelEventType.DOCUMENT_SAVE_STATE_CHANGED;
 
-  LocalDocumentSaveStateChangedEvent._(this.isPending, this.isSaving, target) : super._(target);
+  // TODO not private because doc providers need to create them
+  // TODO these don't need to be private in general because local_rdm is not public anyway
+  LocalDocumentSaveStateChangedEvent(this.isPending, this.isSaving, target) : super._(target);
 }
