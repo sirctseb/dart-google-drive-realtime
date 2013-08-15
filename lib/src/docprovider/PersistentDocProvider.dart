@@ -181,7 +181,7 @@ abstract class PersistentDocumentProvider extends DocumentProvider {
    *  Called by PersistentDocumentProvider.loadDocument to retrieve the document data.
    */
   // TODO what format does this return?
-  Future<dynamic> getDocument();
+  Future<String> getDocument();
 
   /**
    * Save current document state to persistent storage.
