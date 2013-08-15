@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-/// A class to create and load realtime documents
+/// A class to create local documents with no persistence
 class LocalDocumentProvider {
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
