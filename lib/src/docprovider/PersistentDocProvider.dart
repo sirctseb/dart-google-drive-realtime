@@ -147,7 +147,7 @@ abstract class PersistentDocumentProvider extends DocumentProvider {
     _isPending = true;
     // if pending has changed, send change event
     if(lastIsPending != _isPending) {
-      _document._onDocumentSaveStateChanged.add(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, document));
+      _document.changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
     }
   }
 
@@ -157,7 +157,7 @@ abstract class PersistentDocumentProvider extends DocumentProvider {
     _isPending = false;
     _isSaving = true;
     // send state changed event. don't have to make separate check because _isSaving had to be false
-    _document._onDocumentSaveStateChanged.add(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, document));
+    _document.changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
     saveDocument().then((bool saved) {
       if(!saved) {
         // TODO save error?
@@ -166,7 +166,7 @@ abstract class PersistentDocumentProvider extends DocumentProvider {
         var lastIsSaving = isSaving;
         _isSaving = false;
         if(lastIsSaving != isSaving) {
-          _document._onDocumentSaveStateChanged.add(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, document));
+          _document.changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
         }
       }
     });
