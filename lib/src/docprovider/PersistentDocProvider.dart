@@ -36,6 +36,11 @@ abstract class BatchStrategy {
   /**
    * A stream that emits true when document changes should be saved to persistent storage
    */
+  // TODO strategy needs to know if save is in progress so it can delay, or needs to be told
+  // TODO that a save failed because one was already in progress. we could make it a callback
+  // TODO instead of a stream to achieve the latter.
+  // TODO for the former we could pass the document to constructor instead of the model
+  // TODO and strategy can check for save state
   Stream<bool> get saveStream => _saveStreamController.stream;
   StreamController<bool> _saveStreamController = new StreamController<bool>();
 }
@@ -101,6 +106,7 @@ abstract class PersistentDocumentProvider {
       // TODO only do initializeModel if document has never been loaded (where is this recorded)?
       var model = new LocalModel(initializeModel);
       // TODO put data from retrievedDoc into model
+      // TODO do data load in function passed as initializeModel so we don't get events for them
       // listen for changes on model
       model.root.onObjectChanged.listen(_onDocumentChange);
       // create batch strategy
@@ -129,9 +135,9 @@ abstract class PersistentDocumentProvider {
   void _onDocumentChange(ObjectChangedEvent e) {
     bool lastIsPending = isPending;
     _isPending = true;
+    // if pending has changed, send change event
     if(lastIsPending != _isPending) {
-      // TODO implement load save state changed event
-      //_document._onDocumentSaveStateChanged.add(new LocalDocumentSaveStateChangedEvent._(/* args */));
+      _document._onDocumentSaveStateChanged.add(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, document));
     }
   }
 
@@ -140,6 +146,8 @@ abstract class PersistentDocumentProvider {
     if(_isSaving) return;
     _isPending = false;
     _isSaving = true;
+    // send state changed event. don't have to make separate check because _isSaving had to be false
+    _document._onDocumentSaveStateChanged.add(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, document));
     saveDocument().then((bool saved) {
       if(!saved) {
         // TODO save error?
@@ -147,7 +155,9 @@ abstract class PersistentDocumentProvider {
         // TODO this should always be true. what if it's not?
         var lastIsSaving = isSaving;
         _isSaving = false;
-        // TODO do save state changed event on document
+        if(lastIsSaving != isSaving) {
+          _document._onDocumentSaveStateChanged.add(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, document));
+        }
       }
     });
   }
