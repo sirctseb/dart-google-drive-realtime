@@ -180,7 +180,17 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   Future<String> exportDocument() {
+
     // use drive.realtime.get to get document export
-    drive.realtime.get(fileId).then((js) => json.stringify(js));
+//    drive.realtime.get(fileId).then((js) => json.stringify(js));
+
+    // TODO workaround for bug in client library
+    // http://stackoverflow.com/questions/18001043/why-is-the-response-to-gapi-client-drive-realtime-get-empty
+    return HttpRequest.request('https://www.googleapis.com/drive/v2/files/${fileId}/realtime?access_token=${auth.token}',
+      method: 'POST')
+      .then((HttpRequest req) {
+        // TODO error handling
+        return req.responseText;
+      });
   }
 }

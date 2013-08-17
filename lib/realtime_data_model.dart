@@ -14,6 +14,7 @@
 
 library realtime_data_model;
 
+import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
 import 'dart:json' as json;
