@@ -184,7 +184,7 @@ class GoogleDocProvider extends DocumentProvider {
       });
     } else {
       // try only with immediacy specified by argument
-      localAuth.login(immediate: immediate);
+      localAuth.login(immediate: immediate).then(onTokenLoad);
     }
 
     // store on static member
