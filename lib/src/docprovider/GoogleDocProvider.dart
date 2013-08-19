@@ -122,19 +122,28 @@ class GoogleDocProvider extends DocumentProvider {
    * then [GoogleDocProvider] will attempt an immediate authentication using GoogleDocProvider.Authenticate
    */
   static OAuth2 auth;
-  /// Establish authorization for GoogleDocProviders
-  /// The resulting authorization object is stored in GoogleDocProvider.auth
-  /// The returned future is completed with true if authorization succeeds
-  // TODO option for trying immediate only?
+  /**
+   * Establish authorization for GoogleDocProviders
+   * The resulting authorization object is stored in GoogleDocProvider.auth
+   * The returned future is completed with true if authorization succeeds
+   * If a value for immediate is not provided, immediate authentication is attempted,
+   *  and pop-up authentication is attempted if immediate fails.
+   * If immediate is false, only pop-up authentication is attempted.
+   * If immediate it true, only immediate authentication is attempted
+   */
   // TODO make private?
   // TODO if not private, document that clientId must be set or allow it to be passed
-  static Future<OAuth2> authenticate() {
+  static Future<OAuth2> authenticate({bool immediate}) {
 
     // completer whose future will be returned
     var completer = new Completer();
 
+    if(clientId == null) {
+      completer.completeError(new Exception("GoogleDocProvider.clientId must be set before authenticating"));
+      return completer.future;
+    }
+
     if(auth != null) {
-      // TODO can we complete before returning future?
       completer.complete(auth);
       return completer.future;
     }
@@ -166,12 +175,17 @@ class GoogleDocProvider extends DocumentProvider {
       // complete the future
       completer.complete(auth);
     };
-    // try silent login
-    localAuth.login(immediate: true).then(onTokenLoad).catchError((obj) {
-      // if no immediate auth, show window to get auth
-      // let errors here propogate up
-      localAuth.login(immediate: false).then(onTokenLoad);
-    });
+    if(immediate == null) {
+      // try silent login
+      localAuth.login(immediate: true).then(onTokenLoad).catchError((obj) {
+        // if no immediate auth, show window to get auth
+        // let errors here propogate up
+        localAuth.login(immediate: false).then(onTokenLoad);
+      });
+    } else {
+      // try only with immediacy specified by argument
+      localAuth.login(immediate: immediate);
+    }
 
     // store on static member
     GoogleDocProvider.auth = auth;
