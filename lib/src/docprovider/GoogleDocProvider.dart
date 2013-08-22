@@ -135,35 +135,17 @@ class GoogleDocProvider extends DocumentProvider {
   // TODO if not private, document that clientId must be set or allow it to be passed
   static Future<OAuth2> authenticate({bool immediate}) {
 
-    // completer whose future will be returned
-    var completer = new Completer();
-
     if(clientId == null) {
-      completer.completeError(new Exception("GoogleDocProvider.clientId must be set before authenticating"));
-      return completer.future;
+      return new Future.error(new Exception("GoogleDocProvider.clientId must be set before authenticating"));
     }
 
-    if(auth != null) {
-      completer.complete(auth);
-      return completer.future;
+    if(auth != null && auth.token != null) {
+      return new Future.value(auth);
     }
 
-    // create auth object
-    var localAuth = new GoogleOAuth2(
-        clientId,
-        // TODO what scopes? allow them to be supplied as parameters?
-        ['https://www.googleapis.com/auth/drive.install',
-         'https://www.googleapis.com/auth/drive.file',
-         'openid'],
-         // TODO this calls login but doesn't let the exception through
-         // so we have to do it with login calls below
-         autoLogin: false
-    );
-    // use separate name for GoogleOAuth to eliminate compiler warnings
-    auth = localAuth;
     // function to install gapi.auth.getToken and continue with createAndLoadFile
     var onTokenLoad = (Token t) {
-      // TODO this is not realiable and we may have to switch to js-side authorization
+      // TODO this is not reliable and we may have to switch to js-side authorization
       // overwrite gapi.auth.getToken with a function that
       // returns an object with valid data in access_token
       js.context['gapi']['auth'] = js.map({'getToken':
@@ -172,25 +154,37 @@ class GoogleDocProvider extends DocumentProvider {
                 'access_token': t.data
               }))
       });
-      // complete the future
-      completer.complete(auth);
     };
+
+    var localAuth = auth;
+    if(auth == null) {
+      // create auth object
+      localAuth = new GoogleOAuth2(
+          clientId,
+          // TODO what scopes? allow them to be supplied as parameters?
+          ['https://www.googleapis.com/auth/drive.install',
+           'https://www.googleapis.com/auth/drive.file',
+           'openid'],
+           // TODO this calls login but doesn't let the exception through
+           // so we have to do it with login calls below
+           autoLogin: false,
+           tokenLoaded: onTokenLoad
+      );
+      // use separate name for GoogleOAuth to eliminate compiler warnings
+      auth = localAuth;
+    }
     if(immediate == null) {
       // try silent login
-      localAuth.login(immediate: true).then(onTokenLoad).catchError((obj) {
+      return localAuth.login(immediate: true).then((ignored) => auth).catchError((obj) {
         // if no immediate auth, show window to get auth
         // let errors here propogate up
-        localAuth.login(immediate: false).then(onTokenLoad);
+        return localAuth.login(immediate: false).then((ignored) => auth);
       });
     } else {
       // try only with immediacy specified by argument
-      localAuth.login(immediate: immediate).then(onTokenLoad);
+      return localAuth.login(immediate: immediate).then((ignored) => auth);
     }
-
-    // store on static member
-    GoogleDocProvider.auth = auth;
-
-    return completer.future;
+    return new Future.error(new Exception('Reached unreachable code'));
   }
 
   Future<String> exportDocument() {
