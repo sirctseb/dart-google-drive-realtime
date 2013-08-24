@@ -181,17 +181,6 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
     _list.addAll(initialValue);
     initialValue.forEach((element) => _propagateChanges(element));
   }
-  LocalModelList.fromJSON(Map json) : super.fromJSON(json) {
-    initializeWithValue(_jsonToRealtimeList(json['value']));
-
-    initializeEvents();
-  }
-  static List _jsonToRealtimeList(List list) {
-    return list.map((val) {
-      if(val.containsKey('json')) return val['json'];
-      return LocalModelObject.parseJSON(val);
-    }).toList();
-  }
 
   // TODO we could alternatively listen for our own events and do the modifications there
   void _executeEvent(LocalUndoableEvent event_in) {

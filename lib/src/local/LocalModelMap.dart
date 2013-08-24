@@ -105,19 +105,6 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
       }
     });
   }
-  // convert from exported json format to actual realtime model and native objects
-  static Map _jsonToRealtimeMap(Map json) {
-    return new Map.fromIterable(json.keys, value: (key) {
-      // return if native object
-      if(json[key].containsKey('json')) return json[key]['json'];
-      // create realtime object
-      return LocalModelObject.parseJSON(json[key]);
-    });
-  }
-  LocalModelMap.fromJSON(Map json) : super.fromJSON(json) {
-    initializeWithValue(_jsonToRealtimeMap(json['value']));
-    _eventStreamControllers[ModelEventType.VALUE_CHANGED.value] = _onValueChanged;
-  }
 
   void _executeEvent(LocalUndoableEvent event_in) {
     if(event_in.type == ModelEventType.VALUE_CHANGED.value) {

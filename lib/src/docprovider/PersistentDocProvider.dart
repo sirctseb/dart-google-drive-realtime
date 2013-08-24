@@ -112,7 +112,7 @@ abstract class PersistentDocumentProvider extends DocumentProvider {
         doInitialSave = true;
       } else {
         // otherwise, initialize with json data
-        model = new LocalModel.fromJSON(json.parse(retrievedDoc));
+        model = new LocalModel(getModelCloner(retrievedDoc));
       }
       // listen for changes on model
       model.root.onObjectChanged.listen(_onDocumentChange);

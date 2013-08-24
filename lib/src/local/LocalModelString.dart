@@ -63,13 +63,6 @@ class LocalModelString extends LocalIndexReferenceContainer implements rt.Collab
     _eventStreamControllers[ModelEventType.TEXT_INSERTED.value] = _onTextInserted;
   }
 
-  LocalModelString.fromJSON(Map json) : super.fromJSON(json) {
-    _string = json['value'];
-
-    _eventStreamControllers[ModelEventType.TEXT_DELETED.value] = _onTextDeleted;
-    _eventStreamControllers[ModelEventType.TEXT_INSERTED.value] = _onTextInserted;
-  }
-
   void _executeEvent(LocalUndoableEvent event_in) {
     // handle insert and delete events
     // TODO deal with type warnings

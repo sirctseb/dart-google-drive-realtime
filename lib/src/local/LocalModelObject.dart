@@ -41,14 +41,6 @@ class LocalModelObject extends LocalRetainable implements rt.CollaborativeObject
   static String get nextId => (_idNum++).toString();
 
   LocalModelObject() : id = nextId;
-  static dynamic parseJSON(Map json) {
-    // TODO we don't need this static method if a factory constructor can initialize final variables
-    // TODO collect these magic constants from drive.realtime.get format into one place
-    if(json['type'] == 'Map') return new LocalModelMap.fromJSON(json);
-    if(json['type'] == 'List') return new LocalModelList.fromJSON(json);
-    if(json['type'] == 'EditableString') return new LocalModelString.fromJSON(json);
-  }
-  LocalModelObject.fromJSON(Map json) : id = json['id'];
 
   static bool _inEmitEventsAndChangedScope = false;
 

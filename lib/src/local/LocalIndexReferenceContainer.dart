@@ -56,5 +56,4 @@ class LocalIndexReferenceContainer extends LocalModelObject {
   List<LocalIndexReference> _indexReferences = [];
 
   LocalIndexReferenceContainer();
-  LocalIndexReferenceContainer.fromJSON(Map json) : super.fromJSON(json);
 }

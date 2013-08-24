@@ -33,4 +33,55 @@ abstract class DocumentProvider {
    */
   // TODO currently GoogleDocProvider gets from server but Local and Persistent get from local object. is this a problem?
   Future<String> exportDocument();
+
+  /**
+   * Get a function that can be passed to loadDocument that will initialize the
+   * model with the contents of the exported model provided.
+   *
+   * e.g.
+   *     // export an old document
+   *     oldDocProvider.exportDocument().then((exported) {
+   *       // load a new document and initialize with the old document contents
+   *       newDocProvider.loadDocument(DocumentProvider.getModelCloner(exported)).then((doc) {
+   *         // work with new document
+   *       });
+   *     });
+   *
+   * exportedDocument is either a JSON string like exportDocument returns, or a parsed version
+   */
+  static Function getModelCloner(exportedDocument) {
+    if(exportedDocument is String) {
+      exportedDocument = json.parse(exportedDocument);
+    }
+    return (Model model) {
+      for(var key in exportedDocument['data']['value'].keys) {
+        model.root[key] = _parseJSON(model, exportedDocument['data']['value'][key]);
+      }
+    };
+  }
+
+  // recursively construct a model object from an json export map
+  static dynamic _parseJSON(Model model, Map json) {
+    if(json.containsKey('json')) {
+      return json['json'];
+    } else {
+      if(json['type'] == 'Map') {
+        var ret = model.createMap();
+        for(var key in json['value'].keys) {
+          ret[key] = _parseJSON(model, json['value'][key]);
+        }
+        return ret;
+      } else if(json['type'] == 'List') {
+        var ret = model.createList();
+        for(var element in json['value']) {
+          ret.push(_parseJSON(model, element));
+        }
+        return ret;
+      } else if(json['type'] == 'EditableString') {
+        return model.createString(json['value']);
+      } else {
+        throw new Exception('Unsupported json structure ${json}');
+      }
+    }
+  }
 }

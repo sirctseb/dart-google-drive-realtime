@@ -24,9 +24,6 @@ class LocalModel extends LocalRetainable implements rt.Model {
       _undoHistory.initializeModel(initialize, this);
     }
   }
-  LocalModel.fromJSON(Map json) : root = new LocalModelMap.fromJSON(json['data']) {
-    _undoHistory = new UndoHistory(this);
-  }
 
   // TODO need to make local event
   StreamController<LocalUndoRedoStateChangedEvent> _onUndoRedoStateChanged =
