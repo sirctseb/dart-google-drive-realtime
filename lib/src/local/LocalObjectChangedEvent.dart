@@ -16,7 +16,7 @@ part of local_realtime_data_model;
 
 class LocalObjectChangedEvent extends LocalEvent implements rt.ObjectChangedEvent {
 
-  final List<LocalEvent> events;
+  final List<LocalUndoableEvent> events;
 
   // TODO I think this may be true for ObjectChanged and false for everything else?
   bool get bubbles => null; // TODO implement this getter
