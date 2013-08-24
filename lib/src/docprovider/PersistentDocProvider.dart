@@ -121,7 +121,9 @@ abstract class PersistentDocumentProvider extends DocumentProvider {
       // create a document with the model
       _document = new LocalDocument(model);
       // if document had not been loaded before, do initial save
-      saveDocument();
+      if(doInitialSave) {
+        saveDocument();
+      }
       return _document;
     });
   }
