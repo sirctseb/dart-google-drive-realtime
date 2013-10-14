@@ -25,8 +25,8 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:realtime_data_model/src/local/local_realtime_data_model.dart';
 import 'package:google_oauth2_client/google_oauth2_browser.dart';
-import 'package:google_drive_v2_api/drive_v2_api_browser.dart' as driveclient;
-import 'package:google_drive_v2_api/drive_v2_api_client.dart' as driveclient;
+import 'package:google_drive_v2_api/drive_v2_api_browser.dart' as dcbrowser;
+import 'package:google_drive_v2_api/drive_v2_api_client.dart' as dc;
 
 import 'src/utils.dart';
 

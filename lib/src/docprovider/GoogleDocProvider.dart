@@ -37,8 +37,8 @@ class GoogleDocProvider extends DocumentProvider {
         _logger.fine('Title specified, need to insert file');
         // insert file
         return drive.files.insert(
-          new driveclient.File.fromJson({'mimetype': 'application/vnd.google-apps.drive-sdk', 'title': _newTitle})
-        ).then((driveclient.File file) {
+          new dc.File.fromJson({'mimetype': 'application/vnd.google-apps.drive-sdk', 'title': _newTitle})
+        ).then((dc.File file) {
           _logger.fine('Got newly inserted file object, storing id');
           // store fileId
           this._fileId = file.id;
@@ -104,14 +104,14 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   // drive client object, set on authorization
-  static driveclient.Drive drive;
+  static dcbrowser.Drive drive;
   /// Create a drive api object
   static void _loadDrive() {
     _logger.fine('Loading drive if not already loaded');
     if(drive != null) return;
     _logger.finer('Drive not yet loaded, creating client');
     // create drive client object
-    drive = new driveclient.Drive(auth);
+    drive = new dcbrowser.Drive(auth);
     // allow it to make authorized requests (TODO I guess. I got it from the examples)
     drive.makeAuthRequests = true;
     _logger.finer('Drive client created: $drive');
