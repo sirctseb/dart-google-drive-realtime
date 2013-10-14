@@ -33,6 +33,7 @@ part 'src/docprovider/DocumentProvider.dart';
 part 'src/docprovider/GoogleDocProvider.dart';
 part 'src/docprovider/LocalDocumentProvider.dart';
 part 'src/docprovider/PersistentDocProvider.dart';
+part 'src/docprovider/RemoteDocumentProvider.dart';
 part 'src/realtime/BaseModelEvent.dart';
 part 'src/realtime/CollaborativeContainer.dart';
 part 'src/realtime/CollaborativeList.dart';

@@ -78,11 +78,7 @@ class DelayStrategy extends BatchStrategy {
 }
 
 /// A class to provide non Google Drive documents with persistence
-abstract class PersistentDocumentProvider extends DocumentProvider {
-  /// The [Document] provided by this provider. May be null until after the future returned by loadDocument completes
-  Document get document => _document;
-  // TODO we could do final if we are willing to have an uninitialized document on the provider before it acutally loads
-  Document _document;
+abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
 
   /// The strategy to determine when document changes should be saved
   BatchStrategy get batchStrategy => _batchStrategy;
@@ -177,13 +173,6 @@ abstract class PersistentDocumentProvider extends DocumentProvider {
   Future<String> exportDocument() {
     return new Future.value(json.stringify(_document.model.toJSON()));
   }
-
-  /**
-   *  Load a document from persistent storage.
-   *  Called by PersistentDocumentProvider.loadDocument to retrieve the document data.
-   */
-  // TODO what format does this return?
-  Future<String> getDocument();
 
   /**
    * Save current document state to persistent storage.
