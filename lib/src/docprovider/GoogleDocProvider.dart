@@ -121,7 +121,7 @@ class GoogleDocProvider extends DocumentProvider {
    *     GoogleDocProvider.auth = myAuth;
    * then [GoogleDocProvider] will attempt an immediate authentication using GoogleDocProvider.Authenticate
    */
-  static OAuth2 auth;
+  static GoogleOAuth2 auth;
   /**
    * Establish authorization for GoogleDocProviders
    * The resulting authorization object is stored in GoogleDocProvider.auth

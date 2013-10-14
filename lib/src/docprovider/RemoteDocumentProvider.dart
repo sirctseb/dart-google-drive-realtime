@@ -29,7 +29,7 @@ abstract class RemoteDocumentProvider extends LocalDocumentProvider {
         model = new LocalModel(initializeModel);
       } else {
         // otherwise, initialize with json data
-        model = new LocalModel(getModelCloner(retrievedDoc));
+        model = new LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
       }
       // create a document with the model
       _document = new LocalDocument(model);

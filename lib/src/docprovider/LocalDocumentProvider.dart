@@ -33,6 +33,6 @@ class LocalDocumentProvider extends DocumentProvider {
   }
 
   Future<String> exportDocument() {
-    return new Future.value(json.stringify(_document.model.toJSON()));
+    return new Future.value(json.stringify((_document.model as LocalModel).toJSON()));
   }
 }

@@ -108,7 +108,7 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
         doInitialSave = true;
       } else {
         // otherwise, initialize with json data
-        model = new LocalModel(getModelCloner(retrievedDoc));
+        model = new LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
       }
       // listen for changes on model
       model.root.onObjectChanged.listen(_onDocumentChange);
@@ -145,7 +145,8 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
     _isPending = true;
     // if pending has changed, send change event
     if(lastIsPending != _isPending) {
-      _document.changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
+      // TODO have to specify type to avoid compiler warning
+      (_document as LocalDocument).changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
     }
   }
 
@@ -155,7 +156,7 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
     _isPending = false;
     _isSaving = true;
     // send state changed event. don't have to make separate check because _isSaving had to be false
-    _document.changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
+    (_document as LocalDocument).changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
     saveDocument().then((bool saved) {
       if(!saved) {
         // TODO save error?
@@ -164,14 +165,14 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
         var lastIsSaving = isSaving;
         _isSaving = false;
         if(lastIsSaving != isSaving) {
-          _document.changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
+          (_document as LocalDocument).changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
         }
       }
     });
   }
 
   Future<String> exportDocument() {
-    return new Future.value(json.stringify(_document.model.toJSON()));
+    return new Future.value(json.stringify((_document.model as LocalModel).toJSON()));
   }
 
   /**

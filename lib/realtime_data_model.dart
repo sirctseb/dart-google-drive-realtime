@@ -17,10 +17,10 @@ library realtime_data_model;
 import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
-import 'dart:json' as json;
 
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
+import 'package:json/json.dart' as json;
 import 'package:meta/meta.dart';
 import 'package:realtime_data_model/src/local/local_realtime_data_model.dart';
 import 'package:google_oauth2_client/google_oauth2_browser.dart';
