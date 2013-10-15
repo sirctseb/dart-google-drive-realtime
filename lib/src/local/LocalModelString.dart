@@ -12,68 +12,68 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalModelString extends LocalIndexReferenceContainer implements rt.CollaborativeString {
+class _LocalModelString extends _LocalIndexReferenceContainer implements CollaborativeString {
 
   // TODO need local events
-  StreamController<LocalTextInsertedEvent> _onTextInserted
-    = new StreamController<LocalTextInsertedEvent>.broadcast(sync: true);
-  StreamController<LocalTextDeletedEvent> _onTextDeleted
-    = new StreamController<LocalTextDeletedEvent>.broadcast(sync: true);
+  StreamController<_LocalTextInsertedEvent> _onTextInserted
+    = new StreamController<_LocalTextInsertedEvent>.broadcast(sync: true);
+  StreamController<_LocalTextDeletedEvent> _onTextDeleted
+    = new StreamController<_LocalTextDeletedEvent>.broadcast(sync: true);
 
   int get length => _string.length;
 
   void append(String text) {
     // add event to stream
-    var insertEvent = new LocalTextInsertedEvent._(_string.length, text, this);
+    var insertEvent = new _LocalTextInsertedEvent._(_string.length, text, this);
     _emitEventsAndChanged([_onTextInserted], [insertEvent]);
   }
   String get text => _string;
   void insertString(int index, String text) {
-    var insertEvent = new LocalTextInsertedEvent._(index, text, this);
+    var insertEvent = new _LocalTextInsertedEvent._(index, text, this);
     _emitEventsAndChanged([_onTextInserted], [insertEvent]);
   }
   void removeRange(int startIndex, int endIndex) {
     // get removed text for event
     var removed = _string.substring(startIndex, endIndex);
     // add event to stream
-    var deleteEvent = new LocalTextDeletedEvent._(startIndex, removed, this);
+    var deleteEvent = new _LocalTextDeletedEvent._(startIndex, removed, this);
     _emitEventsAndChanged([_onTextDeleted], [deleteEvent]);
   }
   void set text(String text) {
     // trivial edit decomposition algorithm
     // add event to stream
-    var deleteEvent = new LocalTextDeletedEvent._(0, _string, this);
-    var insertEvent = new LocalTextInsertedEvent._(0, text, this);
+    var deleteEvent = new _LocalTextDeletedEvent._(0, _string, this);
+    var insertEvent = new _LocalTextInsertedEvent._(0, text, this);
     _emitEventsAndChanged([_onTextDeleted, _onTextInserted], [deleteEvent, insertEvent]);
   }
 
-  Stream<LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
-  Stream<LocalTextDeletedEvent> get onTextDeleted => _onTextDeleted.stream;
+  Stream<_LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
+  Stream<_LocalTextDeletedEvent> get onTextDeleted => _onTextDeleted.stream;
 
-  LocalModelString([String initialValue]) {
+  _LocalModelString([String initialValue]) {
     // initialize
     if(initialValue != null) {
       // don't emit events
       _string = initialValue;
     }
 
-    _eventStreamControllers[ModelEventType.TEXT_DELETED.value] = _onTextDeleted;
-    _eventStreamControllers[ModelEventType.TEXT_INSERTED.value] = _onTextInserted;
+    _eventStreamControllers[_ModelEventType.TEXT_DELETED.value] = _onTextDeleted;
+    _eventStreamControllers[_ModelEventType.TEXT_INSERTED.value] = _onTextInserted;
   }
 
-  void _executeEvent(LocalUndoableEvent event_in) {
+  void _executeEvent(_LocalUndoableEvent event_in) {
     // handle insert and delete events
     // TODO deal with type warnings
-    if(event_in.type == ModelEventType.TEXT_DELETED.value) {
-      var event = event_in as LocalTextDeletedEvent;
+    if(event_in.type == _ModelEventType.TEXT_DELETED.value) {
+      var event = event_in as _LocalTextDeletedEvent;
       // update string
       _string = "${_string.substring(0, event.index)}${_string.substring(event.index + event.text.length)}";
       // update references
       _shiftReferencesOnDelete(event.index, event.text.length);
-    } else if(event_in.type == ModelEventType.TEXT_INSERTED.value) {
-      var event = event_in as LocalTextInsertedEvent;
+    } else if(event_in.type == _ModelEventType.TEXT_INSERTED.value) {
+      var event = event_in as _LocalTextInsertedEvent;
       // update string
       _string = "${_string.substring(0, event.index)}${event.text}${_string.substring(event.index)}";
       // update references

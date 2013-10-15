@@ -12,29 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-/// A [LocalEvent] that can be undone
+/// A [_LocalEvent] that can be undone
 // TODO put in it's own file?
-abstract class LocalUndoableEvent extends LocalEvent {
+abstract class _LocalUndoableEvent extends _LocalEvent {
   // create an event that performs the opposite of this
-  LocalUndoableEvent get inverse;
+  _LocalUndoableEvent get inverse;
 
-  LocalUndoableEvent._(_target) : super._(_target);
+  _LocalUndoableEvent._(_target) : super._(_target);
 
   void _executeAndEmit() {
     _target._executeAndEmitEvent(this);
   }
 }
 
-/** [UndoHistory] manages the history of actions performed in the app */
+/** [_UndoHistory] manages the history of actions performed in the app */
 // TODO events grouped into a single object changed event are still grouped
 // TODO during undo in the realtime implementation, but are split up here
 // TODO undo state events are not in the same order with respect to other events
 // TODO as seen by client code. also rt sometimes sends two of the same events
-class UndoHistory {
+class _UndoHistory {
   /** The list of actions in the undo history */
-  List<List<LocalUndoableEvent>> _history = [[]];
+  List<List<_LocalUndoableEvent>> _history = [[]];
 
   /// The current index into the undo history.
   int _index = 0;
@@ -47,7 +47,7 @@ class UndoHistory {
   bool get _firstOfSet => _lastWasTerminal && !_undoScope && !_redoScope;
 
   // Add a list of events to the current undo index
-  void _addUndoEvents(Iterable<LocalUndoableEvent> events, {bool terminateSet: false, bool prepend: false}) {
+  void _addUndoEvents(Iterable<_LocalUndoableEvent> events, {bool terminateSet: false, bool prepend: false}) {
     // if this is the first of a set and we're not undoing or redoing,
     // truncate the history after this point
     if(_firstOfSet) {
@@ -65,14 +65,14 @@ class UndoHistory {
     }
   }
 
-  LocalModel model;
+  _LocalModel model;
 
   bool _undoScope = false;
   bool _redoScope = false;
   bool _initScope = false;
 
-  UndoHistory(LocalModel this.model) {
-    model.root.onObjectChanged.listen((LocalObjectChangedEvent e) {
+  _UndoHistory(_LocalModel this.model) {
+    model.root.onObjectChanged.listen((_LocalObjectChangedEvent e) {
       if(_initScope) {
         // don't add to undo history in initialization
       } else if(_undoScope) {
@@ -93,13 +93,13 @@ class UndoHistory {
         // if undo/redo state changed, send event
         if(_canUndo != canUndo || _canRedo != canRedo) {
           model._onUndoRedoStateChanged.add(
-              new LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
+              new _LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
         }
       }
     });
   }
 
-  void initializeModel(initialize, LocalModel m) {
+  void initializeModel(initialize, _LocalModel m) {
     // call initialization callback with _initScope set to true
     _initScope = true;
     initialize(m);
@@ -123,7 +123,7 @@ class UndoHistory {
     inverses.forEach((e) => e._executeAndEmit());
     // do object changed events
     inverses.forEach((e) {
-      var event = new LocalObjectChangedEvent._([e], e._target);
+      var event = new _LocalObjectChangedEvent._([e], e._target);
       e._target._onObjectChanged.add(event);
       e._target._onPostObjectChangedController.add(event);
     });
@@ -133,7 +133,7 @@ class UndoHistory {
     // if undo/redo state changed, send event
     if(_canUndo != canUndo || _canRedo != canRedo) {
       model._onUndoRedoStateChanged.add(
-        new LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
+        new _LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
     }
   }
   void redo() {
@@ -151,7 +151,7 @@ class UndoHistory {
     inverses.forEach((e) => e._executeAndEmit());
     // do object changed events
     inverses.forEach((e) {
-      var event = new LocalObjectChangedEvent._([e], e._target);
+      var event = new _LocalObjectChangedEvent._([e], e._target);
       e._target._onObjectChanged.add(event);
       e._target._onPostObjectChangedController.add(event);
     });
@@ -163,7 +163,7 @@ class UndoHistory {
     // if undo/redo state changed, send event
     if(_canUndo != canUndo || _canRedo != canRedo) {
       model._onUndoRedoStateChanged.add(
-        new LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
+        new _LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
     }
   }
 

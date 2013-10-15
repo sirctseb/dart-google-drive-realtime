@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalDocument extends LocalRetainable implements rt.Document {
-  final LocalModel model;
+class _LocalDocument extends _LocalRetainable implements Document {
+  final _LocalModel model;
 
   void close() {}
-  List<rt.Collaborator> get collaborators => [];
+  List<Collaborator> get collaborators => [];
 
   void exportDocument(void successFn([dynamic _]), void failureFn([dynamic _])) {
     try {
@@ -29,20 +29,20 @@ class LocalDocument extends LocalRetainable implements rt.Document {
     }
   }
 
-  // TODO we can't access the private stream controller form doc provider
-  // TODO we should handle this privacy better
-  void changeSaveState(LocalDocumentSaveStateChangedEvent event) {
-    _onDocumentSaveStateChanged.add(event);
-  }
   // TODO do anything with collaborators?
-  StreamController<rt.CollaboratorLeftEvent> _onCollaboratorLeft = new StreamController<rt.CollaboratorLeftEvent>.broadcast();
-  StreamController<rt.CollaboratorJoinedEvent> _onCollaboratorJoined = new StreamController<rt.CollaboratorJoinedEvent>.broadcast();
-  StreamController<LocalDocumentSaveStateChangedEvent> _onDocumentSaveStateChanged = new StreamController<LocalDocumentSaveStateChangedEvent>.broadcast();
-  Stream<rt.CollaboratorLeftEvent> get onCollaboratorLeft => _onCollaboratorLeft.stream;
-  Stream<rt.CollaboratorJoinedEvent> get onCollaboratorJoined => _onCollaboratorJoined.stream;
-  Stream<rt.DocumentSaveStateChangedEvent> get onDocumentSaveStateChanged => _onDocumentSaveStateChanged.stream;
+  // TODO we're overriding _on* with the wrong type in the local classes, giving us analyzer warnings
+  // TODO we could use different variable names and set these to null to remove warnings
+  // TODO OR we could subclass SubscribeStreamProvider and override the stream accessor using normal StreamController,
+  // TODO but then it's not really a SubscribeStreamProvider
+  // TODO OR we could just use SubscribeStreamProvider as is, but we don't need the functionality, and it makes a stream controller on each stream access
+  StreamController<CollaboratorLeftEvent> _onCollaboratorLeft = new StreamController<CollaboratorLeftEvent>.broadcast();
+  StreamController<CollaboratorJoinedEvent> _onCollaboratorJoined = new StreamController<CollaboratorJoinedEvent>.broadcast();
+  StreamController<_LocalDocumentSaveStateChangedEvent> _onDocumentSaveStateChanged = new StreamController<_LocalDocumentSaveStateChangedEvent>.broadcast();
+  Stream<CollaboratorLeftEvent> get onCollaboratorLeft => _onCollaboratorLeft.stream;
+  Stream<CollaboratorJoinedEvent> get onCollaboratorJoined => _onCollaboratorJoined.stream;
+  Stream<DocumentSaveStateChangedEvent> get onDocumentSaveStateChanged => _onDocumentSaveStateChanged.stream;
 
-  LocalDocument(LocalModel this.model);
+  _LocalDocument(_LocalModel this.model);
 
   /// Local document has no proxy
   final js.Proxy $unsafe = null;

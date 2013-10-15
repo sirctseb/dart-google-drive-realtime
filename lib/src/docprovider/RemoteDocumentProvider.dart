@@ -26,13 +26,13 @@ abstract class RemoteDocumentProvider extends LocalDocumentProvider {
       // if retrieved doc is empty, pass normal initializeModel
       if(retrievedDoc == "") {
         // TODO only do initializeModel if document has never been loaded (where is this recorded)?
-        model = new LocalModel(initializeModel);
+        model = new _LocalModel(initializeModel);
       } else {
         // otherwise, initialize with json data
-        model = new LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
+        model = new _LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
       }
       // create a document with the model
-      _document = new LocalDocument(model);
+      _document = new _LocalDocument(model);
       return _document;
     });
   }

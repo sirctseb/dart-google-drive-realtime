@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
 // TODO this should not actually extend LocalEvent,
-// TODO and rt.UndoRedoStateChangedEvent should not extend rt.BaseModelEvent
-class LocalUndoRedoStateChangedEvent extends LocalEvent implements rt.UndoRedoStateChangedEvent {
+// TODO and UndoRedoStateChangedEvent should not extend BaseModelEvent
+class _LocalUndoRedoStateChangedEvent extends _LocalEvent implements UndoRedoStateChangedEvent {
 
   bool get bubbles => null; // TODO implement this getter
 
@@ -24,8 +24,8 @@ class LocalUndoRedoStateChangedEvent extends LocalEvent implements rt.UndoRedoSt
 
   final bool canUndo;
 
-  final String type = ModelEventType.UNDO_REDO_STATE_CHANGED.value;
+  final String type = _ModelEventType.UNDO_REDO_STATE_CHANGED.value;
 
-  LocalUndoRedoStateChangedEvent._(this.canRedo, this.canUndo)
+  _LocalUndoRedoStateChangedEvent._(this.canRedo, this.canUndo)
     : super._(null);
 }

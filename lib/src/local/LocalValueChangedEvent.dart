@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
 // as a shortcut to defining a separate interface with two subclasses for realtime and local,
 // we can just implement the realtime interface if it doesn't require special realtime members
-class LocalValueChangedEvent extends LocalUndoableEvent implements rt.ValueChangedEvent {
+class _LocalValueChangedEvent extends _LocalUndoableEvent implements ValueChangedEvent {
   // TODO why doesn't fromProxy cause a problem?
 
   bool get bubbles => null; // TODO implement this getter
@@ -27,9 +27,9 @@ class LocalValueChangedEvent extends LocalUndoableEvent implements rt.ValueChang
 
   final String property;
 
-  final String type = ModelEventType.VALUE_CHANGED.value;
+  final String type = _ModelEventType.VALUE_CHANGED.value;
 
-  LocalValueChangedEvent._(this.newValue, this.oldValue, this.property, _target) : super._(_target);
+  _LocalValueChangedEvent._(this.newValue, this.oldValue, this.property, _target) : super._(_target);
 
-  LocalValueChangedEvent get inverse => new LocalValueChangedEvent._(oldValue, newValue, property, _target);
+  _LocalValueChangedEvent get inverse => new _LocalValueChangedEvent._(oldValue, newValue, property, _target);
 }

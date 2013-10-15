@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V> {
+class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V> {
   // TODO add promotes back in here
 
   @override int get length => _map.length;
@@ -23,7 +23,7 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   // TODO event
   @override void operator []=(String key, V value) {
     // send the event
-    var event = new LocalValueChangedEvent._(value, _map[key], key, this);
+    var event = new _LocalValueChangedEvent._(value, _map[key], key, this);
     _emitEventsAndChanged([_onValueChanged], [event]);
   }
 
@@ -34,7 +34,7 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   // TODO event
   @override V remove(String key) {
     // create the event
-    var event = new LocalValueChangedEvent._(null, _map[key], key, this);
+    var event = new _LocalValueChangedEvent._(null, _map[key], key, this);
     // send the event
     _emitEventsAndChanged([_onValueChanged], [event]);
   }
@@ -59,17 +59,17 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
   @override List<V> get values => _map.values;
   @override bool get isNotEmpty => !isEmpty;
 
-  Stream<rt.ValueChangedEvent> get onValueChanged => _onValueChanged.stream;
+  Stream<ValueChangedEvent> get onValueChanged => _onValueChanged.stream;
 
   // backing map instance
   Map<String, V> _map = new Map<String, V>();
   // map of subscriptions for object changed events for model objects contained in this
-  Map<String, StreamSubscription<LocalObjectChangedEvent>> _ssMap
-    = new Map<String, StreamSubscription<LocalObjectChangedEvent>>();
+  Map<String, StreamSubscription<_LocalObjectChangedEvent>> _ssMap
+    = new Map<String, StreamSubscription<_LocalObjectChangedEvent>>();
   // stream controller
   // TODO should be use a subscribestreamprovider? I don't think we need to
   // TODO we are using a broadcast stream so that new listeners don't get back events. is this the correct approach?
-  StreamController<rt.ValueChangedEvent> _onValueChanged = new StreamController<rt.ValueChangedEvent>.broadcast(sync: true);
+  StreamController<ValueChangedEvent> _onValueChanged = new StreamController<ValueChangedEvent>.broadcast(sync: true);
 
   void addAll(Map<String, V> other) {
     other.forEach((key,val) => this[key] = val);
@@ -83,20 +83,20 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
 
   int get size => length;
 
-  LocalModelMap([Map initialValue]) {
+  _LocalModelMap([Map initialValue]) {
     // initialize with value
     if(initialValue != null) {
       initializeWithValue(initialValue);
     }
 
-    _eventStreamControllers[ModelEventType.VALUE_CHANGED.value] = _onValueChanged;
+    _eventStreamControllers[_ModelEventType.VALUE_CHANGED.value] = _onValueChanged;
   }
   void initializeWithValue(Map initialValue) {
     // don't emit events, but do propagate changes
     _map.addAll(initialValue);
     _map.forEach((key,value) {
-      if(value is LocalModelObject) {
-        _ssMap[key] = (value as LocalModelObject)._onPostObjectChanged.listen((e) {
+      if(value is _LocalModelObject) {
+        _ssMap[key] = (value as _LocalModelObject)._onPostObjectChanged.listen((e) {
           // fire normal change event
           _onObjectChanged.add(e);
           // fire on propagation stream
@@ -106,9 +106,9 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
     });
   }
 
-  void _executeEvent(LocalUndoableEvent event_in) {
-    if(event_in.type == ModelEventType.VALUE_CHANGED.value) {
-        var event = event_in as LocalValueChangedEvent;
+  void _executeEvent(_LocalUndoableEvent event_in) {
+    if(event_in.type == _ModelEventType.VALUE_CHANGED.value) {
+        var event = event_in as _LocalValueChangedEvent;
         // TODO what if we actually want to set to null?
         // TODO test if rt returns length 1 or 0 with a single key set to null
         if(event.newValue == null) {
@@ -123,8 +123,8 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
         }
         // propagate changes on model data objects
         // TODO pipe?
-        if(event.newValue is LocalModelObject) {
-          _ssMap[event.property] = (event.newValue as LocalModelObject)._onPostObjectChanged.listen((e) {
+        if(event.newValue is _LocalModelObject) {
+          _ssMap[event.property] = (event.newValue as _LocalModelObject)._onPostObjectChanged.listen((e) {
             // fire normal change event
             _onObjectChanged.add(e);
             // fire on propagation stream
@@ -143,7 +143,7 @@ class LocalModelMap<V> extends LocalModelObject implements rt.CollaborativeMap<V
       "id": this.id,
       "type": "Map",
       "value": new Map.fromIterable(_map.keys, value: (key) {
-        if(_map[key] is LocalModelObject) return _map[key].toJSON();
+        if(_map[key] is _LocalModelObject) return _map[key].toJSON();
         return {"json": _map[key]};
       })
     };

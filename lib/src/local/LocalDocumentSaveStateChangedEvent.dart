@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
 // TODO I think this should not actually extend LocalEvent
-class LocalDocumentSaveStateChangedEvent extends LocalEvent implements rt.DocumentSaveStateChangedEvent {
+class _LocalDocumentSaveStateChangedEvent extends _LocalEvent implements DocumentSaveStateChangedEvent {
 
   bool get bubbles => null; // TODO implement this getter
 
@@ -23,9 +23,9 @@ class LocalDocumentSaveStateChangedEvent extends LocalEvent implements rt.Docume
 
   final bool isSaving;
 
-  final String type = ModelEventType.DOCUMENT_SAVE_STATE_CHANGED.value;
+  final String type = _ModelEventType.DOCUMENT_SAVE_STATE_CHANGED.value;
 
   // TODO not private because doc providers need to create them
   // TODO these don't need to be private in general because local_rdm is not public anyway
-  LocalDocumentSaveStateChangedEvent(this.isPending, this.isSaving, target) : super._(target);
+  _LocalDocumentSaveStateChangedEvent(this.isPending, this.isSaving, target) : super._(target);
 }

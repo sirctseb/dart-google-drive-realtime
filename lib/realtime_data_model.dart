@@ -23,7 +23,6 @@ import 'package:js/js_wrapping.dart' as jsw;
 import 'package:json/json.dart' as json;
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'package:realtime_data_model/src/local/local_realtime_data_model.dart';
 import 'package:google_oauth2_client/google_oauth2_browser.dart';
 import 'package:google_drive_v2_api/drive_v2_api_browser.dart' as dcbrowser;
 import 'package:google_drive_v2_api/drive_v2_api_client.dart' as dc;
@@ -64,6 +63,30 @@ part 'src/realtime/ValuesSetEvent.dart';
 part 'src/realtime/UndoRedoStateChangedEvent.dart';
 part 'src/realtime/error_type.dart';
 part 'src/realtime/event_type.dart';
+
+// local files
+part 'src/local/LocalDocument.dart';
+part 'src/local/LocalDocumentSaveStateChangedEvent.dart';
+part 'src/local/LocalEvent.dart';
+part 'src/local/LocalIndexReference.dart';
+part 'src/local/LocalIndexReferenceContainer.dart';
+part 'src/local/LocalModel.dart';
+part 'src/local/LocalModelList.dart';
+part 'src/local/LocalModelMap.dart';
+part 'src/local/LocalModelObject.dart';
+part 'src/local/LocalModelString.dart';
+part 'src/local/LocalObjectChangedEvent.dart';
+part 'src/local/LocalReferenceShiftedEvent.dart';
+part 'src/local/LocalRetainable.dart';
+part 'src/local/LocalTextDeletedEvent.dart';
+part 'src/local/LocalTextInsertedEvent.dart';
+part 'src/local/LocalUndoRedoStateChangedEvent.dart';
+part 'src/local/LocalValueChangedEvent.dart';
+part 'src/local/LocalValuesAddedEvent.dart';
+part 'src/local/LocalValuesRemovedEvent.dart';
+part 'src/local/LocalValuesSetEvent.dart';
+part 'src/local/ModelEventType.dart';
+part 'src/local/UndoHistory.dart';
 
 // js.Proxy for "gapi.drive.realtime"
 final realtime = js.retain(js.context['gapi']['drive']['realtime']);

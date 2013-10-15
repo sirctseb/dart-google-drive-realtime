@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
 // Implements index reference management
-class LocalIndexReferenceContainer extends LocalModelObject {
+class _LocalIndexReferenceContainer extends _LocalModelObject {
 
-  LocalIndexReference registerReference(int index, bool canBeDeleted) {
+  _LocalIndexReference registerReference(int index, bool canBeDeleted) {
     // create the reference
-    var ref = new LocalIndexReference._(index, canBeDeleted, this);
+    var ref = new _LocalIndexReference._(index, canBeDeleted, this);
     // add to list of references
     _indexReferences.add(ref);
     return ref;
@@ -27,7 +27,7 @@ class LocalIndexReferenceContainer extends LocalModelObject {
 
   void _shiftReferencesOnDelete(int index, int length) {
     // check for reference shifts
-    _indexReferences.forEach((LocalIndexReference ref) {
+    _indexReferences.forEach((_LocalIndexReference ref) {
       // if index is to the right of deletion, shift by deleted length
       if(ref.index >= index + length) {
         ref._shift(ref.index - length);
@@ -44,7 +44,7 @@ class LocalIndexReferenceContainer extends LocalModelObject {
   }
   void _shiftReferencesOnInsert(int index, int length) {
     // check for reference shifts
-    _indexReferences.forEach((LocalIndexReference ref) {
+    _indexReferences.forEach((_LocalIndexReference ref) {
       // if index is to the right on insert index, increase reference
       if(ref.index >= index) {
         ref._shift(ref.index + length);
@@ -53,7 +53,7 @@ class LocalIndexReferenceContainer extends LocalModelObject {
   }
 
   // The list of index references registered to this object
-  List<LocalIndexReference> _indexReferences = [];
+  List<_LocalIndexReference> _indexReferences = [];
 
-  LocalIndexReferenceContainer();
+  _LocalIndexReferenceContainer();
 }

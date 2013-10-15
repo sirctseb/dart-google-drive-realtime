@@ -104,18 +104,18 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
       // if retrieved doc is empty, pass normal initializeModel
       if(retrievedDoc == "") {
         // TODO only do initializeModel if document has never been loaded (where is this recorded)?
-        model = new LocalModel(initializeModel);
+        model = new _LocalModel(initializeModel);
         doInitialSave = true;
       } else {
         // otherwise, initialize with json data
-        model = new LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
+        model = new _LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
       }
       // listen for changes on model
       model.root.onObjectChanged.listen(_onDocumentChange);
       // create batch strategy
       batchStrategy = new DelayStrategy(model, const Duration(seconds: 1));
       // create a document with the model
-      _document = new LocalDocument(model);
+      _document = new _LocalDocument(model);
       // if document had not been loaded before, do initial save
       if(doInitialSave) {
         saveDocument();
@@ -146,7 +146,7 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
     // if pending has changed, send change event
     if(lastIsPending != _isPending) {
       // TODO have to specify type to avoid compiler warning
-      (_document as LocalDocument).changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
+      (_document as _LocalDocument)._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
     }
   }
 
@@ -156,7 +156,7 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
     _isPending = false;
     _isSaving = true;
     // send state changed event. don't have to make separate check because _isSaving had to be false
-    (_document as LocalDocument).changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
+    (_document as _LocalDocument)._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
     saveDocument().then((bool saved) {
       if(!saved) {
         // TODO save error?
@@ -165,14 +165,14 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
         var lastIsSaving = isSaving;
         _isSaving = false;
         if(lastIsSaving != isSaving) {
-          (_document as LocalDocument).changeSaveState(new LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
+          (_document as _LocalDocument)._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
         }
       }
     });
   }
 
   Future<String> exportDocument() {
-    return new Future.value(json.stringify((_document.model as LocalModel).toJSON()));
+    return new Future.value(json.stringify((_document.model as _LocalModel).toJSON()));
   }
 
   /**

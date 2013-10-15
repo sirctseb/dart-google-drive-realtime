@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-abstract class LocalEvent extends LocalRetainable implements rt.BaseModelEvent {
+abstract class _LocalEvent extends _LocalRetainable implements BaseModelEvent {
   /// Local events have no js Proxy object
   final js.Proxy $unsafe = null;
 
@@ -31,7 +31,7 @@ abstract class LocalEvent extends LocalRetainable implements rt.BaseModelEvent {
   final String userId = null;
 
   // the object that generated the event
-  final LocalModelObject _target;
+  final _LocalModelObject _target;
 
-  LocalEvent._(this._target);
+  _LocalEvent._(this._target);
 }

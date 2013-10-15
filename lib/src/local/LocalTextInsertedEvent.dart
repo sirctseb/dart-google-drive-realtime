@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalTextInsertedEvent extends LocalUndoableEvent implements rt.TextInsertedEvent {
+class _LocalTextInsertedEvent extends _LocalUndoableEvent implements TextInsertedEvent {
 
   bool get bubbles => null; // TODO implement this getter
 
@@ -22,9 +22,9 @@ class LocalTextInsertedEvent extends LocalUndoableEvent implements rt.TextInsert
 
   final String text;
 
-  final String type = ModelEventType.TEXT_INSERTED.value;
+  final String type = _ModelEventType.TEXT_INSERTED.value;
 
-  LocalTextInsertedEvent._(this.index, this.text, _target) : super._(_target);
+  _LocalTextInsertedEvent._(this.index, this.text, _target) : super._(_target);
 
-  LocalTextDeletedEvent get inverse => new LocalTextDeletedEvent._(index, text, _target);
+  _LocalTextDeletedEvent get inverse => new _LocalTextDeletedEvent._(index, text, _target);
 }

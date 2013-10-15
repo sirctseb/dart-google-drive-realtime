@@ -12,28 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalIndexReference extends LocalModelObject implements rt.IndexReference {
+// TODO why does this extend LocalModelObject? Why does IndexReferences extend CollaborativeObject?
+class _LocalIndexReference extends _LocalModelObject implements IndexReference {
 
   final bool canBeDeleted;
 
   int index;
 
-  Stream<LocalReferenceShiftedEvent> get onReferenceShifted => _onReferenceShifted.stream;
+  Stream<_LocalReferenceShiftedEvent> get onReferenceShifted => _onReferenceShifted.stream;
 
-  final rt.CollaborativeObject referencedObject;
+  final CollaborativeObject referencedObject;
 
   // TODO js api shows model as param to constructor
-  LocalIndexReference._(this.index, this.canBeDeleted, this.referencedObject);
+  _LocalIndexReference._(this.index, this.canBeDeleted, this.referencedObject);
 
-  StreamController<LocalReferenceShiftedEvent> _onReferenceShifted
-    = new StreamController<LocalReferenceShiftedEvent>.broadcast(sync: true);
+  StreamController<_LocalReferenceShiftedEvent> _onReferenceShifted
+    = new StreamController<_LocalReferenceShiftedEvent>.broadcast(sync: true);
 
   // update index and send event for a shift
   void _shift(int newIndex) {
     int oldIndex = index;
     index = newIndex;
-    _onReferenceShifted.add(new LocalReferenceShiftedEvent._(index, oldIndex, this));
+    _onReferenceShifted.add(new _LocalReferenceShiftedEvent._(index, oldIndex, this));
   }
 }

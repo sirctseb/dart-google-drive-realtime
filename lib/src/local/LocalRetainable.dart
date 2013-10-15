@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
 /// Local implementation of retain and release
-class LocalRetainable {
+class _LocalRetainable {
   void retain() {}
   void release() {}
 }

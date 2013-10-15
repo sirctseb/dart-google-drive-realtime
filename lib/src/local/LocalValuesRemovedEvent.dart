@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalValuesRemovedEvent extends LocalUndoableEvent implements rt.ValuesRemovedEvent {
+class _LocalValuesRemovedEvent extends _LocalUndoableEvent implements ValuesRemovedEvent {
   bool get bubbles => null; // TODO implement this getter
 
   final int index;
 
-  final String type = ModelEventType.VALUES_REMOVED.value;
+  final String type = _ModelEventType.VALUES_REMOVED.value;
 
   final List values;
 
-  LocalValuesRemovedEvent._(this.index, this.values, _target) : super._(_target);
+  _LocalValuesRemovedEvent._(this.index, this.values, _target) : super._(_target);
 
-  LocalValuesAddedEvent get inverse => new LocalValuesAddedEvent._(index, values, _target);
+  _LocalValuesAddedEvent get inverse => new _LocalValuesAddedEvent._(index, values, _target);
 }

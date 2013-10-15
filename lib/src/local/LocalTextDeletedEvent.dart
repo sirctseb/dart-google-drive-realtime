@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalTextDeletedEvent extends LocalUndoableEvent implements rt.TextDeletedEvent {
+class _LocalTextDeletedEvent extends _LocalUndoableEvent implements TextDeletedEvent {
   bool get bubbles => null; // TODO implement this getter
 
   final int index;
 
   final String text;
 
-  final String type = ModelEventType.TEXT_DELETED.value;
+  final String type = _ModelEventType.TEXT_DELETED.value;
 
-  LocalTextDeletedEvent._(this.index, this.text, _target) : super._(_target);
+  _LocalTextDeletedEvent._(this.index, this.text, _target) : super._(_target);
 
-  LocalTextInsertedEvent get inverse => new LocalTextInsertedEvent._(index, text, _target);
+  _LocalTextInsertedEvent get inverse => new _LocalTextInsertedEvent._(index, text, _target);
 }

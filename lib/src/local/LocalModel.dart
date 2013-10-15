@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalModel extends LocalRetainable implements rt.Model {
-  UndoHistory _undoHistory;
+class _LocalModel extends _LocalRetainable implements Model {
+  _UndoHistory _undoHistory;
 
   /// Create a local model with a callback
-  LocalModel([initialize]) : root = new LocalModelMap() {
-    _undoHistory = new UndoHistory(this);
+  _LocalModel([initialize]) : root = new _LocalModelMap() {
+    _undoHistory = new _UndoHistory(this);
     if(initialize != null) {
       _undoHistory.initializeModel(initialize, this);
     }
   }
 
   // TODO need to make local event
-  StreamController<LocalUndoRedoStateChangedEvent> _onUndoRedoStateChanged =
-    new StreamController<LocalUndoRedoStateChangedEvent>.broadcast(sync: true);
+  StreamController<_LocalUndoRedoStateChangedEvent> _onUndoRedoStateChanged =
+    new StreamController<_LocalUndoRedoStateChangedEvent>.broadcast(sync: true);
 
   // TODO is this ever true?
   bool get isReadOnly => false;
@@ -41,7 +41,7 @@ class LocalModel extends LocalRetainable implements rt.Model {
   void beginCreationCompoundOperation() {}
   void endCompoundOperation() {}
 
-  final LocalModelMap root;
+  final _LocalModelMap root;
 
   // TODO is this ever false?
   // TODO we should probably provide the same initialization callback method as realtime
@@ -50,18 +50,18 @@ class LocalModel extends LocalRetainable implements rt.Model {
   // TODO need to implement compound operations. meaningful for undo/redo
   void beginCompoundOperation([String name]) {}
   // TODO implement LocalModelObject and return here
-  rt.CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
+  CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
     return null;
   }
-  LocalModelList createList([List initialValue]) {
-    return new LocalModelList(initialValue);
+  _LocalModelList createList([List initialValue]) {
+    return new _LocalModelList(initialValue);
   }
-  LocalModelMap createMap([Map initialValue]) {
+  _LocalModelMap createMap([Map initialValue]) {
     // TODO take initial value in constructor
-    return new LocalModelMap(initialValue);
+    return new _LocalModelMap(initialValue);
   }
-  LocalModelString createString([String initialValue]) {
-    return new LocalModelString(initialValue);
+  _LocalModelString createString([String initialValue]) {
+    return new _LocalModelString(initialValue);
   }
 
   // TODO implement undo/redo
@@ -77,7 +77,7 @@ class LocalModel extends LocalRetainable implements rt.Model {
   }
 
   // TODO need to make local event
-  Stream<rt.UndoRedoStateChangedEvent> get onUndoRedoStateChanged => _onUndoRedoStateChanged.stream;
+  Stream<UndoRedoStateChangedEvent> get onUndoRedoStateChanged => _onUndoRedoStateChanged.stream;
 
   /// Local models have no js Proxy
   final js.Proxy $unsafe = null;

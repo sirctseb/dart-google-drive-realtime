@@ -22,9 +22,9 @@ class LocalDocumentProvider extends DocumentProvider {
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
   Future<Document> loadDocument([initializeModel(Model)]) {
-    var model = new LocalModel(initializeModel);
+    var model = new _LocalModel(initializeModel);
     // create a document with the model
-    var document = new LocalDocument(model);
+    var document = new _LocalDocument(model);
     _document = document;
     var completer = new Completer();
     // complete with document
@@ -33,6 +33,6 @@ class LocalDocumentProvider extends DocumentProvider {
   }
 
   Future<String> exportDocument() {
-    return new Future.value(json.stringify((_document.model as LocalModel).toJSON()));
+    return new Future.value(json.stringify((_document.model as _LocalModel).toJSON()));
   }
 }

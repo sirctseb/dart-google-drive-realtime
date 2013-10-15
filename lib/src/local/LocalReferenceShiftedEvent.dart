@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalReferenceShiftedEvent extends LocalEvent implements rt.ReferenceShiftedEvent {
+class _LocalReferenceShiftedEvent extends _LocalEvent implements ReferenceShiftedEvent {
   bool get bubbles => null; // TODO implement this getter
 
   final int newIndex;
 
   final int oldIndex;
 
-  final String type = ModelEventType.REFERENCE_SHIFTED.value;
+  final String type = _ModelEventType.REFERENCE_SHIFTED.value;
 
-  LocalReferenceShiftedEvent._(this.newIndex, this.oldIndex, _target) : super._(_target);
+  _LocalReferenceShiftedEvent._(this.newIndex, this.oldIndex, _target) : super._(_target);
 }
 

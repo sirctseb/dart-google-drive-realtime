@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.CollaborativeList<E> {
+class _LocalModelList<E> extends _LocalIndexReferenceContainer implements CollaborativeList<E> {
 
   E operator[](int index) => _list[index];
 
   void operator[]=(int index, E value) {
     if (index < 0 || index >= length) throw new RangeError.value(index);
     // add event to stream
-    var event = new LocalValuesSetEvent._(index, [value], [_list[index]], this);
+    var event = new _LocalValuesSetEvent._(index, [value], [_list[index]], this);
     _emitEventsAndChanged([_onValuesSet], [event]);
   }
 
@@ -29,20 +29,20 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
 
   void clear() {
     // add event to stream
-    var event = new LocalValuesRemovedEvent._(0, _list.toList(), this);
+    var event = new _LocalValuesRemovedEvent._(0, _list.toList(), this);
     _emitEventsAndChanged([_onValuesRemoved], [event]);
   }
 
   void insert(int index, E value) {
     // add event to stream
-    var event = new LocalValuesAddedEvent._(index, [value], this);
+    var event = new _LocalValuesAddedEvent._(index, [value], this);
     _emitEventsAndChanged([_onValuesAdded],[event]);
   }
 
   void insertAll(int index, List<E> values) {
     // add event to stream
     // TODO clone values?
-    var event = new LocalValuesAddedEvent._(index, values, this);
+    var event = new _LocalValuesAddedEvent._(index, values, this);
     _emitEventsAndChanged([_onValuesAdded], [event]);
   }
 
@@ -63,16 +63,16 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
 
   int get length => _list.length;
 
-  Stream<rt.ValuesAddedEvent> get onValuesAdded => _onValuesAdded.stream;
+  Stream<ValuesAddedEvent> get onValuesAdded => _onValuesAdded.stream;
 
-  Stream<rt.ValuesRemovedEvent> get onValuesRemoved => _onValuesRemoved.stream;
+  Stream<ValuesRemovedEvent> get onValuesRemoved => _onValuesRemoved.stream;
 
-  Stream<rt.ValuesSetEvent> get onValuesSet => _onValuesSet.stream;
+  Stream<ValuesSetEvent> get onValuesSet => _onValuesSet.stream;
 
   int push(E value) {
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
-    var event = new LocalValuesAddedEvent._(_list.length, [value], this);
+    var event = new _LocalValuesAddedEvent._(_list.length, [value], this);
     _emitEventsAndChanged([_onValuesAdded], [event]);
     return _list.length;
   }
@@ -80,20 +80,20 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
   void pushAll(List<E> values) {
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
-    var event = new LocalValuesAddedEvent._(_list.length, values, this);
+    var event = new _LocalValuesAddedEvent._(_list.length, values, this);
     _emitEventsAndChanged([_onValuesAdded], [event]);
   }
 
   // TODO this is an actual conflict with the List interface and would make it harder to implement it
   void remove(int index) {
     // add event to stream
-    var event = new LocalValuesRemovedEvent._(index, [_list[index]], this);
+    var event = new _LocalValuesRemovedEvent._(index, [_list[index]], this);
     _emitEventsAndChanged([_onValuesRemoved], [event]);
   }
 
   void removeRange(int startIndex, int endIndex) {
     // add event to stream
-    var event = new LocalValuesRemovedEvent._(startIndex, _list.sublist(startIndex, endIndex), this);
+    var event = new _LocalValuesRemovedEvent._(startIndex, _list.sublist(startIndex, endIndex), this);
     _emitEventsAndChanged([_onValuesRemoved], [event]);
   }
 
@@ -102,7 +102,7 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
     int index = _list.indexOf(value);
     if(index != -1) {
       // add to stream
-      var event = new LocalValuesRemovedEvent._(index, [value], this);
+      var event = new _LocalValuesRemovedEvent._(index, [value], this);
       _emitEventsAndChanged([_onValuesRemoved], [event]);
     }
   }
@@ -110,30 +110,30 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
   void replaceRange(int index, List<E> values) {
     // add event to stream
     // TODO clone values?
-    var event = new LocalValuesSetEvent._(index, values, _list.sublist(index, index + values.length), this);
+    var event = new _LocalValuesSetEvent._(index, values, _list.sublist(index, index + values.length), this);
     _emitEventsAndChanged([_onValuesSet],[event]);
   }
 
   // backing field
   final List _list = [];
   // stream controllers
-  StreamController<rt.ValuesAddedEvent> _onValuesAdded
-    = new StreamController<rt.ValuesAddedEvent>.broadcast(sync: true);
-  StreamController<rt.ValuesRemovedEvent> _onValuesRemoved
-    = new StreamController<rt.ValuesRemovedEvent>.broadcast(sync: true);
-  StreamController<rt.ValuesSetEvent> _onValuesSet
-    = new StreamController<rt.ValuesSetEvent>.broadcast(sync: true);
+  StreamController<ValuesAddedEvent> _onValuesAdded
+    = new StreamController<ValuesAddedEvent>.broadcast(sync: true);
+  StreamController<ValuesRemovedEvent> _onValuesRemoved
+    = new StreamController<ValuesRemovedEvent>.broadcast(sync: true);
+  StreamController<ValuesSetEvent> _onValuesSet
+    = new StreamController<ValuesSetEvent>.broadcast(sync: true);
 
   // map from object ids of contained elements to subscriptions to their object changed streams
-  Map<String, StreamSubscription<LocalObjectChangedEvent>> _ssMap =
-    new Map<String, StreamSubscription<LocalObjectChangedEvent>>();
+  Map<String, StreamSubscription<_LocalObjectChangedEvent>> _ssMap =
+    new Map<String, StreamSubscription<_LocalObjectChangedEvent>>();
   // check if value is a model object and start propagating object changed events
   void _propagateChanges(dynamic element) {
     // start propagating changes if element is model object and not already subscribed
     // TODO do we do the same check in map?
-    if(element is LocalModelObject && !_ssMap.containsKey((element as LocalModelObject).id)) {
-      _ssMap[(element as LocalModelObject).id] =
-        (element as LocalModelObject)._onPostObjectChanged.listen((e) {
+    if(element is _LocalModelObject && !_ssMap.containsKey((element as _LocalModelObject).id)) {
+      _ssMap[(element as _LocalModelObject).id] =
+        (element as _LocalModelObject)._onPostObjectChanged.listen((e) {
           // fire on normal object changed stream
           _onObjectChanged.add(e);
           // fire on propogation stream
@@ -145,13 +145,13 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
   void _stopPropagatingChanges(dynamic element) {
     // stop propagation if overwritten element is model object and it is no longer anywhere in the list
     // TODO this depends on this method being called _after_ the element is removed from _list
-    if(element is LocalModelObject && !_list.contains(element)) {
-      _ssMap[(element as LocalModelObject).id].cancel();
-      _ssMap.remove((element as LocalModelObject).id);
+    if(element is _LocalModelObject && !_list.contains(element)) {
+      _ssMap[(element as _LocalModelObject).id].cancel();
+      _ssMap.remove((element as _LocalModelObject).id);
     }
   }
 
-  LocalModelList([List initialValue]) {
+  _LocalModelList([List initialValue]) {
     // initialize with values
     if(initialValue != null) {
       initializeWithValue(initialValue);
@@ -161,20 +161,20 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
   void initializeEvents() {
 
     // listen for events to add or cancel object changed propagation
-    onValuesAdded.listen((LocalValuesAddedEvent e) {
+    onValuesAdded.listen((_LocalValuesAddedEvent e) {
       e.values.forEach((element) => _propagateChanges(element));
     });
-    onValuesRemoved.listen((LocalValuesRemovedEvent e){
+    onValuesRemoved.listen((_LocalValuesRemovedEvent e){
       e.values.forEach((element) => _stopPropagatingChanges(element));
     });
-    onValuesSet.listen((LocalValuesSetEvent e) {
+    onValuesSet.listen((_LocalValuesSetEvent e) {
       e.oldValues.forEach((element) => _stopPropagatingChanges(element));
       e.newValues.forEach((element) => _propagateChanges(element));
     });
 
-    _eventStreamControllers[ModelEventType.VALUES_SET.value] = _onValuesSet;
-    _eventStreamControllers[ModelEventType.VALUES_ADDED.value] = _onValuesAdded;
-    _eventStreamControllers[ModelEventType.VALUES_REMOVED.value] = _onValuesRemoved;
+    _eventStreamControllers[_ModelEventType.VALUES_SET.value] = _onValuesSet;
+    _eventStreamControllers[_ModelEventType.VALUES_ADDED.value] = _onValuesAdded;
+    _eventStreamControllers[_ModelEventType.VALUES_REMOVED.value] = _onValuesRemoved;
   }
   void initializeWithValue(List initialValue) {
     // don't fire events but do propagate changes
@@ -183,18 +183,18 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
   }
 
   // TODO we could alternatively listen for our own events and do the modifications there
-  void _executeEvent(LocalUndoableEvent event_in) {
-    if(event_in.type == ModelEventType.VALUES_SET.value) {
-        var event = event_in as LocalValuesSetEvent;
+  void _executeEvent(_LocalUndoableEvent event_in) {
+    if(event_in.type == _ModelEventType.VALUES_SET.value) {
+        var event = event_in as _LocalValuesSetEvent;
         _list.setRange(event.index, event.index + event.newValues.length, event.newValues);
-    } else if(event_in.type == ModelEventType.VALUES_REMOVED.value) {
-        var event = event_in as LocalValuesRemovedEvent;
+    } else if(event_in.type == _ModelEventType.VALUES_REMOVED.value) {
+        var event = event_in as _LocalValuesRemovedEvent;
         // update list
         _list.removeRange(event.index, event.index + event.values.length);
         // update references
         _shiftReferencesOnDelete(event.index, event.values.length);
-    } else if(event_in.type == ModelEventType.VALUES_ADDED.value) {
-        LocalValuesAddedEvent event = event_in as LocalValuesAddedEvent;
+    } else if(event_in.type == _ModelEventType.VALUES_ADDED.value) {
+        _LocalValuesAddedEvent event = event_in as _LocalValuesAddedEvent;
         // update list
         _list.insertAll(event.index, event.values);
         // update references
@@ -210,7 +210,7 @@ class LocalModelList<E> extends LocalIndexReferenceContainer implements rt.Colla
       "id": this.id,
       "type": "List",
       "value": _list.map((e) {
-        if(e is LocalModelObject) return e.toJSON();
+        if(e is _LocalModelObject) return e.toJSON();
         return {"json": e};
       }).toList()
     };

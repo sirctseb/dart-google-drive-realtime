@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalValuesSetEvent extends LocalUndoableEvent implements rt.ValuesSetEvent {
+class _LocalValuesSetEvent extends _LocalUndoableEvent implements ValuesSetEvent {
 
   bool get bubbles => null; // TODO implement this getter
 
@@ -24,9 +24,9 @@ class LocalValuesSetEvent extends LocalUndoableEvent implements rt.ValuesSetEven
 
   final List oldValues;
 
-  final String type = ModelEventType.VALUES_SET.value;
+  final String type = _ModelEventType.VALUES_SET.value;
 
-  LocalValuesSetEvent._(this.index, this.newValues, this.oldValues, _target) : super._(_target);
+  _LocalValuesSetEvent._(this.index, this.newValues, this.oldValues, _target) : super._(_target);
 
-  LocalValuesSetEvent get inverse => new LocalValuesSetEvent._(index, oldValues, newValues, _target);
+  _LocalValuesSetEvent get inverse => new _LocalValuesSetEvent._(index, oldValues, newValues, _target);
 }

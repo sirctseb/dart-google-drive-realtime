@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-part of local_realtime_data_model;
+part of realtime_data_model;
 
-class LocalModelObject extends LocalRetainable implements rt.CollaborativeObject {
+class _LocalModelObject extends _LocalRetainable implements CollaborativeObject {
 
   /// Local objects have no js Proxy
   final js.Proxy $unsafe = null;
 
   final String id;
 
-  StreamController<LocalObjectChangedEvent> _onObjectChanged
-    = new StreamController<LocalObjectChangedEvent>.broadcast(sync: true);
-  Stream<LocalObjectChangedEvent> get onObjectChanged => _onObjectChanged.stream;
+  StreamController<_LocalObjectChangedEvent> _onObjectChanged
+    = new StreamController<_LocalObjectChangedEvent>.broadcast(sync: true);
+  Stream<_LocalObjectChangedEvent> get onObjectChanged => _onObjectChanged.stream;
   // a separate stream to which object changed events are sent after they are
   // send to _onObjectChanged. this is to propogate up in the correct order
   // TODO there's almost certainly a better way to do this
-  StreamController<LocalObjectChangedEvent> _onPostObjectChangedController
-    = new StreamController<LocalObjectChangedEvent>.broadcast(sync: true);
-  Stream<LocalObjectChangedEvent> get _onPostObjectChanged => _onPostObjectChangedController.stream;
+  StreamController<_LocalObjectChangedEvent> _onPostObjectChangedController
+    = new StreamController<_LocalObjectChangedEvent>.broadcast(sync: true);
+  Stream<_LocalObjectChangedEvent> get _onPostObjectChanged => _onPostObjectChangedController.stream;
 
   // TODO implement custom objects
-  Stream<rt.ValueChangedEvent> get onValueChanged => null; // TODO implement this getter
+  Stream<ValueChangedEvent> get onValueChanged => null; // TODO implement this getter
 
   /// Local objects have no js Proxy
   dynamic toJs() => null;
@@ -40,18 +40,18 @@ class LocalModelObject extends LocalRetainable implements rt.CollaborativeObject
   static int _idNum = 0;
   static String get nextId => (_idNum++).toString();
 
-  LocalModelObject() : id = nextId;
+  _LocalModelObject() : id = nextId;
 
   static bool _inEmitEventsAndChangedScope = false;
 
-  // create an emit a LocalObjectChangedEvent from a list of events
-  void _emitEventsAndChanged(List<StreamController> controllers, List<LocalUndoableEvent> events) {
+  // create an emit a _LocalObjectChangedEvent from a list of events
+  void _emitEventsAndChanged(List<StreamController> controllers, List<_LocalUndoableEvent> events) {
     bool terminal = !_inEmitEventsAndChangedScope;
     if(terminal) {
       _inEmitEventsAndChangedScope = true;
     }
     // construct change event before firing actual events
-    var event = new LocalObjectChangedEvent._(events,this,terminal);
+    var event = new _LocalObjectChangedEvent._(events,this,terminal);
     for(int i = 0; i < events.length; i++) {
       // execute events
       _executeEvent(events[i]);
@@ -66,14 +66,14 @@ class LocalModelObject extends LocalRetainable implements rt.CollaborativeObject
       _inEmitEventsAndChangedScope = false;
     }
   }
-  void _executeAndEmitEvent(LocalUndoableEvent event) {
+  void _executeAndEmitEvent(_LocalUndoableEvent event) {
     // make change
     _executeEvent(event);
     // emit event
     _eventStreamControllers[event.type].add(event);
   }
 
-  void _executeEvent(LocalUndoableEvent event) {
+  void _executeEvent(_LocalUndoableEvent event) {
     // TODO implement custom objects
   }
 
