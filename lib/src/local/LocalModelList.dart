@@ -22,7 +22,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     if (index < 0 || index >= length) throw new RangeError.value(index);
     // add event to stream
     var event = new _LocalValuesSetEvent._(index, [value], [_list[index]], this);
-    _emitEventsAndChanged([_onValuesSet], [event]);
+    _emitEventsAndChanged([event]);
   }
 
   List<E> asArray() => _list;
@@ -30,20 +30,20 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   void clear() {
     // add event to stream
     var event = new _LocalValuesRemovedEvent._(0, _list.toList(), this);
-    _emitEventsAndChanged([_onValuesRemoved], [event]);
+    _emitEventsAndChanged([event]);
   }
 
   void insert(int index, E value) {
     // add event to stream
     var event = new _LocalValuesAddedEvent._(index, [value], this);
-    _emitEventsAndChanged([_onValuesAdded],[event]);
+    _emitEventsAndChanged([event]);
   }
 
   void insertAll(int index, List<E> values) {
     // add event to stream
     // TODO clone values?
     var event = new _LocalValuesAddedEvent._(index, values, this);
-    _emitEventsAndChanged([_onValuesAdded], [event]);
+    _emitEventsAndChanged([event]);
   }
 
   // TODO anything with comparator?
@@ -73,7 +73,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
     var event = new _LocalValuesAddedEvent._(_list.length, [value], this);
-    _emitEventsAndChanged([_onValuesAdded], [event]);
+    _emitEventsAndChanged([event]);
     return _list.length;
   }
 
@@ -81,20 +81,20 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     // add event to stream
     // TODO make sure this is the index provided when inserting at the end
     var event = new _LocalValuesAddedEvent._(_list.length, values, this);
-    _emitEventsAndChanged([_onValuesAdded], [event]);
+    _emitEventsAndChanged([event]);
   }
 
   // TODO this is an actual conflict with the List interface and would make it harder to implement it
   void remove(int index) {
     // add event to stream
     var event = new _LocalValuesRemovedEvent._(index, [_list[index]], this);
-    _emitEventsAndChanged([_onValuesRemoved], [event]);
+    _emitEventsAndChanged([event]);
   }
 
   void removeRange(int startIndex, int endIndex) {
     // add event to stream
     var event = new _LocalValuesRemovedEvent._(startIndex, _list.sublist(startIndex, endIndex), this);
-    _emitEventsAndChanged([_onValuesRemoved], [event]);
+    _emitEventsAndChanged([event]);
   }
 
   bool removeValue(E value) {
@@ -103,7 +103,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     if(index != -1) {
       // add to stream
       var event = new _LocalValuesRemovedEvent._(index, [value], this);
-      _emitEventsAndChanged([_onValuesRemoved], [event]);
+      _emitEventsAndChanged([event]);
     }
   }
 
@@ -111,7 +111,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     // add event to stream
     // TODO clone values?
     var event = new _LocalValuesSetEvent._(index, values, _list.sublist(index, index + values.length), this);
-    _emitEventsAndChanged([_onValuesSet],[event]);
+    _emitEventsAndChanged([event]);
   }
 
   // backing field

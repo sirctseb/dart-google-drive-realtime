@@ -45,7 +45,7 @@ class _LocalModelObject extends _LocalRetainable implements CollaborativeObject 
   static bool _inEmitEventsAndChangedScope = false;
 
   // create an emit a _LocalObjectChangedEvent from a list of events
-  void _emitEventsAndChanged(List<StreamController> controllers, List<_LocalUndoableEvent> events) {
+  void _emitEventsAndChanged(List<_LocalUndoableEvent> events) {
     bool terminal = !_inEmitEventsAndChangedScope;
     if(terminal) {
       _inEmitEventsAndChangedScope = true;
@@ -56,7 +56,7 @@ class _LocalModelObject extends _LocalRetainable implements CollaborativeObject 
       // execute events
       _executeEvent(events[i]);
       // fire actual events
-      controllers[i].add(events[i]);
+      _eventStreamControllers[events[i].type].add(events[i]);
     }
     // fire change event on normal stream
     _onObjectChanged.add(event);
@@ -77,9 +77,7 @@ class _LocalModelObject extends _LocalRetainable implements CollaborativeObject 
     // TODO implement custom objects
   }
 
-
   // map from event type to stream controller they go on
-  // TODO with this we don't need to pass controllers to _emitEventsAndChanged
   Map<String, StreamController> _eventStreamControllers = {};
 
   /// JSON serialized data

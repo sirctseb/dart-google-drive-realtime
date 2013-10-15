@@ -27,26 +27,26 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
   void append(String text) {
     // add event to stream
     var insertEvent = new _LocalTextInsertedEvent._(_string.length, text, this);
-    _emitEventsAndChanged([_onTextInserted], [insertEvent]);
+    _emitEventsAndChanged([insertEvent]);
   }
   String get text => _string;
   void insertString(int index, String text) {
     var insertEvent = new _LocalTextInsertedEvent._(index, text, this);
-    _emitEventsAndChanged([_onTextInserted], [insertEvent]);
+    _emitEventsAndChanged([insertEvent]);
   }
   void removeRange(int startIndex, int endIndex) {
     // get removed text for event
     var removed = _string.substring(startIndex, endIndex);
     // add event to stream
     var deleteEvent = new _LocalTextDeletedEvent._(startIndex, removed, this);
-    _emitEventsAndChanged([_onTextDeleted], [deleteEvent]);
+    _emitEventsAndChanged([deleteEvent]);
   }
   void set text(String text) {
     // trivial edit decomposition algorithm
     // add event to stream
     var deleteEvent = new _LocalTextDeletedEvent._(0, _string, this);
     var insertEvent = new _LocalTextInsertedEvent._(0, text, this);
-    _emitEventsAndChanged([_onTextDeleted, _onTextInserted], [deleteEvent, insertEvent]);
+    _emitEventsAndChanged([deleteEvent, insertEvent]);
   }
 
   Stream<_LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
