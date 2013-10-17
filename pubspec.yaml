@@ -10,6 +10,8 @@ dependencies:
   google_oauth2_client: '>=0.2.14'
   js: '>=0.0.22 <1.0.0'
   json: any
+  logging: any
+  logging_handlers: any
   meta: 0.6.8
 dev_dependencies:
   browser: any
