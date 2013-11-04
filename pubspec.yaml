@@ -6,13 +6,13 @@ description: |-
   Based on the google_drive_realtime package.
 homepage: https://github.com/sirctseb/realtime-data-model
 dependencies:
-  google_drive_v2_api: 0.3.8
+  google_drive_v2_api: '>=0.4.9'
   google_oauth2_client: '>=0.2.14'
   js: '>=0.0.22 <1.0.0'
   json: '>=0.8.1 <1.0.0'
   logging: '>=0.8.1 <1.0.0'
   logging_handlers: '>=0.5.0 <1.0.0'
-  meta: 0.6.8
+  meta: '>=0.8.7'
 dev_dependencies:
   browser: any
   unittest: any
