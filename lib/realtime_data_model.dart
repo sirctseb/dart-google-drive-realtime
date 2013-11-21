@@ -56,11 +56,11 @@ part 'src/realtime/Retainable.dart';
 part 'src/realtime/TextDeletedEvent.dart';
 part 'src/realtime/TextInsertedEvent.dart';
 part 'src/realtime/TypePromoter.dart';
+part 'src/realtime/UndoRedoStateChangedEvent.dart';
 part 'src/realtime/ValueChangedEvent.dart';
 part 'src/realtime/ValuesAddedEvent.dart';
 part 'src/realtime/ValuesRemovedEvent.dart';
 part 'src/realtime/ValuesSetEvent.dart';
-part 'src/realtime/UndoRedoStateChangedEvent.dart';
 part 'src/realtime/error_type.dart';
 part 'src/realtime/event_type.dart';
 
@@ -89,4 +89,4 @@ part 'src/local/ModelEventType.dart';
 part 'src/local/UndoHistory.dart';
 
 // js.Proxy for "gapi.drive.realtime"
-final realtime = js.retain(js.context['gapi']['drive']['realtime']);
+final realtime = js.context['gapi']['drive']['realtime'];

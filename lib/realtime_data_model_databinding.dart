@@ -14,18 +14,16 @@
 
 library realtime_data_model_databinding;
 
-import 'dart:async';
 import 'dart:html';
 
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
-import 'package:meta/meta.dart';
 
 import 'realtime_data_model.dart';
 
 part 'src/databinding/already_bound_error.dart';
 part 'src/databinding/binding.dart';
 
-final realtimeDatabinding = js.retain(realtime['databinding']);
+final realtimeDatabinding = realtime['databinding'];
 
 Binding bindString(CollaborativeString string, TextInputElement textInputElement) => Binding.cast(realtimeDatabinding.bindString(string, textInputElement));

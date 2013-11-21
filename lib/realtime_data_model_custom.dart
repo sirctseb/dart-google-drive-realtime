@@ -14,15 +14,11 @@
 
 library realtime_data_model_custom;
 
-import 'dart:async';
-
 import 'package:js/js.dart' as js;
-import 'package:js/js_wrapping.dart' as jsw;
-import 'package:meta/meta.dart';
 
 import 'realtime_data_model.dart';
 
-final realtimeCustom = js.retain(realtime['custom']);
+final realtimeCustom = realtime['custom'];
 
 dynamic collaborativeField(String name) => realtimeCustom.collaborativeField(name);
 
@@ -37,9 +33,9 @@ void registerType(js.Serializable<js.FunctionProxy> type, String name) {
 }
 
 void setInitializer(js.Serializable<js.FunctionProxy> type, Function initialize) {
-  realtimeCustom.setInitializer(type, new js.Callback.many(initialize));
+  realtimeCustom.setInitializer(type, initialize);
 }
 
 void setOnLoaded(js.Serializable<js.FunctionProxy> type, [Function onLoaded]) {
-  realtimeCustom.setOnLoaded(type, onLoaded == null ? null : new js.Callback.many(onLoaded));
+  realtimeCustom.setOnLoaded(type, onLoaded);
 }

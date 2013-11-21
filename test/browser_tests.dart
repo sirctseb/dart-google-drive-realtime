@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
+// TODO upstream
+//import 'package:js/js.dart' as js;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
 
@@ -11,7 +13,6 @@ initializeModel(rt.Model model) {
 }
 
 onFileLoaded(rt.Document doc) {
-  doc.retain();
 
   useHtmlConfiguration();
 
@@ -52,7 +53,6 @@ onFileLoaded(rt.Document doc) {
 
   group('CollaborativeString', () {
     var string = doc.model.root['text'];
-    string.retain();
     setUp((){
       string.text = 'unittest';
     });
@@ -110,7 +110,6 @@ onFileLoaded(rt.Document doc) {
 
   group('CollaborativeList', () {
     var list = doc.model.root['list'];
-    list.retain();
     setUp((){
       list.clear();
       list.push('s1');
@@ -176,6 +175,7 @@ onFileLoaded(rt.Document doc) {
       list[0] = 's2';
     });
   });
+
   group('CollaborativeMap', () {
     var map = doc.model.root['map'];
     map.retain();
