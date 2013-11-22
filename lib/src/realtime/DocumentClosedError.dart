@@ -14,6 +14,6 @@
 
 part of realtime_data_model;
 
-class DocumentClosedError extends Retainable {
-  DocumentClosedError._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+class DocumentClosedError extends jsw.TypedProxy {
+  DocumentClosedError._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
 }

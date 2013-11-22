@@ -14,8 +14,8 @@
 
 part of realtime_data_model;
 
-class Error extends Retainable {
-  Error._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+class Error extends jsw.TypedProxy {
+  Error._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
 
   bool get isFatal => $unsafe['isFatal'];
   String get message => $unsafe['message'];

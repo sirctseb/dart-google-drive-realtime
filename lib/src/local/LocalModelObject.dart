@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class _LocalModelObject extends _LocalRetainable implements CollaborativeObject {
+class _LocalModelObject implements CollaborativeObject {
 
   /// Local objects have no js Proxy
   final js.Proxy $unsafe = null;

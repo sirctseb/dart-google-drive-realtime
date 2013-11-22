@@ -58,16 +58,16 @@ class GoogleDocProvider extends DocumentProvider {
     // call realtime load
     realtime['load'](fileId,
       // complete future on file loaded
-      new js.Callback.once((p) {
+      (p) {
         _logger.finest('File loaded callback called, completing future with loaded document');
         // TODO document has to be retained. test if it can be released after complete call
         // TODO it looks like relaese/retain don't ref count. release invalidates immediately
-        completer.complete(_document = new Document._fromProxy(p)..retain());
-      }),
+        completer.complete(_document = new Document._fromProxy(p));
+      },
       // pass initializeModel through if supplied
-      initializeModel == null ? null : new js.Callback.once((p) => initializeModel(new Model._fromProxy(p))),
+      initializeModel == null ? null : (p) => initializeModel(new Model._fromProxy(p)),
       // throw dart error on error
-      new js.Callback.once((p) => throw new Error._fromProxy(p))
+      (p) => throw new Error._fromProxy(p)
     );
     return completer.future;
   }
@@ -132,11 +132,11 @@ class GoogleDocProvider extends DocumentProvider {
 
     // load realtime api
     _logger.fine('Call gapi.load("drive-realtime"...)');
-    js.context['gapi']['load']('drive-realtime', new js.Callback.once(() {
+    js.context['gapi']['load']('drive-realtime', () {
       _logger.fine('Got gapi.load callback, retaining realtime object and completing');
-      realtime = js.retain(js.context['gapi']['drive']['realtime']);
+      realtime = js.context['gapi']['drive']['realtime'];
       completer.complete(realtime);
-    }));
+    });
     return completer.future;
   }
 
@@ -177,10 +177,7 @@ class GoogleDocProvider extends DocumentProvider {
       // overwrite gapi.auth.getToken with a function that
       // returns an object with valid data in access_token
       js.context['gapi']['auth'] = js.map({'getToken':
-          new js.Callback.many(() =>
-              js.map({
-                'access_token': t.data
-              }))
+          () => js.map({'access_token': t.data})
       });
     };
 

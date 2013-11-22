@@ -14,8 +14,8 @@
 
 part of realtime_data_model;
 
-class BaseModelEvent extends Retainable {
-  BaseModelEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+class BaseModelEvent extends jsw.TypedProxy {
+  BaseModelEvent._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
 
   bool get bubbles => $unsafe['bubbles'];
   bool get isLocal => $unsafe['isLocal'];

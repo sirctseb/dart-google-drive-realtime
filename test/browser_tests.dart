@@ -1,12 +1,20 @@
 import 'dart:async';
+import 'dart:html';
 
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
 // TODO upstream
 //import 'package:js/js.dart' as js;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
+import 'package:logging/logging.dart';
 
 initializeModel(rt.Model model) {
+  group('isInitialized in initializeModel', () {
+    test('isInitialized', () {
+      expect(model.isInitialized, false);
+    });
+  });
+
   model.root['text'] = model.createString('Hello Realtime World!');
   model.root['list'] = model.createList();
   model.root['map'] = model.createMap();
@@ -14,7 +22,11 @@ initializeModel(rt.Model model) {
 
 onFileLoaded(rt.Document doc) {
 
-  useHtmlConfiguration();
+  group('isInitialized in onFileLoaded', () {
+    test('isInitialized', () {
+      expect(doc.model.isInitialized, true);
+    });
+  });
 
   group('Undo', () {
     test("start undo state", () {
@@ -178,7 +190,6 @@ onFileLoaded(rt.Document doc) {
 
   group('CollaborativeMap', () {
     var map = doc.model.root['map'];
-    map.retain();
     setUp(() {
       map.clear();
       map['key1'] = 4;
@@ -258,8 +269,6 @@ onFileLoaded(rt.Document doc) {
   group('RealtimeIndexReference', () {
     rt.CollaborativeString string = doc.model.root['text'];
     rt.CollaborativeList list = doc.model.root['list'];
-    string.retain();
-    list.retain();
     // TODO are references ever removed?
     test('RealtimeString Reference Value', () {
       string.text = "aaaaaaaaaa";
@@ -355,6 +364,12 @@ onFileLoaded(rt.Document doc) {
 }
 
 main() {
+  hierarchicalLoggingEnabled = true;
+//  Logger.root.onRecord.listen(new PrintHandler());
+  Logger.root.level = Level.FINEST;
+
+  useHtmlConfiguration();
+
   // set clientId
   rt.GoogleDocProvider.clientId = 'INSERT CLIENT ID HERE';
 

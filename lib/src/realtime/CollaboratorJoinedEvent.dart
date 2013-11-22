@@ -14,10 +14,10 @@
 
 part of realtime_data_model;
 
-class CollaboratorJoinedEvent extends Retainable {
+class CollaboratorJoinedEvent extends jsw.TypedProxy {
   static CollaboratorJoinedEvent _cast(js.Proxy proxy) => proxy == null ? null : new CollaboratorJoinedEvent._fromProxy(proxy);
 
-  CollaboratorJoinedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+  CollaboratorJoinedEvent._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
 
   Collaborator get collaborator => new Collaborator._fromProxy($unsafe['collaborator']);
 }

@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class _LocalDocument extends _LocalRetainable implements Document {
+class _LocalDocument implements Document {
   final _LocalModel model;
 
   void close() {}

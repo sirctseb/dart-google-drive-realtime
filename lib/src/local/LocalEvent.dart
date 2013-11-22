@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-abstract class _LocalEvent extends _LocalRetainable implements BaseModelEvent {
+abstract class _LocalEvent implements BaseModelEvent {
   /// Local events have no js Proxy object
   final js.Proxy $unsafe = null;
 

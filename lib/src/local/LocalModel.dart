@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class _LocalModel extends _LocalRetainable implements Model {
+class _LocalModel implements Model {
   _UndoHistory _undoHistory;
 
   /// Create a local model with a callback
