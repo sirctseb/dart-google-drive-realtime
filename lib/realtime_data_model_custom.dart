@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library realtime_data_model_custom;
+part of realtime_data_model;
 
-import 'package:js/js.dart' as js;
+//import 'package:js/js.dart' as jss;
+//import 'dart:async';
+//import 'dart:js' as js;
+//import 'package:realtime_data_model/src/utils.dart';
 
-import 'realtime_data_model.dart';
+//import 'realtime_data_model.dart';
+
+//part 'src/custom/CustomObject.dart';
 
 final realtimeCustom = realtime['custom'];
 

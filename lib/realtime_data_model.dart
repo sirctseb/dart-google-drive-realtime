@@ -17,6 +17,8 @@ library realtime_data_model;
 import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
+import 'dart:js' as jss;
+import 'dart:mirrors';
 
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
@@ -85,6 +87,9 @@ part 'src/local/LocalValuesRemovedEvent.dart';
 part 'src/local/LocalValuesSetEvent.dart';
 part 'src/local/ModelEventType.dart';
 part 'src/local/UndoHistory.dart';
+
+part 'realtime_data_model_custom.dart';
+part 'src/custom/CustomObject.dart';
 
 // js.Proxy for "gapi.drive.realtime"
 final realtime = js.context['gapi']['drive']['realtime'];

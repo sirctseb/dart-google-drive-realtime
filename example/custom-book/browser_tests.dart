@@ -3,11 +3,11 @@ import 'dart:html';
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
-import 'package:realtime_data_model/realtime_data_model_custom.dart' as rtc;
+//import 'package:realtime_data_model/realtime_data_model_custom.dart' as rtc;
 
-class Book extends rt.CollaborativeObject {
+class Book extends rt.CustomObject {
   static const NAME = 'Book';
-  static void registerType() {
+  /*static void registerType() {
     js.context.Book = (){};
     rtc.registerType(js.context.Book, NAME);
     js.context.Book.prototype.title = rtc.collaborativeField('title');
@@ -18,7 +18,8 @@ class Book extends rt.CollaborativeObject {
   }
   static Book cast(js.Proxy proxy) => proxy == null ? null : new Book.fromProxy(proxy);
 
-  Book.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  Book.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);*/
+  Book() : super(NAME);
 
   String get title => $unsafe.title;
   String get author => $unsafe.author;
@@ -32,8 +33,7 @@ class Book extends rt.CollaborativeObject {
   set reviews(String reviews) => $unsafe.reviews = reviews;
 }
 
-initializeModel(js.Proxy modelProxy) {
-  var model = rt.Model.cast(modelProxy);
+initializeModel(model) {
   var book = model.create(Book.NAME);
   model.root['book'] = book;
 }
@@ -45,9 +45,9 @@ initializeModel(js.Proxy modelProxy) {
  * and bind it to our string model that we created in initializeModel.
  * @param doc {gapi.drive.realtime.Document} the Realtime document.
  */
-onFileLoaded(docProxy) {
-  var doc = rt.Document.cast(docProxy);
-  var book = Book.cast(doc.model.root['book']);
+onFileLoaded(doc) {
+//  var book = Book.cast(doc.model.root['book']);
+  var book = doc.model.root['book'];
 
   // collaborators listener
   doc.onCollaboratorJoined.listen((rt.CollaboratorJoinedEvent e){
