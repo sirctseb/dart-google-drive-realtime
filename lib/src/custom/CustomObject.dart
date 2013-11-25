@@ -1,10 +1,17 @@
 part of realtime_data_model;
 
 class CustomObject extends CollaborativeObject {
+  // information on the custom types registered
   static Map _registeredTypes = {};
 
-  CustomObject(String name) : super._fromProxy(new js.Proxy(_registeredTypes[name]["js-type"]));
-  static CustomObject _createRegisteredType(String name) {
+  // TODO rename
+  static js.Proxy _proxyToCreateFrom = null;
+
+  CustomObject(String name) : super._fromProxy(_proxyToCreateFrom == null ? new js.Proxy(_registeredTypes[name]["js-type"]) : _proxyToCreateFrom) {
+    if(_proxyToCreateFrom != null) _proxyToCreateFrom = null;
+  }
+  static CustomObject _createRegisteredType(String name, {fromProxy}) {
+    _proxyToCreateFrom = fromProxy;
     return reflectClass(_registeredTypes[name]['dart-type']).newInstance(new Symbol(""), []).reflectee;
   }
 
