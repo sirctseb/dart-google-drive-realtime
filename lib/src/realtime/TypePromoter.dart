@@ -23,7 +23,7 @@ dynamic _promoteProxy(dynamic object) {
       // find name
       var name = CustomObject._findTypeName(object);
       // construct dart instance from proxy
-      return new CustomObject._fromProxy(object);
+      return new CustomObject._fromProxy(object, name);
     } else if(js.instanceof(object, realtime['CollaborativeMap'])) {
       return new CollaborativeMap._fromProxy(object);
     } else if(js.instanceof(object, realtime['CollaborativeList'])) {

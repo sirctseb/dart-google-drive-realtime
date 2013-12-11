@@ -29,7 +29,7 @@ dynamic collaborativeField(String name) => realtimeCustom.collaborativeField(nam
 
 String getId(dynamic obj) => realtimeCustom.getId(obj);
 
-Model getModel(dynamic obj) => new Model.fromProxy(realtimeCustom.getModel(obj));
+Model getModel(dynamic obj) => new Model._fromProxy(realtimeCustom.getModel(obj));
 
 bool isCustomObject(dynamic obj) => realtimeCustom.isCustomObject(obj);
 

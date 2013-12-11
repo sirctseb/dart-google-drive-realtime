@@ -4,6 +4,7 @@ part of realtime_data_model;
 class CustomObject extends CollaborativeContainer {
   // information on the custom types registered
   static Map _registeredTypes = {};
+  static final String _idToTypeProperty = '_idToType';
 
   // TODO rename
   static js.Proxy _proxyToCreateFrom = null;
@@ -11,19 +12,14 @@ class CustomObject extends CollaborativeContainer {
   CustomObject(String name) : super._fromProxy(_proxyToCreateFrom == null ? new js.Proxy(_registeredTypes[name]["js-type"]) : _proxyToCreateFrom) {
     if(_proxyToCreateFrom != null) _proxyToCreateFrom = null;
   }
-  factory CustomObject._fromProxy(js.Proxy proxy) {
+  factory CustomObject._fromProxy(js.Proxy proxy, String name) {
     _proxyToCreateFrom = proxy;
-    return reflectClass(_registeredTypes[_findTypeName(proxy)]['dart-type']).newInstance(new Symbol(""), []).reflectee;
+    return reflectClass(_registeredTypes[name]['dart-type']).newInstance(new Symbol(""), []).reflectee;
   }
   static String _findTypeName(js.Proxy proxy) {
-    // search through registered types to find name of custom type
-    for(var name in _registeredTypes.keys) {
-      // TODO this won't work for types that aren't created locally
-      if(_registeredTypes[name]['js-type'] == proxy.constructor) {
-        return name;
-      }
-    }
-    return null;
+    // get reference to id->name map
+    var idToType = new Model._fromProxy(realtime['custom']['getModel'](proxy)).root[_idToTypeProperty];
+    return idToType[realtime['custom']['getId'](proxy)];
   }
 
   /// Register a custom object type
