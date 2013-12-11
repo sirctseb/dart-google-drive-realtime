@@ -20,7 +20,12 @@ dynamic _promoteProxy(dynamic object) {
 
   if(object is js.Proxy) {
     var realtimeNamespace = js.context['gapi']['drive']['realtime'];
-    if(js.instanceof(object, realtimeNamespace['CollaborativeMap'])) {
+    if(realtimeCustom['isCustomObject'](object)) {
+      // find name
+      var name = CustomObject._findTypeName(object);
+      // construct dart instance from proxy
+      return new CustomObject._fromProxy(object);
+    } else if(js.instanceof(object, realtimeNamespace['CollaborativeMap'])) {
       return new CollaborativeMap._fromProxy(object);
     } else if(js.instanceof(object, realtimeNamespace['CollaborativeList'])) {
       return new CollaborativeList._fromProxy(object);

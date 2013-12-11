@@ -7,30 +7,18 @@ import 'package:realtime_data_model/realtime_data_model.dart' as rt;
 
 class Book extends rt.CustomObject {
   static const NAME = 'Book';
-  /*static void registerType() {
-    js.context.Book = (){};
-    rtc.registerType(js.context.Book, NAME);
-    js.context.Book.prototype.title = rtc.collaborativeField('title');
-    js.context.Book.prototype.author = rtc.collaborativeField('author');
-    js.context.Book.prototype.isbn = rtc.collaborativeField('isbn');
-    js.context.Book.prototype.isCheckedOut = rtc.collaborativeField('isCheckedOut');
-    js.context.Book.prototype.reviews = rtc.collaborativeField('reviews');
-  }
-  static Book cast(js.Proxy proxy) => proxy == null ? null : new Book.fromProxy(proxy);
-
-  Book.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);*/
   Book() : super(NAME);
 
-  String get title => $unsafe.title;
-  String get author => $unsafe.author;
-  String get isbn => $unsafe.isbn;
-  bool get isCheckedOut => $unsafe.isCheckedOut;
-  String get reviews => $unsafe.reviews;
-  set title(String title) => $unsafe.title = title;
-  set author(String author) => $unsafe.author = author;
-  set isbn(String isbn) => $unsafe.isbn = isbn;
-  set isCheckedOut(bool isCheckedOut) => $unsafe.isCheckedOut = isCheckedOut;
-  set reviews(String reviews) => $unsafe.reviews = reviews;
+  String get title => getField('title');
+  String get author => getField('author');
+  String get isbon => getField('isbn');
+  bool get isCheckedOut => getField('isCheckedOut');
+  String get reviews => getField('reviews');
+  set title(String title) => setField('title', title);
+  set author(String author) => setField('author', author);
+  set isbn(String isbn) => setField('isbn', isbn);
+  set isCheckedOut(bool isCheckedOut) => setField('isCheckedOut', isCheckedOut);
+  set reviews(String reviews) => setField('reviews', reviews);
 }
 
 initializeModel(model) {
@@ -46,8 +34,7 @@ initializeModel(model) {
  * @param doc {gapi.drive.realtime.Document} the Realtime document.
  */
 onFileLoaded(doc) {
-//  var book = Book.cast(doc.model.root['book']);
-  var book = doc.model.root['book'];
+  Book book = doc.model.root['book'];
 
   // collaborators listener
   doc.onCollaboratorJoined.listen((rt.CollaboratorJoinedEvent e){
@@ -114,8 +101,18 @@ get realtimeOptions => js.map({
 
 
 main() {
-  var realtimeLoader = new js.Proxy(js.context.rtclient.RealtimeLoader, realtimeOptions);
-  realtimeLoader.start((){
-    Book.registerType();
-  });
+  // set clientId
+  rt.GoogleDocProvider.clientId = 'INSERT YOUR CLIENT ID HERE';
+
+  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
+//  var docProvider = new rt.LocalDocumentProvider();
+
+  rt.CustomObject.registerType(Book, "Book", ["title", "author", "isbn", "isCheckedOut", "reviews"]);
+
+  docProvider.loadDocument(initializeModel).then(onFileLoaded);
+
+  //var realtimeLoader = new js.Proxy(js.context.rtclient.RealtimeLoader, realtimeOptions);
+//  realtimeLoader.start((){
+    //Book.registerType();
+//  });
 }

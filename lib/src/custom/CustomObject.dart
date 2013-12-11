@@ -1,6 +1,7 @@
 part of realtime_data_model;
 
-class CustomObject extends CollaborativeObject {
+// TODO extending Container instead of Object for _translator
+class CustomObject extends CollaborativeContainer {
   // information on the custom types registered
   static Map _registeredTypes = {};
 
@@ -10,31 +11,48 @@ class CustomObject extends CollaborativeObject {
   CustomObject(String name) : super._fromProxy(_proxyToCreateFrom == null ? new js.Proxy(_registeredTypes[name]["js-type"]) : _proxyToCreateFrom) {
     if(_proxyToCreateFrom != null) _proxyToCreateFrom = null;
   }
-  static CustomObject _createRegisteredType(String name, {fromProxy}) {
-    _proxyToCreateFrom = fromProxy;
-    return reflectClass(_registeredTypes[name]['dart-type']).newInstance(new Symbol(""), []).reflectee;
+  factory CustomObject._fromProxy(js.Proxy proxy) {
+    _proxyToCreateFrom = proxy;
+    return reflectClass(_registeredTypes[_findTypeName(proxy)]['dart-type']).newInstance(new Symbol(""), []).reflectee;
+  }
+  static String _findTypeName(js.Proxy proxy) {
+    // search through registered types to find name of custom type
+    for(var name in _registeredTypes.keys) {
+      // TODO this won't work for types that aren't created locally
+      if(_registeredTypes[name]['js-type'] == proxy.constructor) {
+        return name;
+      }
+    }
+    return null;
   }
 
   /// Register a custom object type
   static void registerType(Type type, String name, List fields) {
-    // prepare js-side storage
-    // TODO this is necessary to we can get a Proxy for the same JsObject we use here
-    if(!jss.context.hasProperty('registered-types')) {
-      jss.context['registered-types'] = {};
-    }
-
-    // create the js-side function
-    _registeredTypes[name] = {'dart-type': type,
-                             'js-type': new jss.JsObject(js.context['Function']),
-                             'fields': fields};
-    jss.context['registered-types'] = _registeredTypes[name]['js-type'];
-    // do the js-side registration
-    realtimeCustom.registerType(_registeredTypes[name]["js-type"], name);
+    // make sure js drive stuff is loaded
+    // TODO refactor this
+    GoogleDocProvider._globalSetup().then((bool success) {
+      // store the dart type, js type, and fields
+      _registeredTypes[name] = {'dart-type': type,
+                                // TODO is this the best way to just create a js function?
+                               'js-type': new js.FunctionProxy.withThis((p) {}),
+                               'fields': fields};
+      // do the js-side registration
+      realtimeCustom.registerType(_registeredTypes[name]["js-type"], name);
+      // add fields
+      for(var field in fields) {
+        _registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'](field);
+      }
+    });
   }
 
-  SubscribeStreamProvider<ObjectChangedEvent> _onObjectChanged;
-  SubscribeStreamProvider<ValueChangedEvent> _onValueChanged;
+  // TODO these could go in Container also probably
+  dynamic _toJs(e) => _translator == null ? e : _translator.toJs(e);
+  V _fromJs(dynamic value) => _translator == null ? value :
+      _translator.fromJs(value);
 
-  Stream<ObjectChangedEvent> get onObjectChanged => _onObjectChanged.stream;
-  Stream<ValueChangedEvent> get onValueChanged => _onValueChanged.stream;
+  dynamic getField(String field) => $unsafe[field];
+  void setField(String field, dynamic value) {
+    print('setting custom object field $field to $value');
+    $unsafe.title = _toJs(value);
+  }
 }

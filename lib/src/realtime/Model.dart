@@ -33,10 +33,14 @@ class Model extends EventTarget {
   bool get isInitialized => $unsafe.isInitialized();
 
   void beginCompoundOperation([String name]) => $unsafe.beginCompoundOperation(name);
-  CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
+  // TODO args? see below old version
+  CustomObject create(String name) {
+    return new CustomObject._fromProxy($unsafe['create'](name));
+  }
+  /*CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
     final params = [ref]..addAll(args);
     return new CollaborativeObject._fromProxy($unsafe['create'].apply($unsafe, js.array(params)));
-  }
+  }*/
   CollaborativeList createList([List initialValue]) => new CollaborativeList._fromProxy($unsafe.createList(initialValue == null ? null : initialValue is js.Serializable<js.Proxy> ? initialValue : js.array(initialValue)));
   CollaborativeMap createMap([Map initialValue]) => new CollaborativeMap._fromProxy($unsafe.createMap(initialValue == null ? null : initialValue is js.Serializable<js.Proxy> ? initialValue : js.map(initialValue)));
   CollaborativeString createString([String initialValue]) => new CollaborativeString._fromProxy($unsafe.createString(initialValue));
