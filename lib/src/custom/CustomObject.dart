@@ -46,8 +46,8 @@ class CustomObject extends CollaborativeContainer {
   V _fromJs(dynamic value) => _translator == null ? value :
       _translator.fromJs(value);
 
-  dynamic getField(String field) => $unsafe[field];
-  void setField(String field, dynamic value) {
+  dynamic get(String field) => $unsafe[field];
+  void set(String field, dynamic value) {
     print('setting custom object field $field to $value');
     $unsafe.title = _toJs(value);
   }

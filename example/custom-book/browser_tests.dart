@@ -9,16 +9,16 @@ class Book extends rt.CustomObject {
   static const NAME = 'Book';
   Book() : super(NAME);
 
-  String get title => getField('title');
-  String get author => getField('author');
-  String get isbon => getField('isbn');
-  bool get isCheckedOut => getField('isCheckedOut');
-  String get reviews => getField('reviews');
-  set title(String title) => setField('title', title);
-  set author(String author) => setField('author', author);
-  set isbn(String isbn) => setField('isbn', isbn);
-  set isCheckedOut(bool isCheckedOut) => setField('isCheckedOut', isCheckedOut);
-  set reviews(String reviews) => setField('reviews', reviews);
+  String get title => get('title');
+  String get author => get('author');
+  String get isbon => get('isbn');
+  bool get isCheckedOut => get('isCheckedOut');
+  String get reviews => get('reviews');
+  set title(String title) => set('title', title);
+  set author(String author) => set('author', author);
+  set isbn(String isbn) => set('isbn', isbn);
+  set isCheckedOut(bool isCheckedOut) => set('isCheckedOut', isCheckedOut);
+  set reviews(String reviews) => set('reviews', reviews);
 }
 
 initializeModel(model) {
