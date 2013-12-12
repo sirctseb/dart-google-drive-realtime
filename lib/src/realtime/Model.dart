@@ -36,6 +36,7 @@ class Model extends EventTarget {
     // create custom object on js side
     var unsafeCustom = $unsafe['create'](name);
     // store id to type association
+    // TODO call to getId fails with dart2js
     _storeIdType(realtime['custom']['getId'](unsafeCustom), name);
     // return dart wrapper
     return new CustomObject._fromProxy(unsafeCustom, name);
