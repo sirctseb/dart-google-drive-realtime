@@ -18,6 +18,7 @@ part of realtime_data_model;
 class GoogleDocProvider extends DocumentProvider {
   Document get document => _document;
   Document _document;
+  static bool _globallySetup = false;
 
   static Logger _logger = new Logger("rdm.DocumentProvider.GoogleDocProvider");
 
@@ -89,8 +90,11 @@ class GoogleDocProvider extends DocumentProvider {
     _newTitle = title;
   }
 
-  // check authentication, create drive client, load relatime api
-  Future<bool> _globalSetup() {
+  // check authentication, create drive client, load realtime api
+  static Future<bool> _globalSetup() {
+    // complete if already setup
+    if(_globallySetup) return new Future.value(true);
+
     _logger.finer('Doing global setup: authenticate first');
     return authenticate().then((auth) {
       _logger.finer('Global setup: authenticated, load drive');
@@ -99,6 +103,7 @@ class GoogleDocProvider extends DocumentProvider {
       return _loadRealtimeApi();
     }).then((realtime) {
       _logger.finer('Global setup: realtime loaded, returning success');
+      _globallySetup = true;
       return true;
     });
   }

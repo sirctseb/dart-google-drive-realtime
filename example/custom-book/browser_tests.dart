@@ -3,37 +3,25 @@ import 'dart:html';
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
-import 'package:realtime_data_model/realtime_data_model_custom.dart' as rtc;
+//import 'package:realtime_data_model/realtime_data_model_custom.dart' as rtc;
 
-class Book extends rt.CollaborativeObject {
+class Book extends rt.CustomObject {
   static const NAME = 'Book';
-  static void registerType() {
-    js.context.Book = (){};
-    rtc.registerType(js.context.Book, NAME);
-    js.context.Book.prototype.title = rtc.collaborativeField('title');
-    js.context.Book.prototype.author = rtc.collaborativeField('author');
-    js.context.Book.prototype.isbn = rtc.collaborativeField('isbn');
-    js.context.Book.prototype.isCheckedOut = rtc.collaborativeField('isCheckedOut');
-    js.context.Book.prototype.reviews = rtc.collaborativeField('reviews');
-  }
-  static Book cast(js.Proxy proxy) => proxy == null ? null : new Book.fromProxy(proxy);
+  Book() : super(NAME);
 
-  Book.fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
-
-  String get title => $unsafe.title;
-  String get author => $unsafe.author;
-  String get isbn => $unsafe.isbn;
-  bool get isCheckedOut => $unsafe.isCheckedOut;
-  String get reviews => $unsafe.reviews;
-  set title(String title) => $unsafe.title = title;
-  set author(String author) => $unsafe.author = author;
-  set isbn(String isbn) => $unsafe.isbn = isbn;
-  set isCheckedOut(bool isCheckedOut) => $unsafe.isCheckedOut = isCheckedOut;
-  set reviews(String reviews) => $unsafe.reviews = reviews;
+  String get title => get('title');
+  String get author => get('author');
+  String get isbon => get('isbn');
+  bool get isCheckedOut => get('isCheckedOut');
+  String get reviews => get('reviews');
+  set title(String title) => set('title', title);
+  set author(String author) => set('author', author);
+  set isbn(String isbn) => set('isbn', isbn);
+  set isCheckedOut(bool isCheckedOut) => set('isCheckedOut', isCheckedOut);
+  set reviews(String reviews) => set('reviews', reviews);
 }
 
-initializeModel(js.Proxy modelProxy) {
-  var model = rt.Model.cast(modelProxy);
+initializeModel(model) {
   var book = model.create(Book.NAME);
   model.root['book'] = book;
 }
@@ -45,9 +33,8 @@ initializeModel(js.Proxy modelProxy) {
  * and bind it to our string model that we created in initializeModel.
  * @param doc {gapi.drive.realtime.Document} the Realtime document.
  */
-onFileLoaded(docProxy) {
-  var doc = rt.Document.cast(docProxy);
-  var book = Book.cast(doc.model.root['book']);
+onFileLoaded(doc) {
+  Book book = doc.model.root['book'];
 
   // collaborators listener
   doc.onCollaboratorJoined.listen((rt.CollaboratorJoinedEvent e){
@@ -77,45 +64,19 @@ onFileLoaded(docProxy) {
   title.disabled = false;
 }
 
-/**
- * Options for the Realtime loader.
- */
-get realtimeOptions => js.map({
-   /**
-  * Client ID from the APIs Console.
-  */
-  'clientId': 'INSERT YOUR CLIENT ID HERE',
-
-   /**
-  * The ID of the button to click to authorize. Must be a DOM element ID.
-  */
-   'authButtonElementId': 'authorizeButton',
-
-   /**
-  * Function to be called when a Realtime model is first created.
-  */
-   'initializeModel': initializeModel,
-
-   /**
-  * Autocreate files right after auth automatically.
-  */
-   'autoCreate': true,
-
-   /**
-  * Autocreate files right after auth automatically.
-  */
-   'defaultTitle': "New Realtime Quickstart File",
-
-   /**
-  * Function to be called every time a Realtime file is loaded.
-  */
-   'onFileLoaded': onFileLoaded
-});
-
-
 main() {
-  var realtimeLoader = new js.Proxy(js.context.rtclient.RealtimeLoader, realtimeOptions);
-  realtimeLoader.start((){
-    Book.registerType();
-  });
+  // set clientId
+  rt.GoogleDocProvider.clientId = 'INSERT YOUR CLIENT ID HERE';
+
+  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
+//  var docProvider = new rt.LocalDocumentProvider();
+
+  rt.CustomObject.registerType(Book, "Book", ["title", "author", "isbn", "isCheckedOut", "reviews"]);
+
+  docProvider.loadDocument(initializeModel).then(onFileLoaded);
+
+  //var realtimeLoader = new js.Proxy(js.context.rtclient.RealtimeLoader, realtimeOptions);
+//  realtimeLoader.start((){
+    //Book.registerType();
+//  });
 }

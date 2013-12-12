@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library realtime_data_model_custom;
-
-import 'package:js/js.dart' as js;
-
-import 'realtime_data_model.dart';
+part of realtime_data_model;
 
 final realtimeCustom = realtime['custom'];
 
@@ -24,7 +20,7 @@ dynamic collaborativeField(String name) => realtimeCustom.collaborativeField(nam
 
 String getId(dynamic obj) => realtimeCustom.getId(obj);
 
-Model getModel(dynamic obj) => new Model.fromProxy(realtimeCustom.getModel(obj));
+Model getModel(dynamic obj) => new Model._fromProxy(realtimeCustom.getModel(obj));
 
 bool isCustomObject(dynamic obj) => realtimeCustom.isCustomObject(obj);
 

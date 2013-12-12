@@ -17,8 +17,6 @@ part of realtime_data_model;
 class Model extends EventTarget {
   SubscribeStreamProvider<UndoRedoStateChangedEvent> _onUndoRedoStateChanged;
 
-  // TODO this should not be public but the custom library needs to be able to make a model from a proxy
-  Model.fromProxy(js.Proxy proxy) : this._fromProxy(proxy);
   Model._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
     _onUndoRedoStateChanged = _getStreamProviderFor(EventType.UNDO_REDO_STATE_CHANGED, UndoRedoStateChangedEvent._cast);
   }
@@ -33,10 +31,30 @@ class Model extends EventTarget {
   bool get isInitialized => $unsafe.isInitialized();
 
   void beginCompoundOperation([String name]) => $unsafe.beginCompoundOperation(name);
-  CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
+  // TODO args? see below old version
+  CustomObject create(String name) {
+    // create custom object on js side
+    var unsafeCustom = $unsafe['create'](name);
+    // store id to type association
+    // TODO call to getId fails with dart2js
+    _storeIdType(realtime['custom']['getId'](unsafeCustom), name);
+    // return dart wrapper
+    return new CustomObject._fromProxy(unsafeCustom, name);
+  }
+  void _storeIdType(String id, String name) {
+    // make sure map exists
+    // TODO can we do this during initialization?
+    if(!root.containsKey(CustomObject._idToTypeProperty)) {
+      root[CustomObject._idToTypeProperty] = createMap();
+    }
+    // store id to name
+    // TODO try to removed these from map when they are removed from the model?
+    root[CustomObject._idToTypeProperty][id] = name;
+  }
+  /*CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
     final params = [ref]..addAll(args);
     return new CollaborativeObject._fromProxy($unsafe['create'].apply($unsafe, js.array(params)));
-  }
+  }*/
   CollaborativeList createList([List initialValue]) => new CollaborativeList._fromProxy($unsafe.createList(initialValue == null ? null : initialValue is js.Serializable<js.Proxy> ? initialValue : js.array(initialValue)));
   CollaborativeMap createMap([Map initialValue]) => new CollaborativeMap._fromProxy($unsafe.createMap(initialValue == null ? null : initialValue is js.Serializable<js.Proxy> ? initialValue : js.map(initialValue)));
   CollaborativeString createString([String initialValue]) => new CollaborativeString._fromProxy($unsafe.createString(initialValue));
