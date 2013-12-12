@@ -51,4 +51,21 @@ class CustomObject extends CollaborativeContainer {
     print('setting custom object field $field to $value');
     $unsafe.title = _toJs(value);
   }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    var name = MirrorSystem.getName(invocation.memberName);
+    if(_registeredTypes[_findTypeName(this.$unsafe)]['fields'].contains(name)) {
+      return get(name);
+    }
+    if(_registeredTypes[_findTypeName(this.$unsafe)]['fields'].contains(name.substring(0, name.length - 1))
+        && name.endsWith('=')) {
+      set(name.substring(0, name.length - 1), invocation.positionalArguments[0]);
+      return invocation.positionalArguments[0];
+    }
+    throw new NoSuchMethodError(this,
+                                invocation.memberName,
+                                invocation.positionalArguments,
+                                invocation.namedArguments);
+  }
 }
