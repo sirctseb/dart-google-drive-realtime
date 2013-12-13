@@ -239,4 +239,22 @@ class GoogleDocProvider extends DocumentProvider {
         return req.responseText;
       });
   }
+
+  void registerType(Type type, String name, List fields) {
+    // make sure js drive stuff is loaded
+    _globalSetup().then((bool success) {
+      // store the dart type, js type, and fields
+      _RealtimeCustomObject._registeredTypes[name] = {
+                                // TODO is this the best way to just create a js function?
+                               'js-type': new js.FunctionProxy.withThis((p) {}),
+                               'fields': fields};
+      CustomObject._registeredTypes[name] = {'dart-type': type};
+      // do the js-side registration
+      realtimeCustom.registerType(_RealtimeCustomObject._registeredTypes[name]["js-type"], name);
+      // add fields
+      for(var field in fields) {
+        _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'](field);
+      }
+    });
+  }
 }

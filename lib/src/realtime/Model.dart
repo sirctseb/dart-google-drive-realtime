@@ -38,18 +38,24 @@ class Model extends EventTarget {
     // store id to type association
     // TODO call to getId fails with dart2js
     _storeIdType(realtime['custom']['getId'](unsafeCustom), name);
-    // return dart wrapper
-    return new CustomObject._fromProxy(unsafeCustom, name);
+    // make realtime backing object
+    var backingObject = new _RealtimeCustomObject._fromProxy(unsafeCustom);
+    // make CustomObject to return
+    var customObject = new CustomObject._byName(name);
+    // set internal object
+    customObject._internalCustomObject = backingObject;
+    // return custom object subclass
+    return customObject;
   }
   void _storeIdType(String id, String name) {
     // make sure map exists
     // TODO can we do this during initialization?
-    if(!root.containsKey(CustomObject._idToTypeProperty)) {
-      root[CustomObject._idToTypeProperty] = createMap();
+    if(!root.containsKey(_RealtimeCustomObject._idToTypeProperty)) {
+      root[_RealtimeCustomObject._idToTypeProperty] = createMap();
     }
     // store id to name
     // TODO try to removed these from map when they are removed from the model?
-    root[CustomObject._idToTypeProperty][id] = name;
+    root[_RealtimeCustomObject._idToTypeProperty][id] = name;
   }
   /*CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
     final params = [ref]..addAll(args);

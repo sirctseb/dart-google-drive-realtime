@@ -7,7 +7,6 @@ import 'package:realtime_data_model/realtime_data_model.dart' as rt;
 
 class Book extends rt.CustomObject {
   static const NAME = 'Book';
-  Book() : super(NAME);
 
   String get title => get('title');
   String get author => get('author');
@@ -71,7 +70,8 @@ main() {
   var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
 //  var docProvider = new rt.LocalDocumentProvider();
 
-  rt.CustomObject.registerType(Book, "Book", ["title", "author", "isbn", "isCheckedOut", "reviews"]);
+  docProvider.registerType(Book, "Book", ["title", "author", "isbn", "isCheckedOut", "reviews"]);
+//  rt.CustomObject.registerType(Book, "Book", ["title", "author", "isbn", "isCheckedOut", "reviews"]);
 
   docProvider.loadDocument(initializeModel).then(onFileLoaded);
 

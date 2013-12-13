@@ -20,10 +20,14 @@ dynamic _promoteProxy(dynamic object) {
 
   if(object is js.Proxy) {
     if(realtimeCustom['isCustomObject'](object)) {
-      // find name
-      var name = CustomObject._findTypeName(object);
-      // construct dart instance from proxy
-      return new CustomObject._fromProxy(object, name);
+      // make realtime backing object
+      var backingObject = new _RealtimeCustomObject._fromProxy(object);
+      // make CustomObject to return
+      var customObject = new CustomObject._byName(_RealtimeCustomObject._findTypeName(object));
+      // set internal object
+      customObject._internalCustomObject = backingObject;
+      // return custom object subclass
+      return customObject;
     } else if(js.instanceof(object, realtime['CollaborativeMap'])) {
       return new CollaborativeMap._fromProxy(object);
     } else if(js.instanceof(object, realtime['CollaborativeList'])) {
