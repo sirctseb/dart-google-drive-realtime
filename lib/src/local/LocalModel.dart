@@ -50,8 +50,14 @@ class _LocalModel implements Model {
   // TODO need to implement compound operations. meaningful for undo/redo
   void beginCompoundOperation([String name]) {}
   // TODO implement LocalModelObject and return here
-  CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
-    return null;
+  CustomObject create(String name) {
+    var backingObject = new _LocalCustomObject(name);
+    // make CustomObject to return
+    var customObject = new CustomObject._byName(name);
+    // set internal object
+    customObject._internalCustomObject = backingObject;
+    // return custom object subclass
+    return customObject;
   }
   _LocalModelList createList([List initialValue]) {
     return new _LocalModelList(initialValue);
