@@ -90,6 +90,8 @@ part 'src/local/UndoHistory.dart';
 
 part 'realtime_data_model_custom.dart';
 part 'src/custom/CustomObject.dart';
+part 'src/custom/LocalCustomObject.dart';
+part 'src/custom/RealtimeCustomObject.dart';
 
 // js.Proxy for "gapi.drive.realtime"
 final realtime = js.context['gapi']['drive']['realtime'];

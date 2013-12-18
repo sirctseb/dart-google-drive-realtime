@@ -35,4 +35,10 @@ class LocalDocumentProvider extends DocumentProvider {
   Future<String> exportDocument() {
     return new Future.value(json.stringify((_document.model as _LocalModel).toJSON()));
   }
+
+  void registerType(Type type, String name, List fields) {
+    _LocalCustomObject._registeredTypes[name] =
+      {'fields': fields};
+    CustomObject._registeredTypes[name] = {'dart-type': type};
+  }
 }
