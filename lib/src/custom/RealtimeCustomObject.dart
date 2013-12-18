@@ -35,7 +35,6 @@ class _RealtimeCustomObject extends CollaborativeContainer implements _InternalC
 
   dynamic get(String field) => $unsafe[field];
   void set(String field, dynamic value) {
-    print('setting custom object field $field to $value');
     $unsafe.title = _toJs(value);
   }
 
