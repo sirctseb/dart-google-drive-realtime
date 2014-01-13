@@ -361,6 +361,64 @@ onFileLoaded(rt.Document doc) {
       expect(doc.model.root['native-string'], 'value');
     });
   });
+
+  group('Multiple entries', () {
+    test('Twice in one map', () {
+      var str = doc.model.createString('dup');
+      doc.model.root['map']['duplicate1'] = str;
+      doc.model.root['map']['duplicate2'] = str;
+      expect(doc.model.root['map']['duplicate1'].text,
+             doc.model.root['map']['duplicate2'].text);
+      var ssObjChanged;
+      ssObjChanged = doc.model.root['map'].onObjectChanged.listen(expectAsync1((e) {
+        expect(e.events[0].type, 'text_inserted');
+      }, count: 1));
+      doc.model.root['map']['duplicate1'].append('whatever');
+      ssObjChanged.cancel();
+    });
+    // TODO this same test for lists
+    test('One of two removed from map', () {
+      var str = doc.model.createString('dup');
+      doc.model.root['map']['removeOne'] = doc.model.createMap();
+      doc.model.root['map']['removeOne']['duplicate1'] = str;
+      doc.model.root['map']['removeOne']['duplicate2'] = str;
+      expect(doc.model.root['map']['removeOne']['duplicate1'].text,
+             doc.model.root['map']['removeOne']['duplicate2'].text);
+      doc.model.root['map']['removeOne'].remove('duplicate2');
+      var ssObjChanged;
+      ssObjChanged = doc.model.root['map']['removeOne'].onObjectChanged.listen(expectAsync1((e) {
+        expect(e.events[0].type, 'text_inserted');
+      }, count: 1));
+      doc.model.root['map']['removeOne']['duplicate1'].append('something');
+      ssObjChanged.cancel();
+    });
+    test('Once in two maps each', () {
+      var str = doc.model.createString('dup');
+      doc.model.root['map']['dupmap1'] = doc.model.createMap();
+      doc.model.root['map']['dupmap2'] = doc.model.createMap();
+      doc.model.root['map']['dupmap1']['str'] = str;
+      doc.model.root['map']['dupmap2']['str'] = str;
+      // TODO in js test, we compare actual collab objects and not text
+      expect(doc.model.root['map']['dupmap1']['str'].text,
+             doc.model.root['map']['dupmap2']['str'].text);
+      var ssObjChanged1;
+      ssObjChanged1 = doc.model.root['map']['dupmap1'].onObjectChanged.listen(expectAsync1((e) {
+        expect(e.events[0].type, 'text_inserted');
+        ssObjChanged1.cancel();
+      }));
+      var ssObjChanged2;
+      ssObjChanged2 = doc.model.root['map']['dupmap2'].onObjectChanged.listen(expectAsync1((e) {
+        expect(e.events[0].type, 'text_inserted');
+        ssObjChanged2.cancel();
+      }));
+      var ssRootChanged;
+      ssRootChanged = doc.model.root['map'].onObjectChanged.listen(expectAsync1((e) {
+        expect(e.events[0].type, 'text_inserted');
+      }, count: 1));
+      doc.model.root['map']['dupmap1']['str'].append('hello');
+      ssRootChanged.cancel();
+    });
+  });
 }
 
 main() {
