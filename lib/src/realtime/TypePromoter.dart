@@ -43,7 +43,7 @@ dynamic _promoteProxy(dynamic object) {
   return object;
 }
 /// Construct typed event classes based on type
-dynamic _promoteEventByType(BaseModelEvent event) {
+dynamic _promoteEventByType(js.Proxy event) {
   // TODO we only use this for events that fire on strings, lists, and maps, but maybe we should support the rest?
   if(event.type == EventType.TEXT_DELETED.value) {
     return new TextDeletedEvent._fromProxy(event.toJs());
