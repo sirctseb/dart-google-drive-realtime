@@ -373,7 +373,7 @@ onFileLoaded(rt.Document doc) {
       ssObjChanged = doc.model.root['map'].onObjectChanged.listen(expectAsync1((e) {
         expect(e.events[0].type, 'text_inserted');
         expect(e.events[0].text, 'whatever');
-      }, count: 2));
+      }, count: 1));
       doc.model.root['map']['duplicate1'].append('whatever');
       ssObjChanged.cancel();
     });
@@ -417,7 +417,7 @@ onFileLoaded(rt.Document doc) {
       ssRootChanged = doc.model.root['map'].onObjectChanged.listen(expectAsync1((e) {
         print('root handler');
         expect(e.events[0].type, 'text_inserted');
-      }, count: 2));
+      }, count: 1));
       doc.model.root['map']['dupmap1']['str'].append('hello');
       ssObjChanged1.cancel();
       ssObjChanged2.cancel();
