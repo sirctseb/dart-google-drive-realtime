@@ -372,7 +372,8 @@ onFileLoaded(rt.Document doc) {
       var ssObjChanged;
       ssObjChanged = doc.model.root['map'].onObjectChanged.listen(expectAsync1((e) {
         expect(e.events[0].type, 'text_inserted');
-      }, count: 1));
+        expect(e.events[0].text, 'whatever');
+      }, count: 2));
       doc.model.root['map']['duplicate1'].append('whatever');
       ssObjChanged.cancel();
     });
@@ -388,6 +389,7 @@ onFileLoaded(rt.Document doc) {
       var ssObjChanged;
       ssObjChanged = doc.model.root['map']['removeOne'].onObjectChanged.listen(expectAsync1((e) {
         expect(e.events[0].type, 'text_inserted');
+        expect(e.events[0].text, 'something');
       }, count: 1));
       doc.model.root['map']['removeOne']['duplicate1'].append('something');
       ssObjChanged.cancel();
@@ -403,19 +405,22 @@ onFileLoaded(rt.Document doc) {
              doc.model.root['map']['dupmap2']['str'].text);
       var ssObjChanged1;
       ssObjChanged1 = doc.model.root['map']['dupmap1'].onObjectChanged.listen(expectAsync1((e) {
+        print('dupmap1 handler');
         expect(e.events[0].type, 'text_inserted');
-        ssObjChanged1.cancel();
       }));
       var ssObjChanged2;
       ssObjChanged2 = doc.model.root['map']['dupmap2'].onObjectChanged.listen(expectAsync1((e) {
+        print('dupmap2 handler');
         expect(e.events[0].type, 'text_inserted');
-        ssObjChanged2.cancel();
       }));
       var ssRootChanged;
       ssRootChanged = doc.model.root['map'].onObjectChanged.listen(expectAsync1((e) {
+        print('root handler');
         expect(e.events[0].type, 'text_inserted');
-      }, count: 1));
+      }, count: 2));
       doc.model.root['map']['dupmap1']['str'].append('hello');
+      ssObjChanged1.cancel();
+      ssObjChanged2.cancel();
       ssRootChanged.cancel();
     });
   });
