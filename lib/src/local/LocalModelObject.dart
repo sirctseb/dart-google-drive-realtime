@@ -14,22 +14,12 @@
 
 part of realtime_data_model;
 
-class _LocalModelObject implements CollaborativeObject {
+class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject {
 
   /// Local objects have no js Proxy
   final js.Proxy $unsafe = null;
 
   final String id;
-
-  StreamController<_LocalObjectChangedEvent> _onObjectChanged
-    = new StreamController<_LocalObjectChangedEvent>.broadcast(sync: true);
-  Stream<_LocalObjectChangedEvent> get onObjectChanged => _onObjectChanged.stream;
-  // a separate stream to which object changed events are sent after they are
-  // send to _onObjectChanged. this is to propogate up in the correct order
-  // TODO there's almost certainly a better way to do this
-  StreamController<_LocalObjectChangedEvent> _onPostObjectChangedController
-    = new StreamController<_LocalObjectChangedEvent>.broadcast(sync: true);
-  Stream<_LocalObjectChangedEvent> get _onPostObjectChanged => _onPostObjectChangedController.stream;
 
   // TODO implement custom objects
   Stream<ValueChangedEvent> get onValueChanged => null; // TODO implement this getter
@@ -58,10 +48,7 @@ class _LocalModelObject implements CollaborativeObject {
       // fire actual events
       _eventStreamControllers[events[i].type].add(events[i]);
     }
-    // fire change event on normal stream
-    _onObjectChanged.add(event);
-    // fire on propagation stream
-    _onPostObjectChangedController.add(event);
+    dispatchObjectChangedEvent(event);
     if(terminal) {
       _inEmitEventsAndChangedScope = false;
     }

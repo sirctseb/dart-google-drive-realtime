@@ -69,6 +69,7 @@ part 'src/realtime/event_type.dart';
 part 'src/local/LocalDocument.dart';
 part 'src/local/LocalDocumentSaveStateChangedEvent.dart';
 part 'src/local/LocalEvent.dart';
+part 'src/local/LocalEventTarget.dart';
 part 'src/local/LocalIndexReference.dart';
 part 'src/local/LocalIndexReferenceContainer.dart';
 part 'src/local/LocalModel.dart';

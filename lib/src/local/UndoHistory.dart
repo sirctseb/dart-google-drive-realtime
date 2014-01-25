@@ -124,8 +124,7 @@ class _UndoHistory {
     // do object changed events
     inverses.forEach((e) {
       var event = new _LocalObjectChangedEvent._([e], e._target);
-      e._target._onObjectChanged.add(event);
-      e._target._onPostObjectChangedController.add(event);
+      e._target.dispatchObjectChangedEvent(event);
     });
     // unset undo latch
     _undoScope = false;
@@ -152,8 +151,7 @@ class _UndoHistory {
     // do object changed events
     inverses.forEach((e) {
       var event = new _LocalObjectChangedEvent._([e], e._target);
-      e._target._onObjectChanged.add(event);
-      e._target._onPostObjectChangedController.add(event);
+      e._target.dispatchObjectChangedEvent(event);
     });
     // increment index
     _index++;
