@@ -55,28 +55,17 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
                                 invocation.namedArguments);
   }
 
-  // map of subscriptions for object changed events for model objects contained in this
-  Map<String, StreamSubscription<_LocalObjectChangedEvent>> _ssMap
-    = new Map<String, StreamSubscription<_LocalObjectChangedEvent>>();
-
   void _executeEvent(_LocalUndoableEvent event_in) {
     if(event_in.type == _ModelEventType.VALUE_CHANGED.value) {
         var event = event_in as _LocalValueChangedEvent;
         _fields[event.property] = event.newValue;
         // stop propagating changes if we're writing over a model object
-        // TODO this is a bug if the same object is stored on two properties
-        if(_ssMap.containsKey(event.property)) {
-          _ssMap[event.property].cancel();
-          _ssMap.remove(event.property);
+        if(event.oldValue is _LocalModelObject && !_fields.containsValue(event.oldValue)) {
+          event.oldValue.removeParentEventTarget(this);
         }
         // propagate changes on model data objects
         if(event.newValue is _LocalModelObject) {
-          _ssMap[event.property] = (event.newValue as _LocalModelObject)._onPostObjectChanged.listen((e) {
-            // fire normal change event
-            _onObjectChanged.add(e);
-            // fire on propagation stream
-            _onPostObjectChangedController.add(e);
-          });
+          event.newValue.addParentEventTarget(this);
         }
     } else {
         super._executeEvent(event_in);
