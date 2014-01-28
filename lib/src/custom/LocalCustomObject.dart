@@ -17,6 +17,8 @@ part of realtime_data_model;
 class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObject {
   // information on the custom types registered
   static Map _registeredTypes = {};
+  // map from object ids to the models that contain them
+  static Map _customObjectModels = {};
   Map _fields = {};
 
   _LocalCustomObject(String name) {

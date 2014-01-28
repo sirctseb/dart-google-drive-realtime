@@ -257,4 +257,8 @@ class GoogleDocProvider extends DocumentProvider {
       }
     });
   }
+
+  static bool _isCustomObject(dynamic object) {
+    return object is CustomObject && object._isRealtimeCustomObject;
+  }
 }

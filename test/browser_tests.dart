@@ -18,6 +18,7 @@ initializeModel(rt.Model model) {
   model.root['text'] = model.createString('Hello Realtime World!');
   model.root['list'] = model.createList();
   model.root['map'] = model.createMap();
+  model.root['book'] = model.create('Book');
 }
 
 onFileLoaded(rt.Document doc) {
@@ -424,6 +425,45 @@ onFileLoaded(rt.Document doc) {
       ssRootChanged.cancel();
     });
   });
+
+  group('Custom', () {
+    test('Book is custom object', () {
+      expect(rt.isCustomObject(doc.model.root['book']), true);
+      expect(rt.isCustomObject(doc.model.root['text']), false);
+    });
+    test('Set title', () {
+      expect(doc.model.root['book'].title, null);
+      doc.model.root['book'].onObjectChanged.listen((e) {
+        print(e);
+      });
+      doc.model.root['book'].onValueChanged.listen((e) {
+        print('${e.property} changed from ${e.oldValue} to ${e.newValue}');
+      });
+      doc.model.root['book'].title = 'title';
+      expect(doc.model.root['book'].title, 'title');
+    });
+    test('custom.getModel', () {
+      expect(doc.model, rt.getModel(doc.model.root['book']));
+    });
+    test('custom.getId', () {
+      expect(rt.getId(doc.model.root['book']) is String, true);
+    });
+  });
+}
+
+class Book extends rt.CustomObject {
+  static const NAME = 'Book';
+
+  String get title => get('title');
+  String get author => get('author');
+  String get isbon => get('isbn');
+  bool get isCheckedOut => get('isCheckedOut');
+  String get reviews => get('reviews');
+  set title(String title) => set('title', title);
+  set author(String author) => set('author', author);
+  set isbn(String isbn) => set('isbn', isbn);
+  set isCheckedOut(bool isCheckedOut) => set('isCheckedOut', isCheckedOut);
+  set reviews(String reviews) => set('reviews', reviews);
 }
 
 main() {
@@ -439,6 +479,8 @@ main() {
 //  var docProvider = new rt.GoogleDocProvider('0B0OUnldiyG0hSEU0U3VnalQ1a1U');
 ////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
   var docProvider = new rt.LocalDocumentProvider();
+
+  docProvider.registerType(Book, "Book", ["title", "author", "isbn", "isCheckedOut", "reviews"]);
 
   docProvider.loadDocument(initializeModel).then(onFileLoaded);
 }

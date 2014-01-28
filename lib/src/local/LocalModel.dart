@@ -56,6 +56,8 @@ class _LocalModel implements Model {
     var customObject = new CustomObject._byName(name);
     // set internal object
     customObject._internalCustomObject = backingObject;
+    // store map from id to model
+    _LocalCustomObject._customObjectModels[getId(customObject)] = this;
     // return custom object subclass
     return customObject;
   }
