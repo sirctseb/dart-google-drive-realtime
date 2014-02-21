@@ -16,6 +16,31 @@ part of realtime_data_model;
 
 final realtimeCustom = realtime['custom'];
 
+// TODO make field a separate call like js lib
+void registerType(Type type, String name, List fields) {
+  // store dart type
+  CustomObject._registeredTypes[name] = {'dart-type': type};
+
+  // do google registration
+  // make sure js drive stuff is loaded
+  GoogleDocProvider._globalSetup().then((bool success) {
+    // store the js type and fields
+    _RealtimeCustomObject._registeredTypes[name] = {
+                              // TODO is this the best way to just create a js function?
+                             'js-type': new js.FunctionProxy.withThis((p) {}),
+                             'fields': fields};
+    // do the js-side registration
+    realtimeCustom.registerType(_RealtimeCustomObject._registeredTypes[name]["js-type"], name);
+    // add fields
+    for(var field in fields) {
+      _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'](field);
+    }
+  });
+
+  // do local registration
+  _LocalCustomObject._registeredTypes[name] = {'fields': fields};
+}
+
 dynamic collaborativeField(String name) => realtimeCustom.collaborativeField(name);
 
 String getId(dynamic obj) {
