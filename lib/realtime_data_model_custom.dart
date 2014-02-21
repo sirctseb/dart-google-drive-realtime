@@ -18,16 +18,25 @@ final realtimeCustom = realtime['custom'];
 
 dynamic collaborativeField(String name) => realtimeCustom.collaborativeField(name);
 
-String getId(dynamic obj) => realtimeCustom.getId(obj);
-
-Model getModel(dynamic obj) => new Model._fromProxy(realtimeCustom.getModel(obj));
-
-bool isCustomObject(dynamic obj) => realtimeCustom.isCustomObject(obj);
-
-void registerType(js.Serializable<js.FunctionProxy> type, String name) {
-  realtimeCustom.registerType(type, name);
+String getId(dynamic obj) {
+  if(GoogleDocProvider._isCustomObject(obj)) {
+    return realtimeCustom.getId(obj);
+  } else if(LocalDocumentProvider._isCustomObject(obj)) {
+    // TODO should refactor so id accessor is not in custom object
+    return obj._internalCustomObject.id;
+  }
 }
 
+Model getModel(dynamic obj) {
+  // TODO test that obj is custom object
+  return obj._model;
+}
+
+bool isCustomObject(dynamic obj) {
+  return GoogleDocProvider._isCustomObject(obj) || LocalDocumentProvider._isCustomObject(obj);
+}
+
+// TODO move these two into do providers
 void setInitializer(js.Serializable<js.FunctionProxy> type, Function initialize) {
   realtimeCustom.setInitializer(type, initialize);
 }

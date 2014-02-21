@@ -63,9 +63,6 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
 
   // backing map instance
   Map<String, V> _map = new Map<String, V>();
-  // map of subscriptions for object changed events for model objects contained in this
-  Map<String, StreamSubscription<_LocalObjectChangedEvent>> _ssMap
-    = new Map<String, StreamSubscription<_LocalObjectChangedEvent>>();
   // stream controller
   // TODO should be use a subscribestreamprovider? I don't think we need to
   // TODO we are using a broadcast stream so that new listeners don't get back events. is this the correct approach?
@@ -96,12 +93,7 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
     _map.addAll(initialValue);
     _map.forEach((key,value) {
       if(value is _LocalModelObject) {
-        _ssMap[key] = (value as _LocalModelObject)._onPostObjectChanged.listen((e) {
-          // fire normal change event
-          _onObjectChanged.add(e);
-          // fire on propagation stream
-          _onPostObjectChangedController.add(e);
-        });
+        value.addParentEventTarget(this);
       }
     });
   }
@@ -117,19 +109,12 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
           _map[event.property] = event.newValue;
         }
         // stop propagating changes if we're writing over a model object
-        if(_ssMap.containsKey(event.property)) {
-          _ssMap[event.property].cancel();
-          _ssMap.remove(event.property);
+        if(event.oldValue is _LocalModelObject && !_map.values.contains(event.oldValue)) {
+          event.oldValue.removeParentEventTarget(this);
         }
         // propagate changes on model data objects
-        // TODO pipe?
         if(event.newValue is _LocalModelObject) {
-          _ssMap[event.property] = (event.newValue as _LocalModelObject)._onPostObjectChanged.listen((e) {
-            // fire normal change event
-            _onObjectChanged.add(e);
-            // fire on propagation stream
-            _onPostObjectChangedController.add(e);
-          });
+          event.newValue.addParentEventTarget(this);
         }
     } else {
         super._executeEvent(event_in);

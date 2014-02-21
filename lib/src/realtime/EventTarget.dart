@@ -22,15 +22,21 @@ class EventTarget extends jsw.TypedProxy {
 
   SubscribeStreamProvider _getStreamProviderFor(EventType eventType, [transformEvent(e)]) {
     Function handler;
+    js.FunctionProxy jsFunction;
     return new SubscribeStreamProvider(
         subscribe: (EventSink eventSink) {
           handler = (e) {
             eventSink.add(transformEvent == null ? e : transformEvent(e));
           };
-          _addEventListener(eventType, handler);
+          js.context['hackForJsInterop95'] = handler;
+          jsFunction = js.context['hackForJsInterop95'];
+          js.deleteProperty(js.context, 'hackForJsInterop95');
+//          _addEventListener(eventType, handler);
+          _addEventListener(eventType, jsFunction);
         },
         unsubscribe: (EventSink eventSink) {
-          _removeEventListener(eventType, handler);
+//          _removeEventListener(eventType, handler);
+          _removeEventListener(eventType, jsFunction);
         }
     );
   }

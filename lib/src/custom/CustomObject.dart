@@ -39,6 +39,17 @@ class CustomObject implements js.Serializable<js.Proxy> {
   _InternalCustomObject _internalCustomObject;
 
   dynamic toJs() => (_internalCustomObject as _RealtimeCustomObject).$unsafe;
+
+  bool get _isRealtimeCustomObject => _internalCustomObject is _RealtimeCustomObject;
+  bool get _isLocalCustomObject => _internalCustomObject is _LocalCustomObject;
+
+  Model get _model {
+    if(_isRealtimeCustomObject) {
+      return new Model._fromProxy(realtimeCustom.getModel(this));
+    } else if(_isLocalCustomObject) {
+      return _LocalCustomObject._customObjectModels[getId(this)];
+    }
+  }
 }
 
 abstract class _InternalCustomObject extends CustomObject {}

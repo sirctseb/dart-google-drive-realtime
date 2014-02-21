@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
-import 'package:realtime_data_model/realtime_data_model_custom.dart' as rtc;
 
 class Task extends rt.CollaborativeObject {
   static const NAME = 'Task';

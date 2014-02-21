@@ -124,30 +124,19 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   StreamController<ValuesSetEvent> _onValuesSet
     = new StreamController<ValuesSetEvent>.broadcast(sync: true);
 
-  // map from object ids of contained elements to subscriptions to their object changed streams
-  Map<String, StreamSubscription<_LocalObjectChangedEvent>> _ssMap =
-    new Map<String, StreamSubscription<_LocalObjectChangedEvent>>();
   // check if value is a model object and start propagating object changed events
   void _propagateChanges(dynamic element) {
     // start propagating changes if element is model object and not already subscribed
     // TODO do we do the same check in map?
-    if(element is _LocalModelObject && !_ssMap.containsKey((element as _LocalModelObject).id)) {
-      _ssMap[(element as _LocalModelObject).id] =
-        (element as _LocalModelObject)._onPostObjectChanged.listen((e) {
-          // fire on normal object changed stream
-          _onObjectChanged.add(e);
-          // fire on propogation stream
-          _onPostObjectChangedController.add(e);
-        });
+    if(element is _LocalModelObject) {
+      element.addParentEventTarget(this);
     }
   }
   // check if value is a model object and stop propagating object changed events
   void _stopPropagatingChanges(dynamic element) {
     // stop propagation if overwritten element is model object and it is no longer anywhere in the list
-    // TODO this depends on this method being called _after_ the element is removed from _list
     if(element is _LocalModelObject && !_list.contains(element)) {
-      _ssMap[(element as _LocalModelObject).id].cancel();
-      _ssMap.remove((element as _LocalModelObject).id);
+      element.removeParentEventTarget(this);
     }
   }
 

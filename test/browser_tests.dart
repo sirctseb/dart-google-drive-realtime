@@ -18,6 +18,7 @@ initializeModel(rt.Model model) {
   model.root['text'] = model.createString('Hello Realtime World!');
   model.root['list'] = model.createList();
   model.root['map'] = model.createMap();
+  model.root['book'] = model.create('Book');
 }
 
 onFileLoaded(rt.Document doc) {
@@ -361,6 +362,108 @@ onFileLoaded(rt.Document doc) {
       expect(doc.model.root['native-string'], 'value');
     });
   });
+
+  group('Multiple entries', () {
+    test('Twice in one map', () {
+      var str = doc.model.createString('dup');
+      doc.model.root['map']['duplicate1'] = str;
+      doc.model.root['map']['duplicate2'] = str;
+      expect(doc.model.root['map']['duplicate1'].text,
+             doc.model.root['map']['duplicate2'].text);
+      var ssObjChanged;
+      ssObjChanged = doc.model.root['map'].onObjectChanged.listen(expectAsync1((e) {
+        expect(e.events[0].type, 'text_inserted');
+        expect(e.events[0].text, 'whatever');
+      }, count: 1));
+      doc.model.root['map']['duplicate1'].append('whatever');
+      ssObjChanged.cancel();
+    });
+    // TODO this same test for lists
+    test('One of two removed from map', () {
+      var str = doc.model.createString('dup');
+      doc.model.root['map']['removeOne'] = doc.model.createMap();
+      doc.model.root['map']['removeOne']['duplicate1'] = str;
+      doc.model.root['map']['removeOne']['duplicate2'] = str;
+      expect(doc.model.root['map']['removeOne']['duplicate1'].text,
+             doc.model.root['map']['removeOne']['duplicate2'].text);
+      doc.model.root['map']['removeOne'].remove('duplicate2');
+      var ssObjChanged;
+      ssObjChanged = doc.model.root['map']['removeOne'].onObjectChanged.listen(expectAsync1((e) {
+        expect(e.events[0].type, 'text_inserted');
+        expect(e.events[0].text, 'something');
+      }, count: 1));
+      doc.model.root['map']['removeOne']['duplicate1'].append('something');
+      ssObjChanged.cancel();
+    });
+    test('Once in two maps each', () {
+      var str = doc.model.createString('dup');
+      doc.model.root['map']['dupmap1'] = doc.model.createMap();
+      doc.model.root['map']['dupmap2'] = doc.model.createMap();
+      doc.model.root['map']['dupmap1']['str'] = str;
+      doc.model.root['map']['dupmap2']['str'] = str;
+      // TODO in js test, we compare actual collab objects and not text
+      expect(doc.model.root['map']['dupmap1']['str'].text,
+             doc.model.root['map']['dupmap2']['str'].text);
+      var ssObjChanged1;
+      ssObjChanged1 = doc.model.root['map']['dupmap1'].onObjectChanged.listen(expectAsync1((e) {
+        print('dupmap1 handler');
+        expect(e.events[0].type, 'text_inserted');
+      }));
+      var ssObjChanged2;
+      ssObjChanged2 = doc.model.root['map']['dupmap2'].onObjectChanged.listen(expectAsync1((e) {
+        print('dupmap2 handler');
+        expect(e.events[0].type, 'text_inserted');
+      }));
+      var ssRootChanged;
+      ssRootChanged = doc.model.root['map'].onObjectChanged.listen(expectAsync1((e) {
+        print('root handler');
+        expect(e.events[0].type, 'text_inserted');
+      }, count: 1));
+      doc.model.root['map']['dupmap1']['str'].append('hello');
+      ssObjChanged1.cancel();
+      ssObjChanged2.cancel();
+      ssRootChanged.cancel();
+    });
+  });
+
+  group('Custom', () {
+    test('Book is custom object', () {
+      expect(rt.isCustomObject(doc.model.root['book']), true);
+      expect(rt.isCustomObject(doc.model.root['text']), false);
+    });
+    test('Set title', () {
+      expect(doc.model.root['book'].title, null);
+      doc.model.root['book'].onObjectChanged.listen((e) {
+        print(e);
+      });
+      doc.model.root['book'].onValueChanged.listen((e) {
+        print('${e.property} changed from ${e.oldValue} to ${e.newValue}');
+      });
+      doc.model.root['book'].title = 'title';
+      expect(doc.model.root['book'].title, 'title');
+    });
+    test('custom.getModel', () {
+      expect(doc.model, rt.getModel(doc.model.root['book']));
+    });
+    test('custom.getId', () {
+      expect(rt.getId(doc.model.root['book']) is String, true);
+    });
+  });
+}
+
+class Book extends rt.CustomObject {
+  static const NAME = 'Book';
+
+  String get title => get('title');
+  String get author => get('author');
+  String get isbon => get('isbn');
+  bool get isCheckedOut => get('isCheckedOut');
+  String get reviews => get('reviews');
+  set title(String title) => set('title', title);
+  set author(String author) => set('author', author);
+  set isbn(String isbn) => set('isbn', isbn);
+  set isCheckedOut(bool isCheckedOut) => set('isCheckedOut', isCheckedOut);
+  set reviews(String reviews) => set('reviews', reviews);
 }
 
 main() {
@@ -376,6 +479,8 @@ main() {
 //  var docProvider = new rt.GoogleDocProvider('0B0OUnldiyG0hSEU0U3VnalQ1a1U');
 ////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
   var docProvider = new rt.LocalDocumentProvider();
+
+  docProvider.registerType(Book, "Book", ["title", "author", "isbn", "isCheckedOut", "reviews"]);
 
   docProvider.loadDocument(initializeModel).then(onFileLoaded);
 }

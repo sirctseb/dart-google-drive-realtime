@@ -41,4 +41,8 @@ class LocalDocumentProvider extends DocumentProvider {
       {'fields': fields};
     CustomObject._registeredTypes[name] = {'dart-type': type};
   }
+
+  static bool _isCustomObject(dynamic object) {
+    return object is CustomObject && object._isLocalCustomObject;
+  }
 }
