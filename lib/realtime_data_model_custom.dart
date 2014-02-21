@@ -85,11 +85,19 @@ bool isCustomObject(dynamic obj) {
   return GoogleDocProvider._isCustomObject(obj) || LocalDocumentProvider._isCustomObject(obj);
 }
 
-// TODO move these two into do providers
-void setInitializer(js.Serializable<js.FunctionProxy> type, Function initialize) {
-  realtimeCustom.setInitializer(type, initialize);
+// TODO have subclasses just override methods instead of registration (why doesn't that work on js side also?)
+void setInitializer(String name, Function initialize) {
+  // do google-side registration
+  realtimeCustom.setInitializer(name, initialize);
+
+  // store on local side
+  _LocalCustomObject._registeredTypes[name]['initializerFn'] = initialize;
 }
 
-void setOnLoaded(js.Serializable<js.FunctionProxy> type, [Function onLoaded]) {
-  realtimeCustom.setOnLoaded(type, onLoaded);
+void setOnLoaded(String name, [Function onLoaded]) {
+  // do google-side registration
+  realtimeCustom.setOnLoaded(name, onLoaded);
+
+  // store on local side
+  _LocalCustomObject._registeredTypes[name]['onLoadedFn'] = onLoaded;
 }
