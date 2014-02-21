@@ -60,24 +60,6 @@ abstract class DocumentProvider {
     };
   }
 
-  /**
-   * Register a custom object type. Must be called before [DocumentProvider.loadDocument].
-   * Type must be a subclass of [CustomObject] and must define a default constructor that calls
-   * `CustomObject(name)` where `name` is the same value provided to `registerType`.
-   *
-   * e.g.
-   *     class Book extends CustomObject {
-   *       final static NAME = 'Book';
-   *       Book() : CustomObject(NAME);
-   *     }
-   *     docProvider.registerType(Book, Book.NAME, ['title', 'author']);
-   *     docProvider.loadDocument().then((doc) {
-   *       Book book = doc.model.create('Book');
-   *       doc.model.root['book'] = book;
-   *     });
-   */
-  void registerType(Type type, String name, List fields);
-
   // recursively construct a model object from an json export map
   static dynamic _parseJSON(Model model, Map json) {
     if(json.containsKey('json')) {

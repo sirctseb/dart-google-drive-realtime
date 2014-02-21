@@ -17,6 +17,23 @@ part of realtime_data_model;
 final realtimeCustom = realtime['custom'];
 
 // TODO registration can now be in one place since we register on both
+
+/**
+ * Register a custom object type. Must be called before [DocumentProvider.loadDocument].
+ * Type must be a subclass of [CustomObject].
+ *
+ * e.g.
+ *     class Book extends CustomObject {
+ *       final static NAME = 'Book';
+ *     }
+ *     registerType(Book, Book.NAME);
+ *     collaborativeField(Book.NAME, 'title');
+ *     collaborativeField(Bool.NAME, 'author');
+ *     docProvider.loadDocument().then((doc) {
+ *       Book book = doc.model.create('Book');
+ *       doc.model.root['book'] = book;
+ *     });
+ */
 void registerType(Type type, String name) {
   // store dart type
   CustomObject._registeredTypes[name] = {'dart-type': type};
