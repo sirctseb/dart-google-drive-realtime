@@ -16,6 +16,7 @@ part of realtime_data_model;
 
 final realtimeCustom = realtime['custom'];
 
+// TODO check for google api loaded before doing google-side things
 // TODO registration can now be in one place since we register on both
 
 /**
@@ -70,11 +71,14 @@ String getId(dynamic obj) {
     // TODO should refactor so id accessor is not in custom object
     return obj._internalCustomObject.id;
   }
+  throw new Exception('Object $obj is not a custom object');
 }
 
 Model getModel(dynamic obj) {
-  // TODO test that obj is custom object
-  return obj._model;
+  if(GoogleDocProvider._isCustomObject(obj) || LocalDocumentProvider._isCustomObject(obj)) {
+    return obj._model;
+  }
+  throw new Exception('Object $obj is not a custom object');
 }
 
 bool isCustomObject(dynamic obj) {
