@@ -480,7 +480,12 @@ main() {
 ////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
   var docProvider = new rt.LocalDocumentProvider();
 
-  docProvider.registerType(Book, "Book", ["title", "author", "isbn", "isCheckedOut", "reviews"]);
+  rt.registerType(Book, Book.NAME);
+  rt.collaborativeField(Book.NAME, "title");
+  rt.collaborativeField(Book.NAME, "author");
+  rt.collaborativeField(Book.NAME, "isbn");
+  rt.collaborativeField(Book.NAME, "isCheckedOut");
+  rt.collaborativeField(Book.NAME, "reviews");
 
   docProvider.loadDocument(initializeModel).then(onFileLoaded);
 }
