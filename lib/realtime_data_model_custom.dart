@@ -16,7 +16,6 @@ part of realtime_data_model;
 
 final realtimeCustom = realtime['custom'];
 
-// TODO check for google api loaded before doing google-side things
 // TODO registration can now be in one place since we register on both
 
 /**
@@ -40,8 +39,7 @@ void registerType(Type type, String name) {
   CustomObject._registeredTypes[name] = {'dart-type': type};
 
   // do google registration
-  // make sure js drive stuff is loaded
-  GoogleDocProvider._globalSetup().then((bool success) {
+  if(GoogleDocProvider._globallySetup) {
     // store the js type and fields
     _RealtimeCustomObject._registeredTypes[name] = {
                               // TODO is this the best way to just create a js function?
@@ -49,7 +47,7 @@ void registerType(Type type, String name) {
                              'fields': []};
     // do the js-side registration
     realtimeCustom.registerType(_RealtimeCustomObject._registeredTypes[name]["js-type"], name);
-  });
+  }
 
   // do local registration
   _LocalCustomObject._registeredTypes[name] = {'fields': []};
@@ -57,15 +55,17 @@ void registerType(Type type, String name) {
 
 void collaborativeField(String name, String field) {
   // add field google-side
-  _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'](field);
-  _RealtimeCustomObject._registeredTypes[name]['fields'].add(field);
+  if(GoogleDocProvider._globallySetup) {
+    _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'](field);
+    _RealtimeCustomObject._registeredTypes[name]['fields'].add(field);
+  }
 
   // add field locally
   _LocalCustomObject._registeredTypes[name]['fields'].add(field);
 }
 
 String getId(dynamic obj) {
-  if(GoogleDocProvider._isCustomObject(obj)) {
+  if(GoogleDocProvider._globallySetup && GoogleDocProvider._isCustomObject(obj)) {
     return realtimeCustom.getId(obj);
   } else if(LocalDocumentProvider._isCustomObject(obj)) {
     // TODO should refactor so id accessor is not in custom object
@@ -75,20 +75,23 @@ String getId(dynamic obj) {
 }
 
 Model getModel(dynamic obj) {
-  if(GoogleDocProvider._isCustomObject(obj) || LocalDocumentProvider._isCustomObject(obj)) {
+  if(isCustomObject(obj)) {
     return obj._model;
   }
   throw new Exception('Object $obj is not a custom object');
 }
 
 bool isCustomObject(dynamic obj) {
-  return GoogleDocProvider._isCustomObject(obj) || LocalDocumentProvider._isCustomObject(obj);
+  return LocalDocumentProvider._isCustomObject(obj) ||
+      (GoogleDocProvider._globallySetup && GoogleDocProvider._isCustomObject(obj));
 }
 
 // TODO have subclasses just override methods instead of registration (why doesn't that work on js side also?)
 void setInitializer(String name, Function initialize) {
   // do google-side registration
-  realtimeCustom.setInitializer(name, initialize);
+  if(GoogleDocProvider._globallySetup) {
+    realtimeCustom.setInitializer(name, initialize);
+  }
 
   // store on local side
   _LocalCustomObject._registeredTypes[name]['initializerFn'] = initialize;
@@ -96,7 +99,9 @@ void setInitializer(String name, Function initialize) {
 
 void setOnLoaded(String name, [Function onLoaded]) {
   // do google-side registration
-  realtimeCustom.setOnLoaded(name, onLoaded);
+  if(GoogleDocProvider._globallySetup) {
+    realtimeCustom.setOnLoaded(name, onLoaded);
+  }
 
   // store on local side
   _LocalCustomObject._registeredTypes[name]['onLoadedFn'] = onLoaded;
