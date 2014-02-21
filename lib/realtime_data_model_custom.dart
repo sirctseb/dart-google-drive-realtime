@@ -16,8 +16,8 @@ part of realtime_data_model;
 
 final realtimeCustom = realtime['custom'];
 
-// TODO make field a separate call like js lib
-void registerType(Type type, String name, List fields) {
+// TODO registration can now be in one place since we register on both
+void registerType(Type type, String name) {
   // store dart type
   CustomObject._registeredTypes[name] = {'dart-type': type};
 
@@ -28,20 +28,23 @@ void registerType(Type type, String name, List fields) {
     _RealtimeCustomObject._registeredTypes[name] = {
                               // TODO is this the best way to just create a js function?
                              'js-type': new js.FunctionProxy.withThis((p) {}),
-                             'fields': fields};
+                             'fields': []};
     // do the js-side registration
     realtimeCustom.registerType(_RealtimeCustomObject._registeredTypes[name]["js-type"], name);
-    // add fields
-    for(var field in fields) {
-      _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'](field);
-    }
   });
 
   // do local registration
-  _LocalCustomObject._registeredTypes[name] = {'fields': fields};
+  _LocalCustomObject._registeredTypes[name] = {'fields': []};
 }
 
-dynamic collaborativeField(String name) => realtimeCustom.collaborativeField(name);
+void collaborativeField(String name, String field) {
+  // add field google-side
+  _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'](field);
+  _RealtimeCustomObject._registeredTypes[name]['fields'].add(field);
+
+  // add field locally
+  _LocalCustomObject._registeredTypes[name]['fields'].add(field);
+}
 
 String getId(dynamic obj) {
   if(GoogleDocProvider._isCustomObject(obj)) {
