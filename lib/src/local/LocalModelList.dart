@@ -46,9 +46,8 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     _emitEventsAndChanged([event]);
   }
 
-  // TODO anything with comparator?
   int lastIndexOf(E value, [Comparator comparator]) {
-    _list.lastIndexOf(value);
+    return _list.lastIndexOf(value);
   }
 
   /// Deprecated : use `xxx[index]` instead
@@ -111,7 +110,9 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
       // add to stream
       var event = new _LocalValuesRemovedEvent._(index, [value], this);
       _emitEventsAndChanged([event]);
+      return true;
     }
+    return false;
   }
 
   void replaceRange(int index, List<E> values) {
