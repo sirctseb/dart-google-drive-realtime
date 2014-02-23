@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
 // TODO upstream
 //import 'package:js/js.dart' as js;
+import 'package:json/json.dart' as json;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
 import 'package:logging/logging.dart';
@@ -62,6 +63,328 @@ onFileLoaded(rt.Document doc) {
       expect(doc.model.root['text'].text, 'redid');
       doc.model.undo();
     });
+    test('undo event type', () {
+      StreamSubscription ssVR;
+      ssVR = doc.model.root['list'].onValuesRemoved.listen((e) {
+        expect(e.type, rt.EventType.VALUES_REMOVED);
+      });
+      StreamSubscription ssVA;
+      ssVA = doc.model.root['list'].onValuesAdded.listen((e) {
+        expect(e.type, rt.EventType.VALUES_ADDED);
+      });
+      doc.model.root['list'].push('value');
+      ssVR.cancel();
+      ssVA.cancel();
+    });
+    test('event order during undo', () {
+      rt.CollaborativeMap map = doc.model.root['map'];
+      rt.CollaborativeList list = doc.model.root['list'];
+      map.clear();
+      list.clear();
+      String orderString = '';
+      doc.model.beginCompoundOperation();
+      map['key1'] = 'value1';
+      list.push('value');
+      map['key2'] = 'value2';
+      doc.model.endCompoundOperation();
+      var ssVC;
+      ssVC = map.onValueChanged.listen((e) {
+        orderString += 'mapVC${e.property}';
+      });
+      var ssVR;
+      ssVR = list.onValuesRemoved.listen((e) {
+        orderString += 'listVR${e.values[0]}';
+      });
+      doc.model.undo();
+      ssVC.cancel();
+      ssVR.cancel();
+      expect(orderString, 'mapVCkey2listVRvaluemapVCkey1');
+    });
+    test('event order with event handler', () {
+      var map = doc.model.root['map'];
+      var list = doc.model.root['list'];
+      map.clear();
+      list.clear();
+      list.push(1);
+      var first = true;
+      var orderString = '';
+      var ssVC;
+      ssVC = map.onValueChanged.listen((e) {
+        orderString += 'mapVC';
+        if(first) {
+          list[0] = 2;
+          expect(list[0], 2);
+          first = false;
+        }
+      });
+      var ssVS;
+      ssVS = list.onValuesSet.listen((e) {
+        orderString += 'listVS${e.newValues[0]}';
+      });
+      map['key'] = 'val';
+      expect(list[0], 2);
+      expect(orderString, 'mapVClistVS2');
+      orderString = '';
+      doc.model.undo();
+      expect(list[0], 1);
+      expect(orderString, 'listVS1mapVC');
+      orderString = '';
+      doc.model.redo();
+      expect(list[0], 2);
+      expect(orderString, 'mapVClistVS2');
+      ssVC.cancel();
+      ssVS.cancel();
+    });
+  });
+
+  group('Compound Operations', () {
+    rt.CollaborativeMap map = doc.model.root['map'];
+    rt.CollaborativeList list = doc.model.root['list'];
+    rt.CollaborativeString string = doc.model.root['text'];
+    test('map additions', () {
+      map['compound1'] = 'val1';
+      map['compound2'] = 'val2';
+      doc.model.undo();
+      expect(map.keys.indexOf('compound1'), isNot(-1));
+      expect(map.keys.indexOf('compound2'), -1);
+      doc.model.undo();
+      doc.model.beginCompoundOperation();
+      map['compound1'] = 'val1';
+      map['compound2'] = 'val2';
+      doc.model.endCompoundOperation();
+      expect(map['compound1'], 'val1');
+      expect(map['compound2'], 'val2');
+      doc.model.undo();
+      expect(map.keys.indexOf('compound1'), -1);
+      expect(map.keys.indexOf('compound2'), -1);
+    });
+    test('events', () {
+      // TODO expect(10);
+      // TODO implementing with variable, check if built-in
+      int count = 0;
+      map.clear();
+      var rootOC;
+      var mapVC;
+      var mapOC;
+      rootOC = doc.model.root.onObjectChanged.listen((e) {
+        expect(e.type, rt.EventType.OBJECT_CHANGED);
+        count++;
+      });
+      mapVC = map.onValueChanged.listen((e){
+        expect(e.type, rt.EventType.VALUE_CHANGED);
+        count++;
+      });
+      mapOC = map.onObjectChanged.listen((e) {
+        expect(e.type, rt.EventType.OBJECT_CHANGED);
+        count++;
+      });
+      doc.model.beginCompoundOperation();
+      map['compound1'] = 'val1';
+      map['compound2'] = 'val2';
+      doc.model.endCompoundOperation();
+      doc.model.undo();
+      rootOC.cancel();
+      mapVC.cancel();
+      mapOC.cancel();
+      expect(count, 10);
+    });
+    test('list, string, map', () {
+      map.clear();
+      map['key1'] = 'val1';
+      list.clear();
+      list.push('val1');
+      string.text = 'val1';
+      doc.model.beginCompoundOperation();
+      map.remove('key1');
+      map['key2'] = 'val2';
+      list.remove(0);
+      list.push('val2');
+      string.text = 'val2';
+      doc.model.endCompoundOperation();
+      expect(map.keys.indexOf('key1'), -1);
+      expect(map['key2'], 'val2');
+      expect(list.indexOf('val1'), -1);
+      expect(list[0], 'val2');
+      expect(string.text, 'val2');
+      doc.model.undo();
+      expect(map.keys.indexOf('key2'), -1);
+      expect(map['key1'], 'val1');
+      expect(list.indexOf('val2'), -1);
+      expect(list[0], 'val1');
+      expect(string.text, 'val1');
+    });
+    test('list, map events', () {
+      // TODO expect(4)
+      int count = 0;
+      map.clear();
+      list.clear();
+      doc.model.beginCompoundOperation();
+      map['key1'] = 'val1';
+      map['key2'] = 'val2';
+      list.push('val1');
+      doc.model.endCompoundOperation();
+      var rootOC;
+      var listOC;
+      var mapOC;
+      rootOC = doc.model.root.onObjectChanged.listen((e) {
+        expect(e.type, rt.EventType.OBJECT_CHANGED);
+        count++;
+      });
+      mapOC = map.onObjectChanged.listen((e) {
+        expect(e.type, rt.EventType.OBJECT_CHANGED);
+        count++;
+      });
+      listOC = list.onObjectChanged.listen((e) {
+        expect(e.type, rt.EventType.OBJECT_CHANGED);
+        count++;
+      });
+      doc.model.undo();
+      expect(count, 4);
+      rootOC.cancel();
+      listOC.cancel();
+      mapOC.cancel();
+    });
+    test('undo in compound map set operation from empty', () {
+      map.clear();
+      doc.model.beginCompoundOperation();
+      map['key1'] = 'val1';
+      expect(map['key1'], 'val1');
+      expect(doc.model.canUndo, true);
+      doc.model.undo();
+      expect(map['key1'], 'val1');
+      doc.model.endCompoundOperation();
+      expect(map['key1'], 'val1');
+      expect(doc.model.canRedo, false);
+    });
+    test('undo in compound map set operation from value', () {
+      map.clear();
+      map['key1'] = 'val1';
+      doc.model.beginCompoundOperation();
+      map['key1'] = 'val2';
+      expect(map['key1'], 'val2');
+      doc.model.undo();
+      doc.model.endCompoundOperation();
+      expect(map['key1'], null);
+      expect(doc.model.canRedo, false);
+    });
+    test('undo in compound map set operation from 2 values', () {
+      map.clear();
+      map['key1'] = 'val0';
+      map['key1'] = 'val1';
+      doc.model.beginCompoundOperation();
+      map['key1'] = 'val2';
+      doc.model.undo();
+      doc.model.endCompoundOperation();
+      expect(map['key1'], 'val0');
+      expect(doc.model.canRedo, false);
+    });
+    test('undo in compound map set operation from 4 values', () {
+      var oldValue;
+      var newValue;
+      var mapVC;
+      map.clear();
+      mapVC = map.onValueChanged.listen((e) {
+        //print('old: ${e.oldValue} , new: ${e.newValue}');
+        expect(e.oldValue, oldValue);
+        expect(e.newValue, newValue);
+        if(oldValue == 'val2' && newValue == 'val4') {
+          oldValue = 'val4'; newValue = 'val3';
+        } else if(oldValue == 'val3' && newValue == 'val4') {
+          oldValue = 'val4'; newValue = 'val2';
+        }
+      });
+      oldValue = null; newValue = 'val0';
+      map['key1'] = 'val0';
+      oldValue = 'val0'; newValue = 'val1';
+      map['key1'] = 'val1';
+      oldValue = 'val1'; newValue = 'val2';
+      map['key1'] = 'val2';
+      oldValue = 'val2'; newValue = 'val3';
+      map['key1'] = 'val3';
+      doc.model.beginCompoundOperation();
+      oldValue = 'val3'; newValue = 'val4';
+      //print('set to val4 in compound');
+      map['key1'] = 'val4';
+      expect(map['key1'], 'val4');
+      oldValue = 'val4'; newValue = 'val2';
+      //print('undo in compound');
+      doc.model.undo();
+      expect(map['key1'], 'val2');
+      expect(doc.model.canRedo, false);
+      doc.model.endCompoundOperation();
+      expect(map['key1'], 'val2');
+      expect(doc.model.canRedo, false);
+      oldValue = 'val2'; newValue = 'val4';
+      //print('undo');
+      doc.model.undo();
+      expect(map['key1'], 'val3');
+      expect(doc.model.canRedo, true);
+      oldValue = 'val3'; newValue = 'val4';
+      //print('redo');
+      doc.model.redo();
+      expect(map['key1'], 'val2');
+      expect(doc.model.canRedo, false);
+      //print('undo');
+      oldValue = 'val2'; newValue = 'val4';
+      doc.model.undo();
+      expect(map['key1'], 'val3');
+      oldValue = 'val3'; newValue = 'val1';
+      //print('undo');
+      doc.model.undo();
+      expect(map['key1'], 'val1');
+      oldValue = 'val1'; newValue = 'val0';
+      doc.model.undo();
+      expect(map['key1'], 'val0');
+      oldValue = 'val0'; newValue = null;
+      doc.model.undo();
+      expect(map['key1'], null);
+      mapVC.cancel();
+    });
+    // TODO 5 values and an undo
+    test('canRedo mid-compound', () {
+      map.clear();
+      map['key1'] = 'val0';
+      map['key1'] = 'val1';
+      doc.model.undo();
+      expect(doc.model.canRedo, true);
+      doc.model.beginCompoundOperation();
+      map['key1'] = 'val2';
+      expect(doc.model.canRedo, true);
+      doc.model.redo();
+      expect(doc.model.canRedo, false);
+      doc.model.endCompoundOperation();
+    });
+    test('undo in compound string operation', () {
+      string.text = '0123456789';
+      string.removeRange(3,6);
+      doc.model.beginCompoundOperation();
+      string.insertString(0, 'aa');
+      expect(string.text, 'aa0126789');
+      doc.model.undo();
+      doc.model.endCompoundOperation();
+      expect(string.text, 'aa0345126789');
+    });
+    test('nested compound operations', () {
+      map.clear();
+      map['key'] = 0;
+      list.clear();
+      list.push(0);
+      string.text = '0';
+      doc.model.beginCompoundOperation();
+      map['key'] = 1;
+      doc.model.beginCompoundOperation();
+      list[0] = 1;
+      doc.model.endCompoundOperation();
+      string.text = '1';
+      doc.model.endCompoundOperation();
+      expect(map['key'], 1);
+      expect(list[0], 1);
+      expect(string.text, '1');
+      doc.model.undo();
+      expect(map['key'], 0);
+      expect(list[0], 0);
+      expect(string.text, '0');
+    });
   });
 
   group('CollaborativeString', () {
@@ -119,6 +442,24 @@ onFileLoaded(rt.Document doc) {
       }));
       string.removeRange(4, 6);
     });
+    test('string diff', () {
+      var events = [];
+      string.text = 'Hello Realtime World!';
+      var ssOC;
+      ssOC = string.onObjectChanged.listen((e) {
+        e.events.map((event) {
+          events.add({'type': event.type, 'text': event.text, 'index': event.index});
+        });
+      });
+      string.text = 'redid';
+      ssOC.cancel();
+      var jsonString = '[{"type":"text_deleted","text":"Hello R","index":0},{"type":"text_inserted","text":"r","index":0},{"type":"text_deleted","text":"alt","index":2},{"type":"text_inserted","text":"d","index":2},{"type":"text_deleted","text":"me World!","index":4},{"type":"text_inserted","text":"d","index":4}]';
+      expect(events, equals(json.parse(jsonString)));
+    });
+    test('toString', () {
+      string.text = 'stringValue';
+      expect(string.toString(), 'stringValue');
+    });
   });
 
   group('CollaborativeList', () {
@@ -129,6 +470,14 @@ onFileLoaded(rt.Document doc) {
     });
     test('get length', () {
       expect(list.length, 1);
+    });
+    test('set length', () {
+      list.push('s2');
+      expect(list.length, 2);
+      list.length = 1;
+      expect(list.length, 1);
+      // TODO match specific message?
+      expect(() {list.length = 3;}, throws);
     });
     test('operator [](int index)', () {
       expect(list[0], 's1');
@@ -187,6 +536,39 @@ onFileLoaded(rt.Document doc) {
       }));
       list[0] = 's2';
     });
+    test('propogation', () {
+      var ss;
+      ss = doc.model.root.onObjectChanged.listen((e) {
+        expect(e.events[0].type, rt.EventType.VALUES_ADDED);
+      });
+      list.push('value');
+      ss.cancel();
+    });
+    test('same value', () {
+      // expect(4);
+      var ssVS;
+      ssVS = list.onValuesSet.listen((e) {
+        expect(e.type, rt.EventType.VALUES_SET);
+        expect(e.newValues[0], 1);
+      });
+      list[0] = 1;
+      list[0] = 1;
+      ssVS.cancel();
+    });
+    test('set out of range', () {
+      expect(() {list.set(-1,1);}, throws);
+    });
+    test('toString', () {
+      list.clear();
+      list.push(1);
+      list.push([1,2,3]);
+      list.push('string');
+      list.push({'string': 1});
+      list.push(doc.model.createString('collabString'));
+      list.push(doc.model.createList([1,2,3]));
+      list.push(doc.model.createMap({'string': 1}));
+      expect(list.toString(), "[[JsonValue 1], [JsonValue [1,2,3]], [JsonValue \"string\"], [JsonValue {\"string\":1}], collabString, [[JsonValue 1], [JsonValue 2], [JsonValue 3]], {string: [JsonValue 1]}]");
+    });
   });
 
   group('CollaborativeMap', () {
@@ -194,6 +576,26 @@ onFileLoaded(rt.Document doc) {
     setUp(() {
       map.clear();
       map['key1'] = 4;
+    });
+    test('absent key', () {
+      expect(map['absent'], null);
+    });
+    test('null value', () {
+      expect(map['nullkey'], null);
+      expect(map.containsKey('nullkey'), false);
+      map['nullkey'] = null;
+      expect(map['nullkey'], null);
+      expect(map.containsKey('nullkey'), false);
+      expect(map.keys.indexOf('nullkey'), -1);
+      map['nullkey'] = 'value';
+      doc.model.undo();
+      expect(map.containsKey('nullkey'), false);
+      expect(map.keys.indexOf('nullkey'), -1);
+    });
+    test('size with null', () {
+      expect(map.size, 1);
+      map['nullkey'] = null;
+      expect(map.size, 1);
     });
     test('operator [](String key)', () {
       expect(map['key1'], 4);
@@ -266,7 +668,47 @@ onFileLoaded(rt.Document doc) {
       map['key1'] = null;
       expect(map.length, 0);
     });
+    test('set return value', () {
+      map.clear();
+      map['key'] = 'val';
+      expect(map['key'] = 'val2', 'val');
+    });
+    test('delete return value', () {
+      map['key'] = 'val';
+      expect(map.remove('key'), 'val');
+    });
+    test('same value', () {
+      // TODO expect(3)
+      map.clear();
+      map['key1'] = 'val1';
+      map['key1'] = 'val2';
+      var ssVC;
+      ssVC = map.onValueChanged.listen((e) {
+        expect(e.newValue, 'val3');
+        expect(e.oldValue, 'val2');
+      });
+      var blah = map['key1'] = 'val3';
+      expect(blah, 'val2');
+      ssVC.cancel();
+    });
+    test('undo to absent', () {
+      map.clear();
+      expect(map.containsKey('key1'), false);
+      expect(map.keys.indexOf('key1'), -1);
+      map['key1'] = 'val1';
+      expect(map.containsKey('key1'), true);
+      expect(map.keys.indexOf('key1'), isNot(-1));
+      doc.model.undo();
+      expect(map.containsKey('key1'), false);
+      expect(map.keys.indexOf('key1'), -1);
+    });
+    test('toString', () {
+      map.clear();
+      map.set('string', 1);
+      expect(map.toString(), '{string: [JsonValue 1]}');
+    });
   });
+
   group('RealtimeIndexReference', () {
     rt.CollaborativeString string = doc.model.root['text'];
     rt.CollaborativeList list = doc.model.root['list'];
@@ -324,6 +766,35 @@ onFileLoaded(rt.Document doc) {
         expect(ref.index, 7);
       }));
       string.insertString(0, "xx");
+      ssRef.cancel();
+    });
+    test('Assign index', () {
+      string.text = 'aaaaaaaaa';
+      var ref = string.registerReference(5, true);
+      expect(ref.index, 5);
+      ref.index = 7;
+      expect(ref.index, 7);
+      string.insertString(0,  'xx');
+      expect(ref.index, 9);
+    });
+    test('resurrect index', () {
+      var ref = string.registerReference(2, true);
+      string.removeRange(1,3);
+      expect(ref.index, -1);
+      ref.index = 3;
+      expect(ref.index, 3);
+      string.insertString(0, 'x');
+      expect(ref.index, 4);
+    });
+    test('canBeDeleted', () {
+      var refTrue = string.registerReference(3, true);
+      expect(refTrue.canBeDeleted, true);
+      var refFalse = string.registerReference(3, false);
+      expect(refFalse.canBeDeleted, false);
+    });
+    test('referencedObject', () {
+      var ref = string.registerReference(2, false);
+      expect(ref.referencedObject.text, string.text);
     });
   });
 
@@ -443,7 +914,8 @@ onFileLoaded(rt.Document doc) {
       expect(doc.model.root['book'].title, 'title');
     });
     test('custom.getModel', () {
-      expect(doc.model, rt.getModel(doc.model.root['book']));
+      // TODO can't compare to doc.model because it's a new object
+      expect(rt.getModel(doc.model.root['book']) is rt.Model, true);
     });
     test('custom.getId', () {
       expect(rt.getId(doc.model.root['book']) is String, true);
