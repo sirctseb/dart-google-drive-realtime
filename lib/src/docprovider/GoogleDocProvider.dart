@@ -30,7 +30,7 @@ class GoogleDocProvider extends DocumentProvider {
 
     // check global setup
     _logger.finer('Check global setup');
-    return _globalSetup().then((success) {
+    return globalSetup().then((success) {
       _logger.finer('Checked global setup: $success');
 
       // TODO make better state for determining if we need to do a file insert
@@ -91,7 +91,7 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   // check authentication, create drive client, load realtime api
-  static Future<bool> _globalSetup() {
+  static Future<bool> globalSetup() {
     // complete if already setup
     if(_globallySetup) return new Future.value(true);
 
