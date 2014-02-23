@@ -48,6 +48,9 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
     var insertEvent = new _LocalTextInsertedEvent._(0, text, this);
     _emitEventsAndChanged([deleteEvent, insertEvent]);
   }
+  String toString() {
+    return this._string;
+  }
 
   Stream<_LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
   Stream<_LocalTextDeletedEvent> get onTextDeleted => _onTextDeleted.stream;
