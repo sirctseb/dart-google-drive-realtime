@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
 // TODO upstream
 //import 'package:js/js.dart' as js;
+import 'package:logging_handlers/logging_handlers_shared.dart';
 import 'package:json/json.dart' as json;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
@@ -940,8 +941,8 @@ class Book extends rt.CustomObject {
 
 main() {
   hierarchicalLoggingEnabled = true;
-//  Logger.root.onRecord.listen(new PrintHandler());
-  Logger.root.level = Level.FINEST;
+  Logger.root.onRecord.listen(new LogPrintHandler());
+  Logger.root.level = Level.INFO;
 
   useHtmlConfiguration();
 
