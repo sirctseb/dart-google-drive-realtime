@@ -23,7 +23,7 @@ class _LocalDocumentSaveStateChangedEvent extends _LocalEvent implements Documen
 
   final bool isSaving;
 
-  final String type = _ModelEventType.DOCUMENT_SAVE_STATE_CHANGED.value;
+  final String type = EventType.DOCUMENT_SAVE_STATE_CHANGED.value;
 
   // TODO not private because doc providers need to create them
   // TODO these don't need to be private in general because local_rdm is not public anyway

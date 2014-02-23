@@ -21,7 +21,7 @@ class _LocalObjectChangedEvent extends _LocalEvent implements ObjectChangedEvent
   // TODO I think this may be true for ObjectChanged and false for everything else?
   bool get bubbles => null; // TODO implement this getter
 
-  final String type = _ModelEventType.OBJECT_CHANGED.value;
+  final String type = EventType.OBJECT_CHANGED.value;
 
   final bool _isTerminal;
 

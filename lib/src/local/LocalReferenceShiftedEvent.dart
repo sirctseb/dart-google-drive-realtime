@@ -21,7 +21,7 @@ class _LocalReferenceShiftedEvent extends _LocalEvent implements ReferenceShifte
 
   final int oldIndex;
 
-  final String type = _ModelEventType.REFERENCE_SHIFTED.value;
+  final String type = EventType.REFERENCE_SHIFTED.value;
 
   _LocalReferenceShiftedEvent._(this.newIndex, this.oldIndex, _target) : super._(_target);
 }

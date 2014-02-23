@@ -26,7 +26,7 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
     for(var key in _registeredTypes[name]['fields']) {
       _fields[key] = null;
     }
-    _eventStreamControllers[_ModelEventType.VALUE_CHANGED.value] = _onValueChanged;
+    _eventStreamControllers[EventType.VALUE_CHANGED.value] = _onValueChanged;
   }
 
   StreamController<_LocalValueChangedEvent> _onValueChanged
@@ -58,7 +58,7 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
   }
 
   void _executeEvent(_LocalUndoableEvent event_in) {
-    if(event_in.type == _ModelEventType.VALUE_CHANGED.value) {
+    if(event_in.type == EventType.VALUE_CHANGED.value) {
         var event = event_in as _LocalValueChangedEvent;
         _fields[event.property] = event.newValue;
         // stop propagating changes if we're writing over a model object

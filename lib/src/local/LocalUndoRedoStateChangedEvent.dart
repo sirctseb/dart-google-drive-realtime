@@ -24,7 +24,7 @@ class _LocalUndoRedoStateChangedEvent extends _LocalEvent implements UndoRedoSta
 
   final bool canUndo;
 
-  final String type = _ModelEventType.UNDO_REDO_STATE_CHANGED.value;
+  final String type = EventType.UNDO_REDO_STATE_CHANGED.value;
 
   _LocalUndoRedoStateChangedEvent._(this.canRedo, this.canUndo)
     : super._(null);

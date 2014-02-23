@@ -59,20 +59,20 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
       _string = initialValue;
     }
 
-    _eventStreamControllers[_ModelEventType.TEXT_DELETED.value] = _onTextDeleted;
-    _eventStreamControllers[_ModelEventType.TEXT_INSERTED.value] = _onTextInserted;
+    _eventStreamControllers[EventType.TEXT_DELETED.value] = _onTextDeleted;
+    _eventStreamControllers[EventType.TEXT_INSERTED.value] = _onTextInserted;
   }
 
   void _executeEvent(_LocalUndoableEvent event_in) {
     // handle insert and delete events
     // TODO deal with type warnings
-    if(event_in.type == _ModelEventType.TEXT_DELETED.value) {
+    if(event_in.type == EventType.TEXT_DELETED.value) {
       var event = event_in as _LocalTextDeletedEvent;
       // update string
       _string = "${_string.substring(0, event.index)}${_string.substring(event.index + event.text.length)}";
       // update references
       _shiftReferencesOnDelete(event.index, event.text.length);
-    } else if(event_in.type == _ModelEventType.TEXT_INSERTED.value) {
+    } else if(event_in.type == EventType.TEXT_INSERTED.value) {
       var event = event_in as _LocalTextInsertedEvent;
       // update string
       _string = "${_string.substring(0, event.index)}${event.text}${_string.substring(event.index)}";

@@ -86,7 +86,6 @@ part 'src/local/LocalValueChangedEvent.dart';
 part 'src/local/LocalValuesAddedEvent.dart';
 part 'src/local/LocalValuesRemovedEvent.dart';
 part 'src/local/LocalValuesSetEvent.dart';
-part 'src/local/ModelEventType.dart';
 part 'src/local/UndoHistory.dart';
 
 part 'realtime_data_model_custom.dart';

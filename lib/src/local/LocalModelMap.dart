@@ -86,7 +86,7 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
       initializeWithValue(initialValue);
     }
 
-    _eventStreamControllers[_ModelEventType.VALUE_CHANGED.value] = _onValueChanged;
+    _eventStreamControllers[EventType.VALUE_CHANGED.value] = _onValueChanged;
   }
   void initializeWithValue(Map initialValue) {
     // don't emit events, but do propagate changes
@@ -99,7 +99,7 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   }
 
   void _executeEvent(_LocalUndoableEvent event_in) {
-    if(event_in.type == _ModelEventType.VALUE_CHANGED.value) {
+    if(event_in.type == EventType.VALUE_CHANGED.value) {
         var event = event_in as _LocalValueChangedEvent;
         // TODO what if we actually want to set to null?
         // TODO test if rt returns length 1 or 0 with a single key set to null

@@ -22,7 +22,7 @@ class _LocalTextInsertedEvent extends _LocalUndoableEvent implements TextInserte
 
   final String text;
 
-  final String type = _ModelEventType.TEXT_INSERTED.value;
+  final String type = EventType.TEXT_INSERTED.value;
 
   _LocalTextInsertedEvent._(this.index, this.text, _target) : super._(_target);
 

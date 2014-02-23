@@ -21,7 +21,7 @@ class _LocalTextDeletedEvent extends _LocalUndoableEvent implements TextDeletedE
 
   final String text;
 
-  final String type = _ModelEventType.TEXT_DELETED.value;
+  final String type = EventType.TEXT_DELETED.value;
 
   _LocalTextDeletedEvent._(this.index, this.text, _target) : super._(_target);
 

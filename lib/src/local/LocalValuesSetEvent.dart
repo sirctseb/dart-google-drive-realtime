@@ -24,7 +24,7 @@ class _LocalValuesSetEvent extends _LocalUndoableEvent implements ValuesSetEvent
 
   final List oldValues;
 
-  final String type = _ModelEventType.VALUES_SET.value;
+  final String type = EventType.VALUES_SET.value;
 
   _LocalValuesSetEvent._(this.index, this.newValues, this.oldValues, _target) : super._(_target);
 

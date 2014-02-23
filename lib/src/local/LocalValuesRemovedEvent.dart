@@ -19,7 +19,7 @@ class _LocalValuesRemovedEvent extends _LocalUndoableEvent implements ValuesRemo
 
   final int index;
 
-  final String type = _ModelEventType.VALUES_REMOVED.value;
+  final String type = EventType.VALUES_REMOVED.value;
 
   final List values;
 

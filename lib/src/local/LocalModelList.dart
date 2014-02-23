@@ -161,9 +161,9 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
       e.newValues.forEach((element) => _propagateChanges(element));
     });
 
-    _eventStreamControllers[_ModelEventType.VALUES_SET.value] = _onValuesSet;
-    _eventStreamControllers[_ModelEventType.VALUES_ADDED.value] = _onValuesAdded;
-    _eventStreamControllers[_ModelEventType.VALUES_REMOVED.value] = _onValuesRemoved;
+    _eventStreamControllers[EventType.VALUES_SET.value] = _onValuesSet;
+    _eventStreamControllers[EventType.VALUES_ADDED.value] = _onValuesAdded;
+    _eventStreamControllers[EventType.VALUES_REMOVED.value] = _onValuesRemoved;
   }
   void initializeWithValue(List initialValue) {
     // don't fire events but do propagate changes
@@ -173,16 +173,16 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   // TODO we could alternatively listen for our own events and do the modifications there
   void _executeEvent(_LocalUndoableEvent event_in) {
-    if(event_in.type == _ModelEventType.VALUES_SET.value) {
+    if(event_in.type == EventType.VALUES_SET.value) {
         var event = event_in as _LocalValuesSetEvent;
         _list.setRange(event.index, event.index + event.newValues.length, event.newValues);
-    } else if(event_in.type == _ModelEventType.VALUES_REMOVED.value) {
+    } else if(event_in.type == EventType.VALUES_REMOVED.value) {
         var event = event_in as _LocalValuesRemovedEvent;
         // update list
         _list.removeRange(event.index, event.index + event.values.length);
         // update references
         _shiftReferencesOnDelete(event.index, event.values.length);
-    } else if(event_in.type == _ModelEventType.VALUES_ADDED.value) {
+    } else if(event_in.type == EventType.VALUES_ADDED.value) {
         _LocalValuesAddedEvent event = event_in as _LocalValuesAddedEvent;
         // update list
         _list.insertAll(event.index, event.values);

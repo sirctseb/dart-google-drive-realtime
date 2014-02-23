@@ -27,7 +27,7 @@ class _LocalValueChangedEvent extends _LocalUndoableEvent implements ValueChange
 
   final String property;
 
-  final String type = _ModelEventType.VALUE_CHANGED.value;
+  final String type = EventType.VALUE_CHANGED.value;
 
   _LocalValueChangedEvent._(this.newValue, this.oldValue, this.property, _target) : super._(_target);
 

@@ -20,7 +20,7 @@ class _LocalValuesAddedEvent extends _LocalUndoableEvent implements ValuesAddedE
 
   final int index;
 
-  final String type = _ModelEventType.VALUES_ADDED.value;
+  final String type = EventType.VALUES_ADDED.value;
 
   final List values;
 
