@@ -52,8 +52,9 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   @override List<String> get keys => _map.keys.toList();
   /// deprecated : use `xxx[key] = value`
   @deprecated V set(String key, V value) {
+    var oldValue = this[key];
     this[key] = value;
-    return value;
+    return oldValue;
   }
   // TODO return TypePromotingList object
   @override List<V> get values => _map.values;
