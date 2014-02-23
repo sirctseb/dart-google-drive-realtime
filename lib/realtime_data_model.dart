@@ -50,6 +50,7 @@ part 'src/realtime/DocumentClosedError.dart';
 part 'src/realtime/DocumentSaveStateChangedEvent.dart';
 part 'src/realtime/Error.dart';
 part 'src/realtime/EventTarget.dart';
+part 'src/realtime/EventType.dart';
 part 'src/realtime/IndexReference.dart';
 part 'src/realtime/Model.dart';
 part 'src/realtime/ObjectChangedEvent.dart';
@@ -63,7 +64,6 @@ part 'src/realtime/ValuesAddedEvent.dart';
 part 'src/realtime/ValuesRemovedEvent.dart';
 part 'src/realtime/ValuesSetEvent.dart';
 part 'src/realtime/error_type.dart';
-part 'src/realtime/event_type.dart';
 
 // local files
 part 'src/local/LocalDocument.dart';
