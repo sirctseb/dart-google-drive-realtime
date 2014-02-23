@@ -33,10 +33,12 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   }
   // TODO event
   @override V remove(String key) {
+    var oldValue = this[key];
     // create the event
     var event = new _LocalValueChangedEvent._(null, _map[key], key, this);
     // send the event
     _emitEventsAndChanged([event]);
+    return oldValue;
   }
   /// deprecated : use `xxx.remove(key)`
   @deprecated V delete(String key) => remove(key);
