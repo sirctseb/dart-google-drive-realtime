@@ -20,11 +20,12 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   @override int get length => _map.length;
 
   @override V operator [](String key) => _map[key];
-  // TODO event
   @override void operator []=(String key, V value) {
-    // send the event
-    var event = new _LocalValueChangedEvent._(value, _map[key], key, this);
-    _emitEventsAndChanged([event]);
+    if(this[key] != value) {
+      // send the event
+      var event = new _LocalValueChangedEvent._(value, _map[key], key, this);
+      _emitEventsAndChanged([event]);
+    }
   }
 
   void clear() {
