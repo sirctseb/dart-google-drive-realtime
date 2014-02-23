@@ -84,6 +84,16 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
 
   int get size => length;
 
+  String toString() {
+    var valList = _map.keys.map((key) {
+      return '$key: ' +
+          (_map[key] is _LocalModelObject ?
+          _map[key].toString() :
+          '[JsonValue ${json.stringify(_map[key])}]');
+    });
+    return '{${valList.join(", ")}}';
+  }
+
   _LocalModelMap([Map initialValue]) {
     // initialize with value
     if(initialValue != null) {

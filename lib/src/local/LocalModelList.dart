@@ -121,6 +121,18 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     _emitEventsAndChanged([event]);
   }
 
+  String toString() {
+    return '[' +
+    this._list.map((e) {
+      if(e is _LocalModelObject) {
+        return e.toString();
+      } else {
+        return '[JsonValue ${json.stringify(e)}]';
+      }
+    }).join(', ') +
+    ']';
+  }
+
   // backing field
   final List _list = [];
   // stream controllers
