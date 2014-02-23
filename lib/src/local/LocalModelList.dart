@@ -14,6 +14,8 @@
 
 part of realtime_data_model;
 
+typedef bool Comparator<T>(T a, T b);
+
 class _LocalModelList<E> extends _LocalIndexReferenceContainer implements CollaborativeList<E> {
 
   E operator[](int index) => _list[index];
@@ -47,14 +49,33 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
 
   int lastIndexOf(E value, [Comparator comparator]) {
-    return _list.lastIndexOf(value);
+    if(comparator != null) {
+      for(var i = _list.length - 1; i >= 0; i--) {
+        if(comparator(_list[i], value)) {
+          return i;
+        }
+      }
+    } else {
+      return _list.lastIndexOf(value);
+    }
+    // for analyzer
+    return -1;
   }
 
   /// Deprecated : use `xxx[index]` instead
   @deprecated E get(int index) => this[index];
 
   int indexOf(E value, [Comparator comparator]) {
-    return _list.indexOf(value);
+    if(comparator != null) {
+      for(var i = 0; i < _list.length; i++) {
+        if(comparator(_list[i], value)) {
+          return i;
+        }
+      }
+    } else {
+      return _list.indexOf(value);
+    }
+    return -1;
   }
 
   /// Deprecated : use `xxx[index] = value` instead
