@@ -447,9 +447,9 @@ onFileLoaded(rt.Document doc) {
       string.text = 'Hello Realtime World!';
       var ssOC;
       ssOC = string.onObjectChanged.listen((e) {
-        e.events.map((event) {
-          events.add({'type': event.type, 'text': event.text, 'index': event.index});
-        });
+        events.addAll(e.events.map((event) {
+          return {'type': event.type, 'text': event.text, 'index': event.index};
+        }));
       });
       string.text = 'redid';
       ssOC.cancel();
