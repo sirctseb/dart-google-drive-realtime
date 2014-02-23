@@ -62,6 +62,13 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   @deprecated void set(int index, E value) { this[index] = value; }
 
   int get length => _list.length;
+  set length(int l) {
+    if(l > this.length) {
+      throw 'Cannot set the list length to be greater than the current value.';
+    } else {
+      this.removeRange(l, this.length);
+    }
+  }
 
   Stream<ValuesAddedEvent> get onValuesAdded => _onValuesAdded.stream;
 
