@@ -672,7 +672,7 @@ onFileLoaded(rt.Document doc) {
     test('set return value', () {
       map.clear();
       map['key'] = 'val';
-      expect(map['key'] = 'val2', 'val');
+      expect(map.set('key', 'val2'), 'val');
     });
     test('delete return value', () {
       map['key'] = 'val';
@@ -682,14 +682,13 @@ onFileLoaded(rt.Document doc) {
       // TODO expect(3)
       map.clear();
       map['key1'] = 'val1';
-      map['key1'] = 'val2';
       var ssVC;
       ssVC = map.onValueChanged.listen((e) {
-        expect(e.newValue, 'val3');
-        expect(e.oldValue, 'val2');
+        fail('Value changed handler should not be called');
+        expect(e.newValue, 'val1');
+        expect(e.oldValue, 'val1');
       });
-      var blah = map['key1'] = 'val3';
-      expect(blah, 'val2');
+      expect(map.set('key1', 'val1'), 'val1');
       ssVC.cancel();
     });
     test('undo to absent', () {
