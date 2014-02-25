@@ -60,8 +60,6 @@ class GoogleDocProvider extends DocumentProvider {
       // complete future on file loaded
       (p) {
         _logger.finest('File loaded callback called, completing future with loaded document');
-        // TODO document has to be retained. test if it can be released after complete call
-        // TODO it looks like relaese/retain don't ref count. release invalidates immediately
         completer.complete(_document = new Document._fromProxy(p));
       },
       // pass initializeModel through if supplied
