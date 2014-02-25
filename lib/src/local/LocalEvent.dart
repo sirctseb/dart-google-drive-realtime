@@ -33,5 +33,7 @@ abstract class _LocalEvent implements BaseModelEvent {
   // the object that generated the event
   final _LocalModelObject _target;
 
+  void _updateState() {}
+
   _LocalEvent._(this._target);
 }

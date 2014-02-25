@@ -21,7 +21,7 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
   static Map _customObjectModels = {};
   Map _fields = {};
 
-  _LocalCustomObject(String name) {
+  _LocalCustomObject(_LocalModel model, String name) : super(model) {
     // initialize fields
     for(var key in _registeredTypes[name]['fields']) {
       _fields[key] = null;

@@ -27,6 +27,24 @@ abstract class _LocalUndoableEvent extends _LocalEvent {
   }
 }
 
+class Scope extends IsEnum<String> {
+  static final NONE = new Scope._('none');
+  static final CO = new Scope._('co');
+  static final UNDO = new Scope._('undo');
+  static final REDO = new Scope._('redo');
+  static final INIT = new Scope._('init');
+
+  static final _INSTANCES = [NONE, CO, UNDO, REDO, INIT];
+
+  static Scope find(Object o) => findIn(_INSTANCES, o);
+
+  Scope._(String value) : super(value);
+
+  bool operator ==(Object other) => value == (other is Scope ? other.value : other);
+}
+
+typedef String Sorter(dynamic element, int index);
+
 /** [_UndoHistory] manages the history of actions performed in the app */
 // TODO events grouped into a single object changed event are still grouped
 // TODO during undo in the realtime implementation, but are split up here
@@ -34,76 +52,76 @@ abstract class _LocalUndoableEvent extends _LocalEvent {
 // TODO as seen by client code. also rt sometimes sends two of the same events
 class _UndoHistory {
   /** The list of actions in the undo history */
-  List<List<_LocalUndoableEvent>> _history = [[]];
+  List<List<_LocalUndoableEvent>> _history = [];
 
   /// The current index into the undo history.
   int _index = 0;
 
-  // true when the last object changed that wasn't from an undo or redo
-  // was a terminal change
-  bool _lastWasTerminal = false;
-  // accessor to return true if a change event is the first of a set
-  // that is not caused by an undo or redo
-  bool get _firstOfSet => _lastWasTerminal && !_undoScope && !_redoScope;
+  List<_LocalUndoableEvent> _currentCO = null;
+
+  List<Scope> _COScopes = [];
+
+  void beginCompoundOperation(Scope scope) {
+    if(_COScopes.length == 0) {
+      _currentCO = [];
+    }
+    _COScopes.add(scope);
+  }
+
+  void endCompoundOperation() {
+    var scope = _COScopes.removeLast();
+    if(_COScopes.length == 0) {
+      // invert the operations and reverse the order
+      var inverseCO = _currentCO.reversed.map((e) {
+        return e.inverse;
+      }).toList(growable: false);
+      // clear current CO
+      _currentCO = null;
+      if(scope == Scope.UNDO) {
+        // if we started from an undo, replace history at previous index with current CO
+        _history[_index] = inverseCO;
+      } else if(scope == Scope.REDO) {
+        // if we started from a redo, replace history at current index with current CO
+        _history[_index] = inverseCO;
+      } else if(scope != Scope.INIT) {
+        // add to the history
+        _history.removeRange(_index, _history.length);
+        _history.add(inverseCO);
+        _index++;
+      }
+    }
+  }
 
   // Add a list of events to the current undo index
-  void _addUndoEvents(Iterable<_LocalUndoableEvent> events, {bool terminateSet: false, bool prepend: false}) {
-    // if this is the first of a set and we're not undoing or redoing,
-    // truncate the history after this point
-    if(_firstOfSet) {
-      _history.removeRange(_index, _history.length);
-      _history.add([]);
-    }
-    if(prepend) {
-      _history[_index].insertAll(0, events);
-    } else {
-      _history[_index].addAll(events);
-    }
-    if(terminateSet) {
-      _history.add([]);
-      _index++;
+  void _addUndoEvents(Iterable<_LocalUndoableEvent> events) {
+    if(_COScopes.length == 0 || _COScopes[0] != Scope.INIT) {
+      _currentCO.addAll(events);
     }
   }
 
   _LocalModel model;
 
-  bool _undoScope = false;
-  bool _redoScope = false;
-  bool _initScope = false;
-
-  _UndoHistory(_LocalModel this.model) {
-    model.root.onObjectChanged.listen((_LocalObjectChangedEvent e) {
-      if(_initScope) {
-        // don't add to undo history in initialization
-      } else if(_undoScope) {
-        // if undoing, add inverse of events to history
-        _addUndoEvents(e.events, prepend: true);
-      } else if(_redoScope) {
-        // if redoing, add events to history
-        _addUndoEvents(e.events, prepend: true);
-      } else {
-        // store current undo/redo state
-        bool _canUndo = canUndo;
-        bool _canRedo = canRedo;
-
-        // add event to current undo set
-        _addUndoEvents(e.events.reversed, terminateSet: e._isTerminal);
-        _lastWasTerminal = e._isTerminal;
-
-        // if undo/redo state changed, send event
-        if(_canUndo != canUndo || _canRedo != canRedo) {
-          model._onUndoRedoStateChanged.add(
-              new _LocalUndoRedoStateChangedEvent._(canRedo, canUndo));
-        }
-      }
-    });
-  }
+  _UndoHistory(_LocalModel this.model) {}
 
   void initializeModel(initialize, _LocalModel m) {
     // call initialization callback with _initScope set to true
-    _initScope = true;
+    beginCompoundOperation(Scope.INIT);
     initialize(m);
-    _initScope = false;
+    endCompoundOperation();
+  }
+
+  // TODO move this (and typedef above) to utils
+  static Map bucket(List list, Sorter sorter) {
+    Map buckets = {};
+    for(int i = 0; i < list.length; i++) {
+      var value = list[i];
+      var key = sorter(value, i);
+      if(key != null) {
+        var bucket = buckets.containsKey(key) ? buckets[key] : (buckets[key] = []);
+        bucket.add(value);
+      }
+    }
+    return buckets;
   }
 
   void undo() {
@@ -111,23 +129,26 @@ class _UndoHistory {
     bool _canUndo = canUndo;
     bool _canRedo = canRedo;
 
-    // set undo latch
-    _undoScope = true;
+    beginCompoundOperation(Scope.UNDO);
+
     // decrement index
     _index--;
-    // save current events
-    var inverses = _history[_index].map((e) => e.inverse).toList();
-    // put empty list in place
-    _history[_index] = [];
     // do changes and events
-    inverses.forEach((e) => e._executeAndEmit());
-    // do object changed events
-    inverses.forEach((e) {
-      var event = new _LocalObjectChangedEvent._([e], e._target);
-      e._target.dispatchObjectChangedEvent(event);
+    _history[_index].forEach((e) {
+      e._updateState();
+      e._executeAndEmit();
     });
-    // unset undo latch
-    _undoScope = false;
+    // group by target
+    // TODO take id of object base class
+    var bucketed = bucket(_history[_index], (e, index) => e._target.id);
+    // do object changed events
+    for(var id in bucketed.keys) {
+      var event = new _LocalObjectChangedEvent._(bucketed[id], bucketed[id][0]._target);
+      bucketed[id][0]._target.dispatchObjectChangedEvent(event);
+    }
+
+    // unset undo scope flag
+    endCompoundOperation();
 
     // if undo/redo state changed, send event
     if(_canUndo != canUndo || _canRedo != canRedo) {
@@ -140,23 +161,25 @@ class _UndoHistory {
     bool _canUndo = canUndo;
     bool _canRedo = canRedo;
 
-    // set redo latch
-    _redoScope = true;
-    // save current events
-    var inverses = _history[_index].map((e) => e.inverse).toList();
-    // put empty list in place
-    _history[_index] = [];
+    beginCompoundOperation(Scope.REDO);
+
     // redo events
-    inverses.forEach((e) => e._executeAndEmit());
-    // do object changed events
-    inverses.forEach((e) {
-      var event = new _LocalObjectChangedEvent._([e], e._target);
-      e._target.dispatchObjectChangedEvent(event);
+    _history[_index].forEach((e) {
+      e._updateState();
+      e._executeAndEmit();
     });
+    // group by target
+    var bucketed = bucket(_history[_index], (e, index) => e._target.id);
+    // do object changed events
+    for(var id in bucketed.keys) {
+      var event = new _LocalObjectChangedEvent._(bucketed[id], bucketed[id][0]._target);
+      bucketed[id][0]._target.dispatchObjectChangedEvent(event);
+    }
+
+    endCompoundOperation();
+
     // increment index
     _index++;
-    // uset redo latch
-    _redoScope = false;
 
     // if undo/redo state changed, send event
     if(_canUndo != canUndo || _canRedo != canRedo) {
@@ -167,5 +190,5 @@ class _UndoHistory {
 
   // TODO check on these definitions
   bool get canUndo => _index > 0;
-  bool get canRedo => _index < _history.length - 1;
+  bool get canRedo => _index < _history.length;
 }

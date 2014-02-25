@@ -181,7 +181,8 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     }
   }
 
-  _LocalModelList([List initialValue]) {
+  _LocalModelList(_LocalModel model, [List initialValue]) :
+    super(model) {
     // initialize with values
     if(initialValue != null) {
       initializeWithValue(initialValue);

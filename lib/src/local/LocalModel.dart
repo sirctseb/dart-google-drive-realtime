@@ -18,7 +18,8 @@ class _LocalModel implements Model {
   _UndoHistory _undoHistory;
 
   /// Create a local model with a callback
-  _LocalModel([initialize]) : root = new _LocalModelMap() {
+  _LocalModel([initialize]) {
+    _root = createMap();
     _undoHistory = new _UndoHistory(this);
     if(initialize != null) {
       _undoHistory.initializeModel(initialize, this);
@@ -36,22 +37,27 @@ class _LocalModel implements Model {
   bool get canUndo => _undoHistory.canUndo;
   bool get canRedo => _undoHistory.canRedo;
 
-  // TODO need to implement compound operations. meaningful for undo/redo
-  // TODO also, what is beginCreationCompoundOperation
+  // TODO remove
   void beginCreationCompoundOperation() {}
-  void endCompoundOperation() {}
+  void endCompoundOperation() {
+    _undoHistory.endCompoundOperation();
+  }
 
-  final _LocalModelMap root;
+  // TODO can't be final because we need to pass this to constructor
+  _LocalModelMap _root;
+  _LocalModelMap get root => _root;
 
   // TODO is this ever false?
   // TODO we should probably provide the same initialization callback method as realtime
   bool get isInitialized => true;
 
   // TODO need to implement compound operations. meaningful for undo/redo
-  void beginCompoundOperation([String name]) {}
+  void beginCompoundOperation([String name]) {
+    _undoHistory.beginCompoundOperation(Scope.CO);
+  }
   // TODO implement LocalModelObject and return here
   CustomObject create(String name) {
-    var backingObject = new _LocalCustomObject(name);
+    var backingObject = new _LocalCustomObject(this, name);
     // make CustomObject to return
     var customObject = new CustomObject._byName(name);
     // set internal object
@@ -62,14 +68,14 @@ class _LocalModel implements Model {
     return customObject;
   }
   _LocalModelList createList([List initialValue]) {
-    return new _LocalModelList(initialValue);
+    return new _LocalModelList(this, initialValue);
   }
   _LocalModelMap createMap([Map initialValue]) {
     // TODO take initial value in constructor
-    return new _LocalModelMap(initialValue);
+    return new _LocalModelMap(this, initialValue);
   }
   _LocalModelString createString([String initialValue]) {
-    return new _LocalModelString(initialValue);
+    return new _LocalModelString(this, initialValue);
   }
 
   // TODO implement undo/redo

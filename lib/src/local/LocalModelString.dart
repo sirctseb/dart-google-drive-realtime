@@ -55,7 +55,8 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
   Stream<_LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
   Stream<_LocalTextDeletedEvent> get onTextDeleted => _onTextDeleted.stream;
 
-  _LocalModelString([String initialValue]) {
+  _LocalModelString(_LocalModel model, [String initialValue]) :
+    super(model) {
     // initialize
     if(initialValue != null) {
       // don't emit events

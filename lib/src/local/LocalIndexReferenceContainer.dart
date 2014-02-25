@@ -19,7 +19,7 @@ class _LocalIndexReferenceContainer extends _LocalModelObject {
 
   _LocalIndexReference registerReference(int index, bool canBeDeleted) {
     // create the reference
-    var ref = new _LocalIndexReference._(index, canBeDeleted, this);
+    var ref = new _LocalIndexReference._(index, canBeDeleted, this, _model);
     // add to list of references
     _indexReferences.add(ref);
     return ref;
@@ -55,5 +55,5 @@ class _LocalIndexReferenceContainer extends _LocalModelObject {
   // The list of index references registered to this object
   List<_LocalIndexReference> _indexReferences = [];
 
-  _LocalIndexReferenceContainer();
+  _LocalIndexReferenceContainer(_LocalModel model) : super(model);
 }
