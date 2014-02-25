@@ -44,11 +44,10 @@ class CustomObject implements js.Serializable<js.Proxy> {
   bool get _isLocalCustomObject => _internalCustomObject is _LocalCustomObject;
 
   Model get _model {
-    if(_isRealtimeCustomObject) {
-      return new Model._fromProxy(realtimeCustom.getModel(this));
-    } else if(_isLocalCustomObject) {
+    if(_isLocalCustomObject) {
       return _LocalCustomObject._customObjectModels[getId(this)];
     }
+    return new Model._fromProxy(realtimeCustom.getModel(this));
   }
 }
 

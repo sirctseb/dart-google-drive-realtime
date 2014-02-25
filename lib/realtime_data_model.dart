@@ -17,14 +17,12 @@ library realtime_data_model;
 import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
-import 'dart:js' as jss;
 import 'dart:mirrors';
 
 import 'package:js/js.dart' as js;
 import 'package:js/js_wrapping.dart' as jsw;
 import 'package:json/json.dart' as json;
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 import 'package:google_oauth2_client/google_oauth2_browser.dart';
 import 'package:google_drive_v2_api/drive_v2_api_browser.dart' as dcbrowser;
 import 'package:google_drive_v2_api/drive_v2_api_client.dart' as dc;

@@ -29,5 +29,5 @@ class ErrorType extends IsEnum<String> {
 
   ErrorType._(String value) : super(value);
 
-  bool operator ==(Object other) => value == (other is ErrorType ? (other as ErrorType).value : other);
+  bool operator ==(Object other) => value == (other is ErrorType ? other.value : other);
 }
