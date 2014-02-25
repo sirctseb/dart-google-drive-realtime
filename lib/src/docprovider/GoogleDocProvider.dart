@@ -33,9 +33,8 @@ class GoogleDocProvider extends DocumentProvider {
     return globalSetup().then((success) {
       _logger.finer('Checked global setup: $success');
 
-      // TODO make better state for determining if we need to do a file insert
-      if(_newTitle != null) {
-        _logger.fine('Title specified, need to insert file');
+      if(_fileId == null) {
+        _logger.fine('no fileId yet, need to insert file');
         // insert file
         return drive.files.insert(
           new dc.File.fromJson({'mimetype': 'application/vnd.google-apps.drive-sdk', 'title': _newTitle})
