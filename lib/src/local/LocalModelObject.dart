@@ -34,8 +34,6 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
 
   _LocalModelObject(_LocalModel this._model) : id = nextId;
 
-  static bool _inEmitEventsAndChangedScope = false;
-
   // create an emit a _LocalObjectChangedEvent from a list of events
   void _emitEventsAndChanged(List<_LocalUndoableEvent> events) {
     _model.beginCompoundOperation();
