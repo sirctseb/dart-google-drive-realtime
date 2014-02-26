@@ -23,13 +23,27 @@ class _LocalValueChangedEvent extends _LocalUndoableEvent implements ValueChange
 
   final newValue;
 
-  final oldValue;
+  // TODO so we can do _updateState
+  // TODO there is probably a more graceful way of doing this
+//  final oldValue;
+  dynamic _oldValue;
+  dynamic get oldValue => _oldValue;
 
   final String property;
 
   final String type = EventType.VALUE_CHANGED.value;
 
-  _LocalValueChangedEvent._(this.newValue, this.oldValue, this.property, _target) : super._(_target);
+  _LocalValueChangedEvent._(this.newValue, this._oldValue, this.property, _target) : super._(_target);
 
   _LocalValueChangedEvent get inverse => new _LocalValueChangedEvent._(oldValue, newValue, property, _target);
+
+  @override
+  void _updateState() {
+    _oldValue = (_target as _LocalModelMap)[property];
+  }
+//  @override
+//  _LocalValueChangedEvent updated() {
+//    if(oldValue == (_target as _LocalModelMap)[property]) return this;
+//    return new _LocalValueChangedEvent._(newValue, (_target as _LocalModelMap)[property], property, _target);
+//  }
 }

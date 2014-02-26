@@ -21,6 +21,8 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
 
   final String id;
 
+  final _LocalModel _model;
+
   // TODO implement custom objects
   Stream<ValueChangedEvent> get onValueChanged => null; // TODO implement this getter
 
@@ -30,18 +32,17 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
   static int _idNum = 0;
   static String get nextId => (_idNum++).toString();
 
-  _LocalModelObject() : id = nextId;
-
-  static bool _inEmitEventsAndChangedScope = false;
+  _LocalModelObject(_LocalModel this._model) : id = nextId;
 
   // create an emit a _LocalObjectChangedEvent from a list of events
   void _emitEventsAndChanged(List<_LocalUndoableEvent> events) {
-    bool terminal = !_inEmitEventsAndChangedScope;
-    if(terminal) {
-      _inEmitEventsAndChangedScope = true;
-    }
-    // construct change event before firing actual events
-    var event = new _LocalObjectChangedEvent._(events,this,terminal);
+    _model.beginCompoundOperation();
+
+    // add events to undo history
+    _model._undoHistory._addUndoEvents(events);
+
+    // create change event
+    var event = new _LocalObjectChangedEvent._(events,this);
     for(int i = 0; i < events.length; i++) {
       // execute events
       _executeEvent(events[i]);
@@ -49,15 +50,20 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
       _eventStreamControllers[events[i].type].add(events[i]);
     }
     dispatchObjectChangedEvent(event);
-    if(terminal) {
-      _inEmitEventsAndChangedScope = false;
-    }
+    _model.endCompoundOperation();
   }
   void _executeAndEmitEvent(_LocalUndoableEvent event) {
+    _model.beginCompoundOperation();
+
+    // add events to undo history
+    _model._undoHistory._addUndoEvents([event]);
+
     // make change
     _executeEvent(event);
     // emit event
     _eventStreamControllers[event.type].add(event);
+
+    _model.endCompoundOperation();
   }
 
   void _executeEvent(_LocalUndoableEvent event) {

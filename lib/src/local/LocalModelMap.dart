@@ -94,7 +94,8 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
     return '{${valList.join(", ")}}';
   }
 
-  _LocalModelMap([Map initialValue]) {
+  _LocalModelMap(_LocalModel model, [Map initialValue]) :
+    super(model) {
     // initialize with value
     if(initialValue != null) {
       initializeWithValue(initialValue);

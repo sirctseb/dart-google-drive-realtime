@@ -23,8 +23,6 @@ class _LocalObjectChangedEvent extends _LocalEvent implements ObjectChangedEvent
 
   final String type = EventType.OBJECT_CHANGED.value;
 
-  final bool _isTerminal;
-
-  _LocalObjectChangedEvent._(this.events, _target, [this._isTerminal = false])
+  _LocalObjectChangedEvent._(this.events, _target)
     : super._(_target);
 }

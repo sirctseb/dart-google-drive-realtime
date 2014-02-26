@@ -34,7 +34,7 @@ class EventType extends IsEnum<String> {
 
   EventType._(String value) : super(value);
 
-  bool operator ==(Object other) => value == (other is EventType ? (other as EventType).value : other);
+  bool operator ==(Object other) => value == (other is EventType ? other.value : other);
 
   // map to values used in realtime js api
   static const _realtime = const {
