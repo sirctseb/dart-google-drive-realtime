@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:html';
 
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
-// TODO upstream
-//import 'package:js/js.dart' as js;
 import 'package:logging_handlers/logging_handlers_shared.dart';
 import 'package:json/json.dart' as json;
 import 'package:unittest/unittest.dart';
@@ -664,7 +661,6 @@ onFileLoaded(rt.Document doc) {
       ssClear.cancel();
     });
     test('map length on null assignment', () {
-      // TODO this is different than native maps. but that is a rt problem, not rdm.
       expect(map.length, 1);
       map['key1'] = null;
       expect(map.length, 0);
@@ -712,7 +708,6 @@ onFileLoaded(rt.Document doc) {
   group('RealtimeIndexReference', () {
     rt.CollaborativeString string = doc.model.root['text'];
     rt.CollaborativeList list = doc.model.root['list'];
-    // TODO are references ever removed?
     test('RealtimeString Reference Value', () {
       string.text = "aaaaaaaaaa";
       rt.IndexReference ref = string.registerReference(5, false);
@@ -872,7 +867,7 @@ onFileLoaded(rt.Document doc) {
       doc.model.root['map']['dupmap2'] = doc.model.createMap();
       doc.model.root['map']['dupmap1']['str'] = str;
       doc.model.root['map']['dupmap2']['str'] = str;
-      // TODO in js test, we compare actual collab objects and not text
+      // can only compare text because they won't be the same object
       expect(doc.model.root['map']['dupmap1']['str'].text,
              doc.model.root['map']['dupmap2']['str'].text);
       var ssObjChanged1;
@@ -914,7 +909,7 @@ onFileLoaded(rt.Document doc) {
       expect(doc.model.root['book'].title, 'title');
     });
     test('custom.getModel', () {
-      // TODO can't compare to doc.model because it's a new object
+      // can't compare to doc.model because it's a new object
       expect(rt.getModel(doc.model.root['book']) is rt.Model, true);
     });
     test('custom.getId', () {

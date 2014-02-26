@@ -46,10 +46,6 @@ class Scope extends IsEnum<String> {
 typedef String Sorter(dynamic element, int index);
 
 /** [_UndoHistory] manages the history of actions performed in the app */
-// TODO events grouped into a single object changed event are still grouped
-// TODO during undo in the realtime implementation, but are split up here
-// TODO undo state events are not in the same order with respect to other events
-// TODO as seen by client code. also rt sometimes sends two of the same events
 class _UndoHistory {
   /** The list of actions in the undo history */
   List<List<_LocalUndoableEvent>> _history = [];
@@ -188,7 +184,6 @@ class _UndoHistory {
     }
   }
 
-  // TODO check on these definitions
   bool get canUndo => _index > 0;
   bool get canRedo => _index < _history.length;
 }

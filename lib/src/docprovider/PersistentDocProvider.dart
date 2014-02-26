@@ -145,7 +145,6 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
     _isPending = true;
     // if pending has changed, send change event
     if(lastIsPending != _isPending) {
-      // TODO have to specify type to avoid compiler warning
       (_document as _LocalDocument)._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
     }
   }

@@ -15,7 +15,6 @@
 part of realtime_data_model;
 
 class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V> {
-  // TODO add promotes back in here
 
   @override int get length => _map.length;
 
@@ -32,7 +31,7 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
     // remove each key and let it produce the event
     keys.forEach((key) => remove(key));
   }
-  // TODO event
+
   @override V remove(String key) {
     var oldValue = this[key];
     // create the event
@@ -49,9 +48,7 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   /// deprecated : use `xxx.containsKey(key)`
   @deprecated bool has(String key) => containsKey(key);
   @override bool get isEmpty => _map.isEmpty;
-  // TODO figure out what type to return
   List<List<V>> get items => _map.keys.map((key) => [key, _map[key]]).toList();
-  // TODO return TypePromotingList object
   @override List<String> get keys => _map.keys.toList();
   /// deprecated : use `xxx[key] = value`
   @deprecated V set(String key, V value) {
@@ -59,7 +56,6 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
     this[key] = value;
     return oldValue;
   }
-  // TODO return TypePromotingList object
   @override List<V> get values => _map.values;
   @override bool get isNotEmpty => !isEmpty;
 
@@ -69,7 +65,6 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   Map<String, V> _map = new Map<String, V>();
   // stream controller
   // TODO should be use a subscribestreamprovider? I don't think we need to
-  // TODO we are using a broadcast stream so that new listeners don't get back events. is this the correct approach?
   StreamController<ValueChangedEvent> _onValueChanged = new StreamController<ValueChangedEvent>.broadcast(sync: true);
 
   void addAll(Map<String, V> other) {
@@ -116,8 +111,6 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   void _executeEvent(_LocalUndoableEvent event_in) {
     if(event_in.type == EventType.VALUE_CHANGED.value) {
         var event = event_in as _LocalValueChangedEvent;
-        // TODO what if we actually want to set to null?
-        // TODO test if rt returns length 1 or 0 with a single key set to null
         if(event.newValue == null) {
           _map.remove(event.property);
         } else {
