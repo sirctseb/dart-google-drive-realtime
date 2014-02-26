@@ -25,7 +25,6 @@ class _LocalIndexReference extends _LocalModelObject implements IndexReference {
 
   final CollaborativeObject referencedObject;
 
-  // TODO js api shows model as param to constructor
   _LocalIndexReference._(this.index, this.canBeDeleted, this.referencedObject, _LocalModel model) :
     super(model);
 

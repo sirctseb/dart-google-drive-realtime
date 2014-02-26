@@ -14,10 +14,7 @@
 
 part of realtime_data_model;
 
-// as a shortcut to defining a separate interface with two subclasses for realtime and local,
-// we can just implement the realtime interface if it doesn't require special realtime members
 class _LocalValueChangedEvent extends _LocalUndoableEvent implements ValueChangedEvent {
-  // TODO why doesn't fromProxy cause a problem?
 
   bool get bubbles => null; // TODO implement this getter
 

@@ -16,7 +16,6 @@ part of realtime_data_model;
 
 class _LocalModelString extends _LocalIndexReferenceContainer implements CollaborativeString {
 
-  // TODO need local events
   StreamController<_LocalTextInsertedEvent> _onTextInserted
     = new StreamController<_LocalTextInsertedEvent>.broadcast(sync: true);
   StreamController<_LocalTextDeletedEvent> _onTextDeleted
@@ -69,7 +68,6 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
 
   void _executeEvent(_LocalUndoableEvent event_in) {
     // handle insert and delete events
-    // TODO deal with type warnings
     if(event_in.type == EventType.TEXT_DELETED.value) {
       var event = event_in as _LocalTextDeletedEvent;
       // update string

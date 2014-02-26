@@ -26,19 +26,15 @@ class _LocalModel implements Model {
     }
   }
 
-  // TODO need to make local event
   StreamController<_LocalUndoRedoStateChangedEvent> _onUndoRedoStateChanged =
     new StreamController<_LocalUndoRedoStateChangedEvent>.broadcast(sync: true);
 
   // TODO is this ever true?
   bool get isReadOnly => false;
 
-  // TODO need to implement undo system
   bool get canUndo => _undoHistory.canUndo;
   bool get canRedo => _undoHistory.canRedo;
 
-  // TODO remove
-  void beginCreationCompoundOperation() {}
   void endCompoundOperation() {
     _undoHistory.endCompoundOperation();
   }
@@ -51,11 +47,10 @@ class _LocalModel implements Model {
   // TODO we should probably provide the same initialization callback method as realtime
   bool get isInitialized => true;
 
-  // TODO need to implement compound operations. meaningful for undo/redo
   void beginCompoundOperation([String name]) {
     _undoHistory.beginCompoundOperation(Scope.CO);
   }
-  // TODO implement LocalModelObject and return here
+
   CustomObject create(String name) {
     var backingObject = new _LocalCustomObject(this, name);
     // make CustomObject to return
@@ -71,14 +66,12 @@ class _LocalModel implements Model {
     return new _LocalModelList(this, initialValue);
   }
   _LocalModelMap createMap([Map initialValue]) {
-    // TODO take initial value in constructor
     return new _LocalModelMap(this, initialValue);
   }
   _LocalModelString createString([String initialValue]) {
     return new _LocalModelString(this, initialValue);
   }
 
-  // TODO implement undo/redo
   void undo() {
     // TODO check canUndo
     // undo events
@@ -90,7 +83,6 @@ class _LocalModel implements Model {
     _undoHistory.redo();
   }
 
-  // TODO need to make local event
   Stream<UndoRedoStateChangedEvent> get onUndoRedoStateChanged => _onUndoRedoStateChanged.stream;
 
   /// Local models have no js Proxy

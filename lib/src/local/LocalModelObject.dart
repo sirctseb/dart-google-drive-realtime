@@ -23,9 +23,6 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
 
   final _LocalModel _model;
 
-  // TODO implement custom objects
-  Stream<ValueChangedEvent> get onValueChanged => null; // TODO implement this getter
-
   /// Local objects have no js Proxy
   dynamic toJs() => null;
 
@@ -66,9 +63,7 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
     _model.endCompoundOperation();
   }
 
-  void _executeEvent(_LocalUndoableEvent event) {
-    // TODO implement custom objects
-  }
+  void _executeEvent(_LocalUndoableEvent event) {}
 
   // map from event type to stream controller they go on
   Map<String, StreamController> _eventStreamControllers = {};

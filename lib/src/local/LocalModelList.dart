@@ -43,7 +43,6 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   void insertAll(int index, List<E> values) {
     // add event to stream
-    // TODO clone values?
     var event = new _LocalValuesAddedEvent._(index, values, this);
     _emitEventsAndChanged([event]);
   }
@@ -98,7 +97,6 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   int push(E value) {
     // add event to stream
-    // TODO make sure this is the index provided when inserting at the end
     var event = new _LocalValuesAddedEvent._(_list.length, [value], this);
     _emitEventsAndChanged([event]);
     return _list.length;
@@ -106,7 +104,6 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   void pushAll(List<E> values) {
     // add event to stream
-    // TODO make sure this is the index provided when inserting at the end
     var event = new _LocalValuesAddedEvent._(_list.length, values, this);
     _emitEventsAndChanged([event]);
   }
@@ -138,7 +135,6 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   void replaceRange(int index, List<E> values) {
     // add event to stream
-    // TODO clone values?
     var event = new _LocalValuesSetEvent._(index, values, _list.sublist(index, index + values.length), this);
     _emitEventsAndChanged([event]);
   }
@@ -168,7 +164,6 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   // check if value is a model object and start propagating object changed events
   void _propagateChanges(dynamic element) {
     // start propagating changes if element is model object and not already subscribed
-    // TODO do we do the same check in map?
     if(element is _LocalModelObject) {
       element.addParentEventTarget(this);
     }
@@ -213,7 +208,6 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     initialValue.forEach((element) => _propagateChanges(element));
   }
 
-  // TODO we could alternatively listen for our own events and do the modifications there
   void _executeEvent(_LocalUndoableEvent event_in) {
     if(event_in.type == EventType.VALUES_SET.value) {
         var event = event_in as _LocalValuesSetEvent;
