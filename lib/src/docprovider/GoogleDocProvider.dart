@@ -56,7 +56,7 @@ class GoogleDocProvider extends DocumentProvider {
     var completer = new Completer();
     _logger.finer('Do realtime.load with $fileId');
     // call realtime load
-    realtime['load'](fileId,
+    realtime['load'].apply([fileId,
       // complete future on file loaded
       (p) {
         _logger.finest('File loaded callback called, completing future with loaded document');
@@ -65,7 +65,7 @@ class GoogleDocProvider extends DocumentProvider {
       // pass initializeModel through if supplied
       initializeModel == null ? null : (p) => initializeModel(new Model._fromProxy(p)),
       // throw dart error on error
-      (p) => throw new Error._fromProxy(p)
+      (p) => throw new Error._fromProxy(p)]
     );
     return completer.future;
   }
@@ -120,9 +120,9 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   // true if the realtime api is loaded
-  static js.Proxy realtime;
+  static js.JsObject realtime;
   /// Load the realtime api
-  static Future<js.Proxy> _loadRealtimeApi() {
+  static Future<js.JsObject> _loadRealtimeApi() {
     _logger.fine('Loading realtime api');
     var completer = new Completer();
 
@@ -134,11 +134,11 @@ class GoogleDocProvider extends DocumentProvider {
 
     // load realtime api
     _logger.fine('Call gapi.load("drive-realtime"...)');
-    js.context['gapi']['load']('drive-realtime', () {
+    js.context['gapi']['load'].apply(['drive-realtime', () {
       _logger.fine('Got gapi.load callback, retaining realtime object and completing');
       realtime = js.context['gapi']['drive']['realtime'];
       completer.complete(realtime);
-    });
+    }]);
     return completer.future;
   }
 
@@ -178,8 +178,9 @@ class GoogleDocProvider extends DocumentProvider {
       // TODO this is not reliable and we may have to switch to js-side authorization
       // overwrite gapi.auth.getToken with a function that
       // returns an object with valid data in access_token
-      js.context['gapi']['auth'] = js.map({'getToken':
-          () => js.map({'access_token': t.data})
+      // TODO are both of the jsify's necessary?
+      js.context['gapi']['auth'] = new js.JsObject.jsify({'getToken':
+          () => new js.JsObject.jsify({'access_token': t.data})
       });
     };
 

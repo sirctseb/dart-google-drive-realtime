@@ -20,6 +20,6 @@ class ValuesSetEvent extends BaseModelEvent {
   ValuesSetEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   int get index => $unsafe['index'];
-  List<dynamic> get newValues => jsw.JsArrayToListAdapter.cast($unsafe['newValues'], CollaborativeContainer._realtimeTranslator);
-  List<dynamic> get oldValues => jsw.JsArrayToListAdapter.cast($unsafe['oldValues'], CollaborativeContainer._realtimeTranslator);
+  List<dynamic> get newValues => JsArrayToListAdapter($unsafe['newValues'], CollaborativeContainer._realtimeTranslator.fromJs);
+  List<dynamic> get oldValues => JsArrayToListAdapter($unsafe['oldValues'], CollaborativeContainer._realtimeTranslator.fromJs);
 }

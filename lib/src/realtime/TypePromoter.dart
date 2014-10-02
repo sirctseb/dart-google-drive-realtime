@@ -18,8 +18,9 @@ part of realtime_data_model;
 dynamic _promoteProxy(dynamic object) {
   String type;
 
-  if(object is js.Proxy) {
-    if(realtimeCustom['isCustomObject'](object)) {
+  if(object is js.JsObject) {
+    if(realtimeCustom['isCustomObject'].apply([object])) {
+      // TODO do backing object assignment in the CustomObject constructor
       // make realtime backing object
       var backingObject = new _RealtimeCustomObject._fromProxy(object);
       // make CustomObject to return
@@ -28,39 +29,39 @@ dynamic _promoteProxy(dynamic object) {
       customObject._internalCustomObject = backingObject;
       // return custom object subclass
       return customObject;
-    } else if(js.instanceof(object, realtime['CollaborativeMap'])) {
+    } else if(object.instanceof(realtime['CollaborativeMap'])) {
       return new CollaborativeMap._fromProxy(object);
-    } else if(js.instanceof(object, realtime['CollaborativeList'])) {
+    } else if(object.instanceof(realtime['CollaborativeList'])) {
       return new CollaborativeList._fromProxy(object);
-    } else if(js.instanceof(object, realtime['CollaborativeString'])) {
+    } else if(object.instanceof(realtime['CollaborativeString'])) {
       return new CollaborativeString._fromProxy(object);
-    } else if(js.instanceof(object, js.context['Array'])
-               || js.instanceof(object, js.context['Object'])) {
-      return json.parse(js.context['JSON']['stringify'](object));
+    } else if(object.instanceof(js.context['Array'])
+               || object.instanceof(js.context['Object'])) {
+      return json.parse(js.context['JSON']['stringify'].apply([object]));
     }
   }
   // string, bool, numbers all get the correct type automatically
   return object;
 }
 /// Construct typed event classes based on type
-dynamic _promoteEventByType(js.Proxy event) {
-  if(event.type == EventType.TEXT_DELETED.value) {
-    return new TextDeletedEvent._fromProxy(event.toJs());
+dynamic _promoteEventByType(js.JsObject event) {
+  if(event['type'] == EventType.TEXT_DELETED.value) {
+    return new TextDeletedEvent._fromProxy(event);
   }
-  if(event.type == EventType.TEXT_INSERTED.value) {
-    return new TextInsertedEvent._fromProxy(event.toJs());
+  if(event['type'] == EventType.TEXT_INSERTED.value) {
+    return new TextInsertedEvent._fromProxy(event);
   }
-  if(event.type == EventType.VALUES_ADDED.value) {
-    return new ValuesAddedEvent._fromProxy(event.toJs());
+  if(event['type'] == EventType.VALUES_ADDED.value) {
+    return new ValuesAddedEvent._fromProxy(event);
   }
-  if(event.type == EventType.VALUES_REMOVED.value) {
-    return new ValuesRemovedEvent._fromProxy(event.toJs());
+  if(event['type'] == EventType.VALUES_REMOVED.value) {
+    return new ValuesRemovedEvent._fromProxy(event);
   }
-  if(event.type == EventType.VALUES_SET.value) {
-    return new ValuesSetEvent._fromProxy(event.toJs());
+  if(event['type'] == EventType.VALUES_SET.value) {
+    return new ValuesSetEvent._fromProxy(event);
   }
-  if(event.type == EventType.VALUE_CHANGED.value) {
-    return new ValueChangedEvent._fromProxy(event.toJs());
+  if(event['type'] == EventType.VALUE_CHANGED.value) {
+    return new ValueChangedEvent._fromProxy(event);
   }
   // TODO throw
   return null;

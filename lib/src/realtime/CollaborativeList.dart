@@ -20,7 +20,7 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
   SubscribeStreamProvider<ValuesRemovedEvent> _onValuesRemoved;
   SubscribeStreamProvider<ValuesSetEvent> _onValuesSet;
 
-  CollaborativeList._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+  CollaborativeList._fromProxy(js.JsObject proxy) : super._fromProxy(proxy) {
     _onValuesAdded = _getStreamProviderFor(EventType.VALUES_ADDED, ValuesAddedEvent._cast);
     _onValuesRemoved = _getStreamProviderFor(EventType.VALUES_REMOVED, ValuesRemovedEvent._cast);
     _onValuesSet = _getStreamProviderFor(EventType.VALUES_SET, ValuesSetEvent._cast);
@@ -36,31 +36,32 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
 
   /*@override*/ E operator [](int index) {
     if (index < 0 || index >= this.length) throw new RangeError.value(index);
-    return _fromJs($unsafe.get(index));
+    return _fromJs($unsafe.callMethod('get', [index]));
   }
   /*@override*/ void operator []=(int index, E value) {
     if (index < 0 || index >= this.length) throw new RangeError.value(index);
-    $unsafe.set(index, _toJs(value));
+    $unsafe.callMethod('set', [index, _toJs(value)]);
   }
 
-  void clear() { $unsafe.clear(); }
+  void clear() { $unsafe.callMethod('clear'); }
   /// Deprecated : use `xxx[index]` instead
   @deprecated E get(int index) => this[index];
-  void insert(int index, E value) { $unsafe.insert(index, _toJs(value)); }
-  int push(E value) => $unsafe.push(_toJs(value));
-  IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.registerReference(index, canBeDeleted));
-  void remove(int index) { $unsafe.remove(index); }
-  void removeRange(int startIndex, int endIndex) { $unsafe.removeRange(startIndex, endIndex); }
-  bool removeValue(E value) => $unsafe.removeValue(_toJs(value));
+  void insert(int index, E value) { $unsafe.callMethod('insert', [index, _toJs(value)]); }
+  int push(E value) => $unsafe.callMethod('push', [_toJs(value)]);
+  IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.callMethod('registerReference', [index, canBeDeleted]));
+  void remove(int index) { $unsafe.callMethod('remove', [index]); }
+  void removeRange(int startIndex, int endIndex) { $unsafe.callMethod('removeRange', [startIndex, endIndex]); }
+  bool removeValue(E value) => $unsafe.callMethod('removeValue', [_toJs(value)]);
   /// Deprecated : use `xxx[index] = value` instead
-  @deprecated void set(int index, E value) { $unsafe.set(index, _toJs(value)); }
+  @deprecated void set(int index, E value) { $unsafe.callMethod('set', [index, _toJs(value)]); }
 
-  List<E> asArray() => jsw.JsArrayToListAdapter.cast($unsafe.asArray(), _translator);
-  int indexOf(E value, [Comparator comparator]) => $unsafe.indexOf(_toJs(value), comparator);
-  void insertAll(int index, List<E> values) { $unsafe.insertAll(index, values is js.Serializable<js.Proxy> ? values : js.array(values.map(_toJs))); }
-  int lastIndexOf(E value, [Comparator comparator]) => $unsafe.lastIndexOf(_toJs(value), comparator);
-  void pushAll(List<E> values) { $unsafe.pushAll(values is js.Serializable<js.Proxy> ? values : js.array(values.map(_toJs))); }
-  void replaceRange(int index, List<E> values) { $unsafe.replaceRange(index, values is js.Serializable<js.Proxy> ? values : js.array(values.map(_toJs))); }
+  List<E> asArray() => TranslateCollaborativeListToArray($unsafe.callMethod('asArray'));
+  int indexOf(E value, [Comparator comparator]) => $unsafe.callMethod('indexOf', [_toJs(value), comparator]);
+  // TODO do we really have to check if these arrays are already JsArrays?
+  void insertAll(int index, List<E> values) { $unsafe.callMethod('insertAll', [index, values is js.JsArray ? values : new js.JsArray.from(values.map(_toJs))]); }
+  int lastIndexOf(E value, [Comparator comparator]) => $unsafe.callMethod('lastIndexOf',[_toJs(value), comparator]);
+  void pushAll(List<E> values) { $unsafe.callMethod('pushAll', [values is js.JsArray ? values : new js.JsArray.from(values.map(_toJs))]); }
+  void replaceRange(int index, List<E> values) { $unsafe.callMethod('replaceRange', [index, values is js.JsArray ? values : new js.JsArray.from(values.map(_toJs))]); }
 
   Stream<ValuesAddedEvent> get onValuesAdded => _onValuesAdded.stream;
   Stream<ValuesRemovedEvent> get onValuesRemoved => _onValuesRemoved.stream;

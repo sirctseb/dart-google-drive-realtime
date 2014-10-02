@@ -20,5 +20,5 @@ class ValuesRemovedEvent extends BaseModelEvent {
   ValuesRemovedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
 
   int get index => $unsafe['index'];
-  List<dynamic> get values => jsw.JsArrayToListAdapter.cast($unsafe['values'], CollaborativeContainer._realtimeTranslator);
+  List<dynamic> get values => JsArrayToListAdapter($unsafe['values'], CollaborativeContainer._realtimeTranslator.fromJs);
 }

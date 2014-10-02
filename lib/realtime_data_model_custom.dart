@@ -43,10 +43,10 @@ void registerType(Type type, String name) {
     // store the js type and fields
     _RealtimeCustomObject._registeredTypes[name] = {
                               // TODO is this the best way to just create a js function?
-                             'js-type': new js.FunctionProxy.withThis((p) {}),
+                             'js-type': new js.JsFunction.withThis((p) {}),
                              'fields': []};
     // do the js-side registration
-    realtimeCustom.registerType(_RealtimeCustomObject._registeredTypes[name]["js-type"], name);
+    realtimeCustom['registerType'].apply([_RealtimeCustomObject._registeredTypes[name]["js-type"], name]);
   }
 
   // do local registration
@@ -56,7 +56,7 @@ void registerType(Type type, String name) {
 void collaborativeField(String name, String field) {
   // add field google-side
   if(GoogleDocProvider._globallySetup) {
-    _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'](field);
+    _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'].apply([field]);
     _RealtimeCustomObject._registeredTypes[name]['fields'].add(field);
   }
 
@@ -66,7 +66,7 @@ void collaborativeField(String name, String field) {
 
 String getId(dynamic obj) {
   if(GoogleDocProvider._globallySetup && GoogleDocProvider._isCustomObject(obj)) {
-    return realtimeCustom.getId(obj);
+    return realtimeCustom['getId'].apply([obj.toJs()]);
   } else if(LocalDocumentProvider._isCustomObject(obj)) {
     // TODO should refactor so id accessor is not in custom object
     return obj._internalCustomObject.id;

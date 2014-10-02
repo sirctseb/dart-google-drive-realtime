@@ -14,15 +14,17 @@
 
 part of realtime_data_model;
 
-class EventTarget extends jsw.TypedProxy {
-  EventTarget._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+class EventTarget extends TypedProxy {
+  EventTarget._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
-  void _addEventListener(EventType type, dynamic/*Function|Object*/ handler, [bool capture]) => $unsafe.addEventListener(type, handler, capture);
-  void _removeEventListener(EventType type, dynamic/*Function|Object*/ handler, [bool capture]) => $unsafe.removeEventListener(type, handler, capture);
+  // TODO don't think JsObject provides auto-recovery of undefined methods
+  void _addEventListener(EventType type, dynamic/*Function|Object*/ handler, [bool capture]) => $unsafe.callMethod('addEventListener', [type.value, handler, capture]);
+  void _removeEventListener(EventType type, dynamic/*Function|Object*/ handler, [bool capture]) => $unsafe.callMethod('removeEventListener', [type.value, handler, capture]);
 
+  // TODO do not know if hackForJsInterop95 is still necessary
   SubscribeStreamProvider _getStreamProviderFor(EventType eventType, [transformEvent(e)]) {
     Function handler;
-    js.FunctionProxy jsFunction;
+    js.JsFunction jsFunction;
     return new SubscribeStreamProvider(
         subscribe: (EventSink eventSink) {
           handler = (e) {
@@ -30,7 +32,7 @@ class EventTarget extends jsw.TypedProxy {
           };
           js.context['hackForJsInterop95'] = handler;
           jsFunction = js.context['hackForJsInterop95'];
-          js.deleteProperty(js.context, 'hackForJsInterop95');
+          js.context.deleteProperty('hackForJsInterop95');
 //          _addEventListener(eventType, handler);
           _addEventListener(eventType, jsFunction);
         },

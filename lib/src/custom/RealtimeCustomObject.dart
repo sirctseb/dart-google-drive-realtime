@@ -24,8 +24,8 @@ class _RealtimeCustomObject extends CollaborativeContainer implements _InternalC
   _RealtimeCustomObject._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {}
   static String _findTypeName(js.Proxy proxy) {
     // get reference to id->name map
-    var idToType = new Model._fromProxy(realtime['custom']['getModel'](proxy)).root[_idToTypeProperty];
-    return idToType[realtime['custom']['getId'](proxy)];
+    var idToType = new Model._fromProxy(realtime['custom']['getModel'].apply([proxy])).root[_idToTypeProperty];
+    return idToType[realtime['custom']['getId'].apply([proxy])];
   }
 
   // TODO these could go in Container also probably
@@ -35,7 +35,7 @@ class _RealtimeCustomObject extends CollaborativeContainer implements _InternalC
 
   dynamic get(String field) => $unsafe[field];
   void set(String field, dynamic value) {
-    $unsafe.title = _toJs(value);
+    $unsafe[field] = _toJs(value);
   }
 
   @override

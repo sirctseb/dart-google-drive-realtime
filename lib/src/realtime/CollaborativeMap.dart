@@ -17,7 +17,7 @@ part of realtime_data_model;
 class CollaborativeMap<V> extends CollaborativeContainer implements Map<String, V> {
   SubscribeStreamProvider<ValueChangedEvent> _onValueChanged;
 
-  CollaborativeMap._fromProxy(js.Proxy proxy)
+  CollaborativeMap._fromProxy(js.JsObject proxy)
       : super._fromProxy(proxy) {
     _onValueChanged = _getStreamProviderFor(EventType.VALUE_CHANGED, ValueChangedEvent._cast);
   }
@@ -30,26 +30,26 @@ class CollaborativeMap<V> extends CollaborativeContainer implements Map<String, 
   /// deprecated : use `xxx.length`
   @deprecated int get size => length;
 
-  @override V operator [](String key) => _fromJs($unsafe.get(key));
+  @override V operator [](String key) => _fromJs($unsafe.callMethod('get',[key]));
   @override void operator []=(String key, V value) {
-    $unsafe.set(key, _toJs(value));
+    $unsafe.callMethod('set', [key, _toJs(value)]);
   }
 
-  void clear() { $unsafe.clear(); }
-  @override V remove(String key) => _fromJs($unsafe.delete(key));
+  void clear() { $unsafe.callMethod('clear'); }
+  @override V remove(String key) => _fromJs($unsafe.callMethod('delete', [key]));
   /// deprecated : use `xxx.remove(key)`
   @deprecated V delete(String key) => remove(key);
   /// deprecated : use `xxx[key]`
   @deprecated V get(String key) => this[key];
-  @override bool containsKey(String key) => $unsafe.has(key);
+  @override bool containsKey(String key) => $unsafe.callMethod('has', [key]);
   /// deprecated : use `xxx.containsKey(key)`
   @deprecated bool has(String key) => containsKey(key);
-  @override bool get isEmpty => $unsafe.isEmpty();
-  List<List<V>> get items => jsw.JsArrayToListAdapter.castListOfSerializables($unsafe.items(), (e) => jsw.JsArrayToListAdapter.cast(e, _translator));
-  @override List<String> get keys => jsw.JsArrayToListAdapter.cast($unsafe.keys());
+  @override bool get isEmpty => $unsafe.callMethod('isEmpty');
+  List<List<V>> get items => JsArrayOfArraysToListAdapter($unsafe.callMethod('items'), _translator.fromJs);
+  @override List<String> get keys => JsArrayToListAdapter($unsafe.callMethod('keys'), _translator.fromJs);
   /// deprecated : use `xxx[key] = value`
-  @deprecated V set(String key, V value) => _fromJs($unsafe.set(key, _toJs(value)));
-  @override List<V> get values => jsw.JsArrayToListAdapter.cast($unsafe.values(), _translator);
+  @deprecated V set(String key, V value) => _fromJs($unsafe.callMethod('set',[key, _toJs(value)]));
+  @override List<V> get values => JsArrayToListAdapter($unsafe.callMethod('values'), _translator.fromJs);
   @override bool get isNotEmpty => !isEmpty;
 
   // use Maps to implement functions

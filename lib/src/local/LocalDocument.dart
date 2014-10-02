@@ -45,7 +45,7 @@ class _LocalDocument implements Document {
   _LocalDocument(_LocalModel this.model);
 
   /// Local document has no proxy
-  final js.Proxy $unsafe = null;
+  final js.JsObject $unsafe = null;
   /// Local document has no proxy
   dynamic toJs() { return null;}
 }

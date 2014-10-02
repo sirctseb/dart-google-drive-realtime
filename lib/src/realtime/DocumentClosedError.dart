@@ -14,6 +14,6 @@
 
 part of realtime_data_model;
 
-class DocumentClosedError extends jsw.TypedProxy {
-  DocumentClosedError._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+class DocumentClosedError extends TypedProxy {
+  DocumentClosedError._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 }
