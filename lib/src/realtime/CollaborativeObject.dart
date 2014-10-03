@@ -23,6 +23,12 @@ class CollaborativeObject extends EventTarget {
     _onValueChanged = _getStreamProviderFor(EventType.VALUE_CHANGED, ValueChangedEvent._cast);
   }
 
+  static final Translator _realtimeTranslator = new CollaborativeObjectTranslator();
+  final Translator _translator = _realtimeTranslator;
+
+  dynamic _toJs(dynamic e) => _translator == null ? e : _translator.toJs(e);
+  dynamic _fromJs(dynamic value) => _translator == null ? value : _translator.fromJs(value);
+
   String get id => $unsafe['id'];
 
   String toString() => $unsafe.toString();

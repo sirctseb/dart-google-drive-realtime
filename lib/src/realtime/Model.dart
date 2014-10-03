@@ -61,8 +61,8 @@ class Model extends EventTarget {
     final params = [ref]..addAll(args);
     return new CollaborativeObject._fromProxy($unsafe['create'].apply($unsafe, js.array(params)));
   }*/
-  CollaborativeList createList([List initialValue]) => new CollaborativeList._fromProxy($unsafe.callMethod('createList', [initialValue == null ? null : ListToJsArrayAdapter(initialValue, CollaborativeContainer._realtimeTranslator.toJs)]));
-  CollaborativeMap createMap([Map initialValue]) => new CollaborativeMap._fromProxy($unsafe.callMethod('createMap', [initialValue == null ? null : MapToJsObjectAdapter(initialValue, CollaborativeContainer._realtimeTranslator.toJs)]));
+  CollaborativeList createList([List initialValue]) => new CollaborativeList._fromProxy($unsafe.callMethod('createList', [initialValue == null ? null : ListToJsArrayAdapter(initialValue, CollaborativeObject._realtimeTranslator.toJs)]));
+  CollaborativeMap createMap([Map initialValue]) => new CollaborativeMap._fromProxy($unsafe.callMethod('createMap', [initialValue == null ? null : MapToJsObjectAdapter(initialValue, CollaborativeObject._realtimeTranslator.toJs)]));
   CollaborativeString createString([String initialValue]) => new CollaborativeString._fromProxy($unsafe.callMethod('createString', [initialValue]));
 
   void undo() { $unsafe.callMethod('undo'); }

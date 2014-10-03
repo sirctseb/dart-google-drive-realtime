@@ -16,10 +16,4 @@ part of realtime_data_model;
 
 class CollaborativeContainer<V> extends CollaborativeObject {
   CollaborativeContainer._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
-
-  static final Translator _realtimeTranslator = new CollaborativeContainerTranslator();
-  final Translator<V> _translator = _realtimeTranslator;
-
-  dynamic _toJs(V e) => _translator == null ? e : _translator.toJs(e);
-  V _fromJs(dynamic value) => _translator == null ? value : _translator.fromJs(value);
 }

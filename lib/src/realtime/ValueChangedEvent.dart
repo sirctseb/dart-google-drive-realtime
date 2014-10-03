@@ -19,7 +19,7 @@ class ValueChangedEvent extends BaseModelEvent {
 
   ValueChangedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
-  dynamic get newValue => _promoteProxy($unsafe['newValue']);
-  dynamic get oldValue => _promoteProxy($unsafe['oldValue']);
+  dynamic get newValue => CollaborativeObject._realtimeTranslator.fromJs($unsafe['newValue']);
+  dynamic get oldValue => CollaborativeObject._realtimeTranslator.fromJs($unsafe['oldValue']);
   String get property => $unsafe['property'];
 }
