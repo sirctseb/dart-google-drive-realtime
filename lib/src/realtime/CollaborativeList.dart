@@ -26,9 +26,6 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
     _onValuesSet = _getStreamProviderFor(EventType.VALUES_SET, ValuesSetEvent._cast);
   }
 
-  dynamic _toJs(E e) => _translator == null ? e : _translator.toJs(e);
-  E _fromJs(dynamic value) => _translator == null ? value : _translator.fromJs(value);
-
   /*@override*/ int get length => $unsafe['length'];
   set length(int l) {
     $unsafe['length'] = l;
@@ -55,7 +52,7 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
   /// Deprecated : use `xxx[index] = value` instead
   @deprecated void set(int index, E value) { $unsafe.callMethod('set', [index, _toJs(value)]); }
 
-  List<E> asArray() => TranslateCollaborativeListToArray($unsafe.callMethod('asArray'));
+  List<E> asArray() => JsArrayToListAdapter($unsafe.callMethod('asArray'), _fromJs);
   int indexOf(E value, [Comparator comparator]) => $unsafe.callMethod('indexOf', [_toJs(value), comparator]);
   // TODO do we really have to check if these arrays are already JsArrays?
   void insertAll(int index, List<E> values) { $unsafe.callMethod('insertAll', [index, values is js.JsArray ? values : new js.JsArray.from(values.map(_toJs))]); }

@@ -19,5 +19,5 @@ class ObjectChangedEvent extends BaseModelEvent {
 
   ObjectChangedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
-  List<BaseModelEvent> get events => TranslateEventList($unsafe['events']);
+  List<BaseModelEvent> get events => JsArrayToListAdapter($unsafe['events'], _promoteEventByType);
 }

@@ -27,11 +27,6 @@ class _RealtimeCustomObject extends CollaborativeContainer implements _InternalC
     return idToType[realtime['custom']['getId'].apply([proxy])];
   }
 
-  // TODO these could go in Container also probably
-  dynamic _toJs(e) => _translator == null ? e : _translator.toJs(e);
-  dynamic _fromJs(dynamic value) => _translator == null ? value :
-      _translator.fromJs(value);
-
   dynamic get(String field) => $unsafe[field];
   void set(String field, dynamic value) {
     $unsafe[field] = _toJs(value);

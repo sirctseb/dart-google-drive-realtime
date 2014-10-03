@@ -14,6 +14,53 @@
 
 part of realtime_data_model;
 
+
+typedef T Mapper<F,T>(F o);
+
+// TODO I have dumped a lot of js wrapping stuff here, it all needs to move out
+
+// TODO should this be a smarter list that only converts on demand like jsw version?
+// functions that convert from js to dart objects
+List<dynamic> JsArrayToListAdapter(js.JsArray jsArray, Mapper mapper) {
+  return jsArray.map(mapper).toList(growable: false);
+}
+// functions that convert from dart to js objects
+js.JsArray ListToJsArrayAdapter(List<dynamic> list, Mapper mapper) {
+  return new js.JsArray.from(list.map(mapper));
+}
+js.JsObject MapToJsObjectAdapter(Map<String, dynamic> map, Mapper mapper) {
+  var translated = {};
+  for(var key in map.keys) {
+    translated[key] = mapper(map[key]);
+  }
+  return new js.JsObject.jsify(translated);
+}
+
+class Translator<E> {
+  final Mapper<dynamic, E> fromJs;
+  final Mapper<E, dynamic> toJs;
+
+  Translator(this.fromJs, this.toJs);
+}
+
+// translator to promote to collaborative types
+class CollaborativeContainerTranslator<E> extends Translator<E> {
+  static dynamic _fromJs(dynamic object) {
+    return _promoteProxy(object);
+  }
+  static dynamic _toJs(dynamic object) {
+    // TODO this should not be called toJS
+    if(object is CustomObject) return object.toJs();
+    if(object is CollaborativeObject) return object.$unsafe;
+    if(object is List) return new js.JsObject.jsify(object);
+    if(object is Map) return new js.JsObject.jsify(object);
+    // TODO should still restrict to supported types here
+    return object;
+  }
+
+  CollaborativeContainerTranslator() : super(_fromJs, _toJs);
+}
+
 /// Promote proxied objects to collaborative objects if they are that type
 dynamic _promoteProxy(dynamic object) {
   String type;

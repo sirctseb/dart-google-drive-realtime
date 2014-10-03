@@ -22,10 +22,6 @@ class CollaborativeMap<V> extends CollaborativeContainer implements Map<String, 
     _onValueChanged = _getStreamProviderFor(EventType.VALUE_CHANGED, ValueChangedEvent._cast);
   }
 
-  dynamic _toJs(V e) => _translator == null ? e : _translator.toJs(e);
-  V _fromJs(dynamic value) => _translator == null ? value :
-      _translator.fromJs(value);
-
   @override int get length => $unsafe['size'];
   /// deprecated : use `xxx.length`
   @deprecated int get size => length;
@@ -45,11 +41,11 @@ class CollaborativeMap<V> extends CollaborativeContainer implements Map<String, 
   /// deprecated : use `xxx.containsKey(key)`
   @deprecated bool has(String key) => containsKey(key);
   @override bool get isEmpty => $unsafe.callMethod('isEmpty');
-  List<List<V>> get items => JsArrayOfArraysToListAdapter($unsafe.callMethod('items'), _translator.fromJs);
-  @override List<String> get keys => JsArrayToListAdapter($unsafe.callMethod('keys'), _translator.fromJs);
+  List<List<V>> get items => JsArrayToListAdapter($unsafe.callMethod('items'), (e) => JsArrayToListAdapter(e, _fromJs));
+  @override List<String> get keys => JsArrayToListAdapter($unsafe.callMethod('keys'), _fromJs);
   /// deprecated : use `xxx[key] = value`
   @deprecated V set(String key, V value) => _fromJs($unsafe.callMethod('set',[key, _toJs(value)]));
-  @override List<V> get values => JsArrayToListAdapter($unsafe.callMethod('values'), _translator.fromJs);
+  @override List<V> get values => JsArrayToListAdapter($unsafe.callMethod('values'), _fromJs);
   @override bool get isNotEmpty => !isEmpty;
 
   // use Maps to implement functions
