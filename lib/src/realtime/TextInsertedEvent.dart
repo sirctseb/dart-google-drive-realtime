@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class TextInsertedEvent extends BaseModelEvent {
-  static TextInsertedEvent _cast(js.Proxy proxy) => proxy == null ? null : new TextInsertedEvent._fromProxy(proxy);
+  static TextInsertedEvent _cast(js.JsObject proxy) => proxy == null ? null : new TextInsertedEvent._fromProxy(proxy);
 
-  TextInsertedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+  TextInsertedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
   int get index => $unsafe['index'];
   String get text => $unsafe['text'];

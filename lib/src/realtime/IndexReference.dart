@@ -17,7 +17,7 @@ part of realtime_data_model;
 class IndexReference extends CollaborativeObject {
   SubscribeStreamProvider<ReferenceShiftedEvent> _onReferenceShifted;
 
-  IndexReference._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+  IndexReference._fromProxy(js.JsObject proxy) : super._fromProxy(proxy) {
     _onReferenceShifted = _getStreamProviderFor(EventType.REFERENCE_SHIFTED, ReferenceShiftedEvent._cast);
   }
 

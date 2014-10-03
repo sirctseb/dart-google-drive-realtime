@@ -15,7 +15,7 @@
 part of realtime_data_model;
 
 class Error extends TypedProxy {
-  Error._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  Error._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
   bool get isFatal => $unsafe['isFatal'];
   String get message => $unsafe['message'];

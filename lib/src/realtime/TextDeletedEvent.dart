@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class TextDeletedEvent extends BaseModelEvent {
-  static TextDeletedEvent _cast(js.Proxy proxy) => proxy == null ? null : new TextDeletedEvent._fromProxy(proxy);
+  static TextDeletedEvent _cast(js.JsObject proxy) => proxy == null ? null : new TextDeletedEvent._fromProxy(proxy);
 
-  TextDeletedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+  TextDeletedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
   int get index => $unsafe['index'];
   String get text => $unsafe['text'];

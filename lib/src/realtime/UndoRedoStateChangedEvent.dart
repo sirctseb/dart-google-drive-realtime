@@ -15,9 +15,9 @@
 part of realtime_data_model;
 
 class UndoRedoStateChangedEvent extends BaseModelEvent {
-  static UndoRedoStateChangedEvent _cast(js.Proxy proxy) => proxy == null ? null : new UndoRedoStateChangedEvent._fromProxy(proxy);
+  static UndoRedoStateChangedEvent _cast(js.JsObject proxy) => proxy == null ? null : new UndoRedoStateChangedEvent._fromProxy(proxy);
 
-  UndoRedoStateChangedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+  UndoRedoStateChangedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
   bool get canRedo => $unsafe['canRedo'];
   bool get canUndo => $unsafe['canUndo'];

@@ -19,7 +19,7 @@ class Document extends EventTarget {
   SubscribeStreamProvider<CollaboratorJoinedEvent> _onCollaboratorJoined;
   SubscribeStreamProvider<DocumentSaveStateChangedEvent> _onDocumentSaveStateChanged;
 
-  Document._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+  Document._fromProxy(js.JsObject proxy) : super._fromProxy(proxy) {
     _onCollaboratorLeft = _getStreamProviderFor(EventType.COLLABORATOR_LEFT, CollaboratorLeftEvent._cast);
     _onCollaboratorJoined = _getStreamProviderFor(EventType.COLLABORATOR_JOINED, CollaboratorJoinedEvent._cast);
     _onDocumentSaveStateChanged = _getStreamProviderFor(EventType.DOCUMENT_SAVE_STATE_CHANGED, DocumentSaveStateChangedEvent._cast);
