@@ -229,8 +229,9 @@ class GoogleDocProvider extends DocumentProvider {
     // TODO workaround for bug in client library
     // http://stackoverflow.com/questions/18001043/why-is-the-response-to-gapi-client-drive-realtime-get-empty
     _logger.finer('Using HttpRequest.request workaround for realtime.get bug');
-    return HttpRequest.request('https://www.googleapis.com/drive/v2/files/${fileId}/realtime?access_token=${auth.token}',
-      method: 'POST')
+    return HttpRequest.request('https://www.googleapis.com/drive/v2/files/${fileId}/realtime',
+      method: 'GET',
+      requestHeaders: {'Authorization': 'Bearer ${auth.token.data}'})
       .then((HttpRequest req) {
         _logger.finest('Got exported document text: ${req.responseText}');
         // TODO error handling
