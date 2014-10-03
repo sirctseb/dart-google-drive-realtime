@@ -17,7 +17,7 @@ part of realtime_data_model;
 class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject {
 
   /// Local objects have no js Proxy
-  final js.Proxy $unsafe = null;
+  final js.JsObject $unsafe = null;
 
   final String id;
 

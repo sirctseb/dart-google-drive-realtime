@@ -18,9 +18,8 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
 import 'dart:mirrors';
+import 'dart:js' as js;
 
-import 'package:js/js.dart' as js;
-import 'package:js/js_wrapping.dart' as jsw;
 import 'package:json/json.dart' as json;
 import 'package:logging/logging.dart';
 import 'package:google_oauth2_client/google_oauth2_browser.dart';

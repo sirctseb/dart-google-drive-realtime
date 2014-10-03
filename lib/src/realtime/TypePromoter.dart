@@ -14,54 +14,106 @@
 
 part of realtime_data_model;
 
-/// Promote proxied objects to collaborative objects if they are that type
-dynamic _promoteProxy(dynamic object) {
-  String type;
 
-  if(object is js.Proxy) {
-    if(realtimeCustom['isCustomObject'](object)) {
-      // make realtime backing object
-      var backingObject = new _RealtimeCustomObject._fromProxy(object);
-      // make CustomObject to return
-      var customObject = new CustomObject._byName(_RealtimeCustomObject._findTypeName(object));
-      // set internal object
-      customObject._internalCustomObject = backingObject;
-      // return custom object subclass
-      return customObject;
-    } else if(js.instanceof(object, realtime['CollaborativeMap'])) {
-      return new CollaborativeMap._fromProxy(object);
-    } else if(js.instanceof(object, realtime['CollaborativeList'])) {
-      return new CollaborativeList._fromProxy(object);
-    } else if(js.instanceof(object, realtime['CollaborativeString'])) {
-      return new CollaborativeString._fromProxy(object);
-    } else if(js.instanceof(object, js.context['Array'])
-               || js.instanceof(object, js.context['Object'])) {
-      return json.parse(js.context['JSON']['stringify'](object));
-    }
-  }
-  // string, bool, numbers all get the correct type automatically
-  return object;
+typedef T Mapper<F,T>(F o);
+
+// TODO should this be a smarter list that only converts on demand like jsw version?
+List<dynamic> JsArrayToListAdapter(js.JsArray jsArray, Mapper mapper) {
+  return jsArray.map(mapper).toList(growable: false);
 }
+js.JsArray ListToJsArrayAdapter(List<dynamic> list, Mapper mapper) {
+  return new js.JsArray.from(list.map(mapper));
+}
+js.JsObject MapToJsObjectAdapter(Map<String, dynamic> map, Mapper mapper) {
+  var translated = {};
+  for(var key in map.keys) {
+    translated[key] = mapper(map[key]);
+  }
+  return new js.JsObject.jsify(translated);
+}
+
+class Translator<E> {
+  final Mapper<dynamic, E> fromJs;
+  final Mapper<E, dynamic> toJs;
+
+  Translator(this.fromJs, this.toJs);
+}
+
+// translator to promote to collaborative types
+class CollaborativeObjectTranslator<E> extends Translator<E> {
+  static dynamic _fromJs(dynamic object) {
+    if(object is js.JsObject) {
+      if(realtimeCustom['isCustomObject'].apply([object])) {
+        // TODO do backing object assignment in the CustomObject constructor
+        // make realtime backing object
+        var backingObject = new _RealtimeCustomObject._fromProxy(object);
+        // make CustomObject to return
+        var customObject = new CustomObject._byName(_RealtimeCustomObject._findTypeName(object));
+        // set internal object
+        customObject._internalCustomObject = backingObject;
+        // return custom object subclass
+        return customObject;
+      } else if(object.instanceof(realtime['CollaborativeMap'])) {
+        return new CollaborativeMap._fromProxy(object);
+      } else if(object.instanceof(realtime['CollaborativeList'])) {
+        return new CollaborativeList._fromProxy(object);
+      } else if(object.instanceof(realtime['CollaborativeString'])) {
+        return new CollaborativeString._fromProxy(object);
+      } else if(object.instanceof(js.context['Array'])
+                 || object.instanceof(js.context['Object'])) {
+        return json.parse(js.context['JSON']['stringify'].apply([object]));
+      }
+    }
+    // string, bool, numbers all get the correct type automatically
+    return object;
+  }
+  static dynamic _toJs(dynamic object) {
+    // TODO this should not be called toJS
+    if(object is CustomObject) return object.toJs();
+    if(object is CollaborativeObject) return object.toJs();
+    if(object is List) return new js.JsObject.jsify(object);
+    if(object is Map) return new js.JsObject.jsify(object);
+    // TODO should still restrict to supported types here
+    return object;
+  }
+
+  CollaborativeObjectTranslator() : super(_fromJs, _toJs);
+}
+
 /// Construct typed event classes based on type
-dynamic _promoteEventByType(js.Proxy event) {
-  if(event.type == EventType.TEXT_DELETED.value) {
-    return new TextDeletedEvent._fromProxy(event.toJs());
+class EventTranslator<E> extends Translator<E> {
+  static dynamic _fromJs(js.JsObject event) {
+    if(event['type'] == EventType.TEXT_DELETED.value) {
+      return new TextDeletedEvent._fromProxy(event);
+    }
+    if(event['type'] == EventType.TEXT_INSERTED.value) {
+      return new TextInsertedEvent._fromProxy(event);
+    }
+    if(event['type'] == EventType.VALUES_ADDED.value) {
+      return new ValuesAddedEvent._fromProxy(event);
+    }
+    if(event['type'] == EventType.VALUES_REMOVED.value) {
+      return new ValuesRemovedEvent._fromProxy(event);
+    }
+    if(event['type'] == EventType.VALUES_SET.value) {
+      return new ValuesSetEvent._fromProxy(event);
+    }
+    if(event['type'] == EventType.VALUE_CHANGED.value) {
+      return new ValueChangedEvent._fromProxy(event);
+    }
+    // TODO throw
+    return null;
   }
-  if(event.type == EventType.TEXT_INSERTED.value) {
-    return new TextInsertedEvent._fromProxy(event.toJs());
+
+  static dynamic _toJs(dynamic object) {
+    // TODO this should not be called toJS
+    if(object is CustomObject) return object.toJs();
+    if(object is CollaborativeObject) return object.toJs();
+    if(object is List) return new js.JsObject.jsify(object);
+    if(object is Map) return new js.JsObject.jsify(object);
+    // TODO should still restrict to supported types here
+    return object;
   }
-  if(event.type == EventType.VALUES_ADDED.value) {
-    return new ValuesAddedEvent._fromProxy(event.toJs());
-  }
-  if(event.type == EventType.VALUES_REMOVED.value) {
-    return new ValuesRemovedEvent._fromProxy(event.toJs());
-  }
-  if(event.type == EventType.VALUES_SET.value) {
-    return new ValuesSetEvent._fromProxy(event.toJs());
-  }
-  if(event.type == EventType.VALUE_CHANGED.value) {
-    return new ValueChangedEvent._fromProxy(event.toJs());
-  }
-  // TODO throw
-  return null;
+
+  EventTranslator() : super(_fromJs, _toJs);
 }

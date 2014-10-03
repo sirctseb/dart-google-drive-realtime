@@ -16,7 +16,7 @@ part of realtime_data_model;
 
 abstract class _LocalEvent implements BaseModelEvent {
   /// Local events have no js Proxy object
-  final js.Proxy $unsafe = null;
+  final js.JsObject $unsafe = null;
 
   /// Local events are always isLocal
   final bool isLocal = true;

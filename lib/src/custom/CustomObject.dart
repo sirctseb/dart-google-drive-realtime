@@ -14,7 +14,7 @@
 
 part of realtime_data_model;
 
-class CustomObject implements js.Serializable<js.Proxy> {
+class CustomObject {
   // information on the custom types registered
   static Map _registeredTypes = {};
 
@@ -47,7 +47,7 @@ class CustomObject implements js.Serializable<js.Proxy> {
     if(_isLocalCustomObject) {
       return _LocalCustomObject._customObjectModels[getId(this)];
     }
-    return new Model._fromProxy(realtimeCustom.getModel(this));
+    return new Model._fromProxy(realtimeCustom['getModel'].apply([(this._internalCustomObject as _RealtimeCustomObject).$unsafe]));
   }
 }
 

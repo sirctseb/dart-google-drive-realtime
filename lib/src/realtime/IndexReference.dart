@@ -17,14 +17,14 @@ part of realtime_data_model;
 class IndexReference extends CollaborativeObject {
   SubscribeStreamProvider<ReferenceShiftedEvent> _onReferenceShifted;
 
-  IndexReference._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+  IndexReference._fromProxy(js.JsObject proxy) : super._fromProxy(proxy) {
     _onReferenceShifted = _getStreamProviderFor(EventType.REFERENCE_SHIFTED, ReferenceShiftedEvent._cast);
   }
 
   bool get canBeDeleted => $unsafe['canBeDeleted'];
   int get index => $unsafe['index'];
   set index(int i) => $unsafe['index'] = i;
-  CollaborativeObject get referencedObject => _promoteProxy($unsafe['referencedObject']);
+  CollaborativeObject get referencedObject => CollaborativeObject._realtimeTranslator.fromJs($unsafe['referencedObject']);
 
   Stream<ReferenceShiftedEvent> get onReferenceShifted => _onReferenceShifted.stream;
 }

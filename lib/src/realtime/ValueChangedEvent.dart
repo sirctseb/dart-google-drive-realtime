@@ -15,11 +15,11 @@
 part of realtime_data_model;
 
 class ValueChangedEvent extends BaseModelEvent {
-  static ValueChangedEvent _cast(js.Proxy proxy) => proxy == null ? null : new ValueChangedEvent._fromProxy(proxy);
+  static ValueChangedEvent _cast(js.JsObject proxy) => proxy == null ? null : new ValueChangedEvent._fromProxy(proxy);
 
-  ValueChangedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+  ValueChangedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
-  dynamic get newValue => _promoteProxy($unsafe['newValue']);
-  dynamic get oldValue => _promoteProxy($unsafe['oldValue']);
+  dynamic get newValue => CollaborativeObject._realtimeTranslator.fromJs($unsafe['newValue']);
+  dynamic get oldValue => CollaborativeObject._realtimeTranslator.fromJs($unsafe['oldValue']);
   String get property => $unsafe['property'];
 }

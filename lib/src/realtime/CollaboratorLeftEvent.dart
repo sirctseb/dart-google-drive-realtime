@@ -14,10 +14,10 @@
 
 part of realtime_data_model;
 
-class CollaboratorLeftEvent extends jsw.TypedProxy {
-  static CollaboratorLeftEvent _cast(js.Proxy proxy) => proxy == null ? null : new CollaboratorLeftEvent._fromProxy(proxy);
+class CollaboratorLeftEvent extends TypedProxy {
+  static CollaboratorLeftEvent _cast(js.JsObject proxy) => proxy == null ? null : new CollaboratorLeftEvent._fromProxy(proxy);
 
-  CollaboratorLeftEvent._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  CollaboratorLeftEvent._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
   Collaborator get collaborator => new Collaborator._fromProxy($unsafe['collaborator']);
 }

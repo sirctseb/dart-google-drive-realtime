@@ -20,22 +20,16 @@ class _RealtimeCustomObject extends CollaborativeContainer implements _InternalC
   static Map _registeredTypes = {};
   static final String _idToTypeProperty = '_idToType';
 
-  _RealtimeCustomObject(String name) : super._fromProxy(new js.Proxy(_registeredTypes[name]["js-type"])) {}
-  _RealtimeCustomObject._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {}
-  static String _findTypeName(js.Proxy proxy) {
+  _RealtimeCustomObject._fromProxy(js.JsObject proxy) : super._fromProxy(proxy) {}
+  static String _findTypeName(js.JsObject proxy) {
     // get reference to id->name map
-    var idToType = new Model._fromProxy(realtime['custom']['getModel'](proxy)).root[_idToTypeProperty];
-    return idToType[realtime['custom']['getId'](proxy)];
+    var idToType = new Model._fromProxy(realtime['custom']['getModel'].apply([proxy])).root[_idToTypeProperty];
+    return idToType[realtime['custom']['getId'].apply([proxy])];
   }
-
-  // TODO these could go in Container also probably
-  dynamic _toJs(e) => _translator == null ? e : _translator.toJs(e);
-  V _fromJs(dynamic value) => _translator == null ? value :
-      _translator.fromJs(value);
 
   dynamic get(String field) => $unsafe[field];
   void set(String field, dynamic value) {
-    $unsafe.title = _toJs(value);
+    $unsafe[field] = _toJs(value);
   }
 
   @override

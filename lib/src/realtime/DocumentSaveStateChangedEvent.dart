@@ -14,10 +14,10 @@
 
 part of realtime_data_model;
 
-class DocumentSaveStateChangedEvent extends jsw.TypedProxy {
-  static DocumentSaveStateChangedEvent _cast(js.Proxy proxy) => proxy == null ? null : new DocumentSaveStateChangedEvent._fromProxy(proxy);
+class DocumentSaveStateChangedEvent extends TypedProxy {
+  static DocumentSaveStateChangedEvent _cast(js.JsObject proxy) => proxy == null ? null : new DocumentSaveStateChangedEvent._fromProxy(proxy);
 
-  DocumentSaveStateChangedEvent._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  DocumentSaveStateChangedEvent._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
   bool get isPending => $unsafe['isPending'];
   bool get isSaving => $unsafe['isSaving'];

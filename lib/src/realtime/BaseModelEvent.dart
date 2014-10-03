@@ -14,8 +14,25 @@
 
 part of realtime_data_model;
 
-class BaseModelEvent extends jsw.TypedProxy {
-  BaseModelEvent._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+// TypedProxy taken from:
+
+// Copyright (c) 2013, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+//part of js.wrapping;
+
+/// base class to wrap a [Proxy] in a strong typed object.
+class TypedProxy {
+  final js.JsObject $unsafe;
+
+  TypedProxy.fromProxy(this.$unsafe);
+
+  @override dynamic toJs() => $unsafe;
+}
+
+class BaseModelEvent extends TypedProxy {
+  BaseModelEvent._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
   bool get bubbles => $unsafe['bubbles'];
   bool get isLocal => $unsafe['isLocal'];

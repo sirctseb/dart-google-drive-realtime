@@ -14,10 +14,10 @@
 
 part of realtime_data_model;
 
-class Collaborator extends jsw.TypedProxy {
-  static Collaborator _cast(js.Proxy proxy) => proxy == null ? null : new Collaborator._fromProxy(proxy);
+class Collaborator extends TypedProxy {
+  static Collaborator _cast(js.JsObject proxy) => proxy == null ? null : new Collaborator._fromProxy(proxy);
 
-  Collaborator._fromProxy(js.Proxy proxy) : super.fromProxy(proxy);
+  Collaborator._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
   String get color => $unsafe['color'];
   String get displayName => $unsafe['displayName'];

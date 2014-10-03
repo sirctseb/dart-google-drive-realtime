@@ -18,19 +18,19 @@ class CollaborativeString extends CollaborativeObject {
   SubscribeStreamProvider<TextInsertedEvent> _onTextInserted;
   SubscribeStreamProvider<TextDeletedEvent> _onTextDeleted;
 
-  CollaborativeString._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+  CollaborativeString._fromProxy(js.JsObject proxy) : super._fromProxy(proxy) {
     _onTextInserted = _getStreamProviderFor(EventType.TEXT_INSERTED, TextInsertedEvent._cast);
     _onTextDeleted = _getStreamProviderFor(EventType.TEXT_DELETED, TextDeletedEvent._cast);
   }
 
   int get length => $unsafe['length'];
 
-  void append(String text) { $unsafe.append(text); }
-  String get text => $unsafe.getText();
-  void insertString(int index, String text) { $unsafe.insertString(index, text); }
-  IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.registerReference(index, canBeDeleted));
-  void removeRange(int startIndex, int endIndex) { $unsafe.removeRange(startIndex, endIndex); }
-  void set text(String text) { $unsafe.setText(text); }
+  void append(String text) { $unsafe.callMethod('append', [text]); }
+  String get text => $unsafe.callMethod('getText');
+  void insertString(int index, String text) { $unsafe.callMethod('insertString', [index, text]); }
+  IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.callMethod('registerReference', [index, canBeDeleted]));
+  void removeRange(int startIndex, int endIndex) { $unsafe.callMethod('removeRange', [startIndex, endIndex]); }
+  void set text(String text) { $unsafe.callMethod('setText', [text]); }
 
   Stream<TextInsertedEvent> get onTextInserted => _onTextInserted.stream;
   Stream<TextDeletedEvent> get onTextDeleted => _onTextDeleted.stream;

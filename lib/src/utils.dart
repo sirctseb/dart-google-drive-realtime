@@ -16,12 +16,10 @@ library utils;
 
 import 'dart:async';
 
-import 'package:js/js.dart' as js;
-
 // utility to get js.Proxy even if out of scope
 dynamic findIn(List elements, Object o) => elements.firstWhere((e) => e == o, orElse: () => null);
 
-class IsEnum<E> implements js.Serializable<E> {
+class IsEnum<E> {
   E value;
 
   IsEnum(this.value);

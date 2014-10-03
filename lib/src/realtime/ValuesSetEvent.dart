@@ -15,11 +15,11 @@
 part of realtime_data_model;
 
 class ValuesSetEvent extends BaseModelEvent {
-  static ValuesSetEvent _cast(js.Proxy proxy) => proxy == null ? null : new ValuesSetEvent._fromProxy(proxy);
+  static ValuesSetEvent _cast(js.JsObject proxy) => proxy == null ? null : new ValuesSetEvent._fromProxy(proxy);
 
-  ValuesSetEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+  ValuesSetEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
   int get index => $unsafe['index'];
-  List<dynamic> get newValues => jsw.JsArrayToListAdapter.cast($unsafe['newValues'], CollaborativeContainer._realtimeTranslator);
-  List<dynamic> get oldValues => jsw.JsArrayToListAdapter.cast($unsafe['oldValues'], CollaborativeContainer._realtimeTranslator);
+  List<dynamic> get newValues => JsArrayToListAdapter($unsafe['newValues'], CollaborativeObject._realtimeTranslator.fromJs);
+  List<dynamic> get oldValues => JsArrayToListAdapter($unsafe['oldValues'], CollaborativeObject._realtimeTranslator.fromJs);
 }

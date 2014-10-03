@@ -15,10 +15,10 @@
 part of realtime_data_model;
 
 class ValuesRemovedEvent extends BaseModelEvent {
-  static ValuesRemovedEvent _cast(js.Proxy proxy) => proxy == null ? null : new ValuesRemovedEvent._fromProxy(proxy);
+  static ValuesRemovedEvent _cast(js.JsObject proxy) => proxy == null ? null : new ValuesRemovedEvent._fromProxy(proxy);
 
-  ValuesRemovedEvent._fromProxy(js.Proxy proxy) : super._fromProxy(proxy);
+  ValuesRemovedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
   int get index => $unsafe['index'];
-  List<dynamic> get values => jsw.JsArrayToListAdapter.cast($unsafe['values'], CollaborativeContainer._realtimeTranslator);
+  List<dynamic> get values => JsArrayToListAdapter($unsafe['values'], CollaborativeObject._realtimeTranslator.fromJs);
 }

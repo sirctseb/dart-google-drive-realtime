@@ -86,7 +86,7 @@ class _LocalModel implements Model {
   Stream<UndoRedoStateChangedEvent> get onUndoRedoStateChanged => _onUndoRedoStateChanged.stream;
 
   /// Local models have no js Proxy
-  final js.Proxy $unsafe = null;
+  final js.JsObject $unsafe = null;
 
   /// Local models have no js Proxy
   dynamic toJs() => null;

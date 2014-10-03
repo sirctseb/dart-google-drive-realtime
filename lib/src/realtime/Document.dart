@@ -19,15 +19,15 @@ class Document extends EventTarget {
   SubscribeStreamProvider<CollaboratorJoinedEvent> _onCollaboratorJoined;
   SubscribeStreamProvider<DocumentSaveStateChangedEvent> _onDocumentSaveStateChanged;
 
-  Document._fromProxy(js.Proxy proxy) : super._fromProxy(proxy) {
+  Document._fromProxy(js.JsObject proxy) : super._fromProxy(proxy) {
     _onCollaboratorLeft = _getStreamProviderFor(EventType.COLLABORATOR_LEFT, CollaboratorLeftEvent._cast);
     _onCollaboratorJoined = _getStreamProviderFor(EventType.COLLABORATOR_JOINED, CollaboratorJoinedEvent._cast);
     _onDocumentSaveStateChanged = _getStreamProviderFor(EventType.DOCUMENT_SAVE_STATE_CHANGED, DocumentSaveStateChangedEvent._cast);
   }
 
-  void close() { $unsafe.close(); }
-  List<Collaborator> get collaborators => jsw.JsArrayToListAdapter.castListOfSerializables($unsafe.getCollaborators(), Collaborator._cast);
-  Model get model => new Model._fromProxy($unsafe.getModel());
+  void close() { $unsafe.callMethod('close'); }
+  List<Collaborator> get collaborators => JsArrayToListAdapter($unsafe.callMethod('getCollaborators'), Collaborator._cast);
+  Model get model => new Model._fromProxy($unsafe.callMethod('getModel'));
 
   Stream<CollaboratorLeftEvent> get onCollaboratorLeft => _onCollaboratorLeft.stream;
   Stream<CollaboratorJoinedEvent> get onCollaboratorJoined => _onCollaboratorJoined.stream;
