@@ -25,5 +25,5 @@ class _LocalValuesRemovedEvent extends _LocalUndoableEvent implements ValuesRemo
 
   _LocalValuesRemovedEvent._(this.index, this.values, _target) : super._(_target);
 
-  _LocalValuesAddedEvent get inverse => new _LocalValuesAddedEvent._(index, values, _target);
+  _LocalValuesAddedEvent get _inverse => new _LocalValuesAddedEvent._(index, values, _target);
 }

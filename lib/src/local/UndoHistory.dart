@@ -18,7 +18,7 @@ part of realtime_data_model;
 // TODO put in it's own file?
 abstract class _LocalUndoableEvent extends _LocalEvent {
   // create an event that performs the opposite of this
-  _LocalUndoableEvent get inverse;
+  _LocalUndoableEvent get _inverse;
 
   _LocalUndoableEvent._(_target) : super._(_target);
 

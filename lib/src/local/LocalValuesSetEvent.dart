@@ -31,7 +31,7 @@ class _LocalValuesSetEvent extends _LocalUndoableEvent implements ValuesSetEvent
 
   _LocalValuesSetEvent._(this.index, this.newValues, this._oldValues, _target) : super._(_target);
 
-  _LocalValuesSetEvent get inverse => new _LocalValuesSetEvent._(index, oldValues, newValues, _target);
+  _LocalValuesSetEvent get _inverse => new _LocalValuesSetEvent._(index, oldValues, newValues, _target);
 
   void _updateState() {
     _oldValues = (_target as _LocalModelList).asArray().sublist(index, index + newValues.length);
