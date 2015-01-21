@@ -15,10 +15,19 @@
 part of realtime_data_model;
 
 class _LocalDocument implements Document {
+  // TODO this accessor verifies document in js. make accessor?
   final _LocalModel model;
 
-  void close() {}
-  List<Collaborator> get collaborators => [];
+  void close() {
+    // remove document from set of open documents
+    _openRootIDs.remove(model.root.id);
+  }
+  List<Collaborator> get collaborators {
+    _LocalDocument._verifyDocument(this);
+    return [];
+  }
+
+  static Map _openRootIDs = {};
 
   void exportDocument(void successFn([dynamic _]), void failureFn([dynamic _])) {
     try {
@@ -42,7 +51,16 @@ class _LocalDocument implements Document {
   Stream<CollaboratorJoinedEvent> get onCollaboratorJoined => _onCollaboratorJoined.stream;
   Stream<DocumentSaveStateChangedEvent> get onDocumentSaveStateChanged => _onDocumentSaveStateChanged.stream;
 
-  _LocalDocument(_LocalModel this.model);
+  _LocalDocument(_LocalModel this.model) {
+    _openRootIDs[model.root.id] = true;
+  }
+
+  static _verifyDocument(object) {
+    var model = object is _LocalModelObject ? object._model : object;
+    if(_openRootIDs.containsKey(model) && _openRootIDs[model]) {
+      throw new _LocalDocumentClosedError();
+    }
+  }
 
   /// Local document has no proxy
   final js.JsObject $unsafe = null;

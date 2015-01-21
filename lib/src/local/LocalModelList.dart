@@ -18,36 +18,47 @@ typedef bool Comparator<T>(T a, T b);
 
 class _LocalModelList<E> extends _LocalIndexReferenceContainer implements CollaborativeList<E> {
 
-  E operator[](int index) => _list[index];
+  E operator[](int index) {
+    _LocalDocument._verifyDocument(this);
+    return _list[index];
+  }
 
   void operator[]=(int index, E value) {
+    _LocalDocument._verifyDocument(this);
     if (index < 0 || index >= length) throw new RangeError.value(index);
     // add event to stream
     var event = new _LocalValuesSetEvent._(index, [value], [_list[index]], this);
     _emitEventsAndChanged([event]);
   }
 
-  List<E> asArray() => _list;
+  List<E> asArray() {
+    _LocalDocument._verifyDocument(this);
+    return _list;
+  }
 
   void clear() {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var event = new _LocalValuesRemovedEvent._(0, _list.toList(), this);
     _emitEventsAndChanged([event]);
   }
 
   void insert(int index, E value) {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var event = new _LocalValuesAddedEvent._(index, [value], this);
     _emitEventsAndChanged([event]);
   }
 
   void insertAll(int index, List<E> values) {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var event = new _LocalValuesAddedEvent._(index, values, this);
     _emitEventsAndChanged([event]);
   }
 
   int lastIndexOf(E value, [Comparator comparator]) {
+    _LocalDocument._verifyDocument(this);
     if(comparator != null) {
       for(var i = _list.length - 1; i >= 0; i--) {
         if(comparator(_list[i], value)) {
@@ -62,9 +73,13 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
 
   /// Deprecated : use `xxx[index]` instead
-  @deprecated E get(int index) => this[index];
+  @deprecated E get(int index) {
+    _LocalDocument._verifyDocument(this);
+    return this[index];
+  }
 
   int indexOf(E value, [Comparator comparator]) {
+    _LocalDocument._verifyDocument(this);
     if(comparator != null) {
       for(var i = 0; i < _list.length; i++) {
         if(comparator(_list[i], value)) {
@@ -78,10 +93,17 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
 
   /// Deprecated : use `xxx[index] = value` instead
-  @deprecated void set(int index, E value) { this[index] = value; }
+  @deprecated void set(int index, E value) {
+    _LocalDocument._verifyDocument(this);
+    this[index] = value;
+  }
 
-  int get length => _list.length;
+  int get length {
+    _LocalDocument._verifyDocument(this);
+    return _list.length;
+  }
   set length(int l) {
+    _LocalDocument._verifyDocument(this);
     if(l > this.length) {
       throw 'Cannot set the list length to be greater than the current value.';
     } else {
@@ -96,6 +118,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   Stream<ValuesSetEvent> get onValuesSet => _onValuesSet.stream;
 
   int push(E value) {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var event = new _LocalValuesAddedEvent._(_list.length, [value], this);
     _emitEventsAndChanged([event]);
@@ -103,6 +126,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
 
   void pushAll(List<E> values) {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var event = new _LocalValuesAddedEvent._(_list.length, values, this);
     _emitEventsAndChanged([event]);
@@ -110,18 +134,21 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   // TODO this is an actual conflict with the List interface and would make it harder to implement it
   void remove(int index) {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var event = new _LocalValuesRemovedEvent._(index, [_list[index]], this);
     _emitEventsAndChanged([event]);
   }
 
   void removeRange(int startIndex, int endIndex) {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var event = new _LocalValuesRemovedEvent._(startIndex, _list.sublist(startIndex, endIndex), this);
     _emitEventsAndChanged([event]);
   }
 
   bool removeValue(E value) {
+    _LocalDocument._verifyDocument(this);
     // get index of value for event
     int index = _list.indexOf(value);
     if(index != -1) {
@@ -134,6 +161,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
 
   void replaceRange(int index, List<E> values) {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var event = new _LocalValuesSetEvent._(index, values, _list.sublist(index, index + values.length), this);
     _emitEventsAndChanged([event]);
@@ -163,6 +191,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   // check if value is a model object and start propagating object changed events
   void _propagateChanges(dynamic element) {
+    _LocalDocument._verifyDocument(this);
     // start propagating changes if element is model object and not already subscribed
     if(element is _LocalModelObject) {
       element.addParentEventTarget(this);
@@ -170,6 +199,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
   // check if value is a model object and stop propagating object changed events
   void _stopPropagatingChanges(dynamic element) {
+    _LocalDocument._verifyDocument(this);
     // stop propagation if overwritten element is model object and it is no longer anywhere in the list
     if(element is _LocalModelObject && !_list.contains(element)) {
       element.removeParentEventTarget(this);
@@ -184,6 +214,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     }
     initializeEvents();
   }
+  // TODO should be private
   void initializeEvents() {
 
     // listen for events to add or cancel object changed propagation
@@ -202,6 +233,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
     _eventStreamControllers[EventType.VALUES_ADDED.value] = _onValuesAdded;
     _eventStreamControllers[EventType.VALUES_REMOVED.value] = _onValuesRemoved;
   }
+  // TODO should be private
   void initializeWithValue(List initialValue) {
     // don't fire events but do propagate changes
     _list.addAll(initialValue);
@@ -209,6 +241,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
 
   void _executeEvent(_LocalUndoableEvent event_in) {
+    _LocalDocument._verifyDocument(this);
     if(event_in.type == EventType.VALUES_SET.value) {
         var event = event_in as _LocalValuesSetEvent;
         _list.setRange(event.index, event.index + event.newValues.length, event.newValues);

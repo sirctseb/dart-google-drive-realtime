@@ -18,6 +18,7 @@ part of realtime_data_model;
 class _LocalIndexReferenceContainer extends _LocalModelObject {
 
   _LocalIndexReference registerReference(int index, bool canBeDeleted) {
+    _LocalDocument._verifyDocument(this);
     // create the reference
     var ref = new _LocalIndexReference._(index, canBeDeleted, this, _model);
     // add to list of references

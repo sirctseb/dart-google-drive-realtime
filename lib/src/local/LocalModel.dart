@@ -19,10 +19,14 @@ class _LocalModel implements Model {
 
   /// Create a local model with a callback
   _LocalModel([initialize]) {
+    // TODO js doesn't use createMap for this
     _root = createMap();
     _undoHistory = new _UndoHistory(this);
-    if(initialize != null) {
-      _undoHistory.initializeModel(initialize, this);
+  }
+
+  _initialize(opt_initializerFn) {
+    if(opt_initializerFn != null) {
+      _undoHistory.initializeModel(opt_initializerFn, this);
     }
   }
 
@@ -32,26 +36,41 @@ class _LocalModel implements Model {
   // TODO is this ever true?
   bool get isReadOnly => false;
 
-  bool get canUndo => _undoHistory.canUndo;
-  bool get canRedo => _undoHistory.canRedo;
+  bool get canUndo {
+    _LocalDocument._verifyDocument(this);
+    return _undoHistory.canUndo;
+  }
+  bool get canRedo {
+    _LocalDocument._verifyDocument(this);
+    return _undoHistory.canRedo;
+  }
 
   void endCompoundOperation() {
+    _LocalDocument._verifyDocument(this);
     _undoHistory.endCompoundOperation();
   }
 
   // TODO can't be final because we need to pass this to constructor
   _LocalModelMap _root;
-  _LocalModelMap get root => _root;
+  _LocalModelMap get root {
+    _LocalDocument._verifyDocument(this);
+    return _root;
+  }
 
   // TODO is this ever false?
   // TODO we should probably provide the same initialization callback method as realtime
-  bool get isInitialized => true;
+  bool get isInitialized {
+    _LocalDocument._verifyDocument(this);
+    return true;
+  }
 
   void beginCompoundOperation([String name]) {
+    _LocalDocument._verifyDocument(this);
     _undoHistory.beginCompoundOperation(Scope.CO);
   }
 
   CustomObject create(String name) {
+    _LocalDocument._verifyDocument(this);
     var backingObject = new _LocalCustomObject(this, name);
     // make CustomObject to return
     var customObject = new CustomObject._byName(name);
@@ -63,21 +82,26 @@ class _LocalModel implements Model {
     return customObject;
   }
   _LocalModelList createList([List initialValue]) {
+    _LocalDocument._verifyDocument(this);
     return new _LocalModelList(this, initialValue);
   }
   _LocalModelMap createMap([Map initialValue]) {
+    _LocalDocument._verifyDocument(this);
     return new _LocalModelMap(this, initialValue);
   }
   _LocalModelString createString([String initialValue]) {
+    _LocalDocument._verifyDocument(this);
     return new _LocalModelString(this, initialValue);
   }
 
   void undo() {
+    _LocalDocument._verifyDocument(this);
     // TODO check canUndo
     // undo events
     _undoHistory.undo();
   }
   void redo() {
+    _LocalDocument._verifyDocument(this);
     // TODO check canRedo
     // redo events
     _undoHistory.redo();

@@ -22,9 +22,10 @@ class LocalDocumentProvider extends DocumentProvider {
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
   Future<Document> loadDocument([initializeModel(Model)]) {
-    var model = new _LocalModel(initializeModel);
+    var model = new _LocalModel();
     // create a document with the model
     var document = new _LocalDocument(model);
+    model._initialize(initializeModel);
     _document = document;
     var completer = new Completer();
     // complete with document

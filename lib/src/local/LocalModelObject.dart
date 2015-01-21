@@ -33,6 +33,7 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
 
   // create an emit a _LocalObjectChangedEvent from a list of events
   void _emitEventsAndChanged(List<_LocalUndoableEvent> events) {
+    _LocalDocument._verifyDocument(this);
     _model.beginCompoundOperation();
 
     // add events to undo history

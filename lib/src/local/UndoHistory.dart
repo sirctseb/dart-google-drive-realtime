@@ -69,7 +69,7 @@ class _UndoHistory {
     if(_COScopes.length == 0) {
       // invert the operations and reverse the order
       var inverseCO = _currentCO.reversed.map((e) {
-        return e.inverse;
+        return e._inverse;
       }).toList(growable: false);
       // clear current CO
       _currentCO = null;

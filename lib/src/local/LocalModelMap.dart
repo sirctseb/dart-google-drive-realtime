@@ -16,10 +16,17 @@ part of realtime_data_model;
 
 class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V> {
 
-  @override int get length => _map.length;
+  @override int get length {
+    _LocalDocument._verifyDocument(this);
+    return _map.length;
+  }
 
-  @override V operator [](String key) => _map[key];
+  @override V operator [](String key) {
+    _LocalDocument._verifyDocument(this);
+    return _map[key];
+  }
   @override void operator []=(String key, V value) {
+    _LocalDocument._verifyDocument(this);
     if(this[key] != value) {
       // send the event
       var event = new _LocalValueChangedEvent._(value, _map[key], key, this);
@@ -28,11 +35,13 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   }
 
   void clear() {
+    _LocalDocument._verifyDocument(this);
     // remove each key and let it produce the event
     keys.forEach((key) => remove(key));
   }
 
   @override V remove(String key) {
+    _LocalDocument._verifyDocument(this);
     var oldValue = this[key];
     // create the event
     var event = new _LocalValueChangedEvent._(null, _map[key], key, this);
@@ -44,19 +53,35 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   @deprecated V delete(String key) => remove(key);
   /// deprecated : use `xxx[key]`
   @deprecated V get(String key) => this[key];
-  @override bool containsKey(String key) => _map.containsKey(key);
+  @override bool containsKey(String key) {
+    _LocalDocument._verifyDocument(this);
+    return _map.containsKey(key);
+  }
   /// deprecated : use `xxx.containsKey(key)`
   @deprecated bool has(String key) => containsKey(key);
-  @override bool get isEmpty => _map.isEmpty;
-  List<List<V>> get items => _map.keys.map((key) => [key, _map[key]]).toList();
-  @override List<String> get keys => _map.keys.toList();
+  @override bool get isEmpty {
+    _LocalDocument._verifyDocument(this);
+    return _map.isEmpty;
+  }
+  List<List<V>> get items {
+    _LocalDocument._verifyDocument(this);
+    return _map.keys.map((key) => [key, _map[key]]).toList();
+  }
+  @override List<String> get keys {
+    _LocalDocument._verifyDocument(this);
+    return _map.keys.toList();
+  }
   /// deprecated : use `xxx[key] = value`
   @deprecated V set(String key, V value) {
+    _LocalDocument._verifyDocument(this);
     var oldValue = this[key];
     this[key] = value;
     return oldValue;
   }
-  @override List<V> get values => _map.values;
+  @override List<V> get values {
+    _LocalDocument._verifyDocument(this);
+    return _map.values;
+  }
   @override bool get isNotEmpty => !isEmpty;
 
   Stream<ValueChangedEvent> get onValueChanged => _onValueChanged.stream;
@@ -80,6 +105,7 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   int get size => length;
 
   String toString() {
+    _LocalDocument._verifyDocument(this);
     var valList = _map.keys.map((key) {
       return '$key: ' +
           (_map[key] is _LocalModelObject ?
@@ -109,6 +135,7 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
   }
 
   void _executeEvent(_LocalUndoableEvent event_in) {
+    _LocalDocument._verifyDocument(this);
     if(event_in.type == EventType.VALUE_CHANGED.value) {
         var event = event_in as _LocalValueChangedEvent;
         if(event.newValue == null) {

@@ -17,12 +17,14 @@ part of realtime_data_model;
 // TODO why does this extend LocalModelObject? Why does IndexReferences extend CollaborativeObject?
 class _LocalIndexReference extends _LocalModelObject implements IndexReference {
 
+  // TODO had verifyDocument in js
   final bool canBeDeleted;
 
   int index;
 
   Stream<_LocalReferenceShiftedEvent> get onReferenceShifted => _onReferenceShifted.stream;
 
+  // TODO had verifyDocument in js
   final CollaborativeObject referencedObject;
 
   _LocalIndexReference._(this.index, this.canBeDeleted, this.referencedObject, _LocalModel model) :
