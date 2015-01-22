@@ -61,6 +61,17 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
     _LocalDocument._verifyDocument(this);
     return this._string;
   }
+  String _toStringHelper(Set ids) {
+    _LocalDocument._verifyDocument(this);
+
+    if(ids.contains(this.id)) {
+      return '<EditableString: ${this.id}>';
+    }
+
+    ids.add(this.id);
+
+    return this._string;
+  }
 
   Stream<_LocalTextInsertedEvent> get onTextInserted => _onTextInserted.stream;
   Stream<_LocalTextDeletedEvent> get onTextDeleted => _onTextDeleted.stream;
@@ -101,7 +112,15 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
   String _string = "";
 
   /// JSON serialized data
-  Map toJSON() {
+  Map _export(Set ids) {
+    _LocalDocument._verifyDocument(this);
+
+    if(ids.contains(this.id)) {
+      return {'ref': this.id};
+    }
+
+    ids.add(this.id);
+
     return {
       "id": this.id,
       "type": "EditableString",

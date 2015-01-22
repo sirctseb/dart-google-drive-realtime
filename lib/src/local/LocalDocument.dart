@@ -56,7 +56,17 @@ class _LocalDocument implements Document {
   }
 
   static _verifyDocument(object) {
-    var model = object is _LocalModelObject ? object._model : object;
+    var model;
+    // if object is derived from a collaborative object, it is a map, string, or list
+    if(object is _LocalModelObject) {
+      model = object._model;
+    } else if(isCustomObject(object)) {
+      // otherwise test if it is a custom object
+      model = getModel(object);
+    } else {
+      model = object;
+    }
+
     if(_openRootIDs.containsKey(model) && _openRootIDs[model]) {
       throw new _LocalDocumentClosedError();
     }

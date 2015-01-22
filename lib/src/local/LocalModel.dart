@@ -116,11 +116,11 @@ class _LocalModel implements Model {
   dynamic toJs() => null;
 
   /// JSON serialized data
-  Map toJSON() {
+  Map _export() {
     return {
-      "appId": "", // TODO
-      "revision": 0, // TODO
-      "data": root.toJSON()
+      "appId": "local", // TODO
+      "revision": 1, // TODO
+      "data": root._export(new Set())
     };
   }
 }

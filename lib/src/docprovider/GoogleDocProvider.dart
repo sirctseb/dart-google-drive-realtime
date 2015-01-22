@@ -235,7 +235,7 @@ class GoogleDocProvider extends DocumentProvider {
       .then((HttpRequest req) {
         _logger.finest('Got exported document text: ${req.responseText}');
         // TODO error handling
-        return req.responseText;
+        return json.parse(req.responseText);
       });
   }
 

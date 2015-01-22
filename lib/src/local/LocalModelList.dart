@@ -168,10 +168,23 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
 
   String toString() {
+    _LocalDocument._verifyDocument(this);
+    return _toStringHelper(new Set());
+  }
+
+  String _toStringHelper(Set ids) {
+    _LocalDocument._verifyDocument(this);
+
+    if(ids.contains(this.id)) {
+      return '<List: ${this.id}>';
+    }
+
+    ids.add(this.id);
+
     return '[' +
     this._list.map((e) {
-      if(e is _LocalModelObject) {
-        return e.toString();
+      if(e is _LocalModelObject || isCustomObject(e)) {
+        return e._toStringHelper(ids);
       } else {
         return '[JsonValue ${json.stringify(e)}]';
       }
@@ -263,12 +276,14 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   }
 
   /// JSON serialized data
-  Map toJSON() {
+  Map _export(Set ids) {
+    _LocalDocument._verifyDocument(this);
+
     return {
       "id": this.id,
       "type": "List",
       "value": _list.map((e) {
-        if(e is _LocalModelObject) return e.toJSON();
+        if(e is _LocalModelObject) return e._export(ids);
         return {"json": e};
       }).toList()
     };

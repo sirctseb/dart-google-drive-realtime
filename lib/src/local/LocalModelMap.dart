@@ -106,10 +106,22 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
 
   String toString() {
     _LocalDocument._verifyDocument(this);
+    return _toStringHelper(new Set());
+  }
+
+  String _toStringHelper(Set ids) {
+    _LocalDocument._verifyDocument(this);
+
+    if(ids.contains(this.id)) {
+      return '<Map: ${this.id}>';
+    }
+
+    ids.add(this.id);
+
     var valList = _map.keys.map((key) {
       return '$key: ' +
-          (_map[key] is _LocalModelObject ?
-          _map[key].toString() :
+          ((_map[key] is _LocalModelObject || isCustomObject(_map[key])) ?
+          _map[key]._toStringHelper(ids) :
           '[JsonValue ${json.stringify(_map[key])}]');
     });
     return '{${valList.join(", ")}}';
@@ -158,12 +170,20 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
 
   /// JSON serialized data
   // TODO output numbers as floating point
-  Map toJSON() {
+  Map _export(Set ids) {
+    _LocalDocument._verifyDocument(this);
+
+    if(ids.contains(this.id)) {
+      return {'ref': this.id};
+    }
+
+    ids.add(this.id);
+
     return {
       "id": this.id,
       "type": "Map",
       "value": new Map.fromIterable(_map.keys, value: (key) {
-        if(_map[key] is _LocalModelObject) return _map[key].toJSON();
+        if(_map[key] is _LocalModelObject || isCustomObject(_map[key])) return _map[key]._export(ids);
         return {"json": _map[key]};
       })
     };

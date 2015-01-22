@@ -73,4 +73,54 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
         super._executeEvent(event_in);
     }
   }
+
+  String _toStringHelper(Map ids) {
+    _LocalDocument._verifyDocument(this);
+    if(ids[getId(this)]) {
+      // TODO what to put here for collaborative objects?
+      return '<Map: ${this.id}>';
+    }
+
+    ids[getId(this)] = true;
+
+    // TODO can custom objects contain collaborative objects?
+    var valList = [];
+    for(var key in _fields) {
+      var valString;
+      if(_fields[key] is _LocalModelObject || isCustomObject(_fields[key])) {
+        valString = _fields[key]._toStringHelper(ids);
+      } else {
+        valString = '[JsonValue ${json.stringify(_fields[key])}]';
+      }
+      valList.add('$key: $valString');
+    }
+    return '{${valList.join(',')}}';
+  }
+
+  Map _export(Map ids) {
+    _LocalDocument._verifyDocument(this);
+
+    if(ids[getId(this)]) {
+      return {'ref': getId(this)};
+    }
+
+    ids[getId(this)] = true;
+
+    var result = {
+      'ids': getId(this),
+      // TODO need to get type
+      //'type':
+      'value': {}
+    };
+
+    for(var key in _fields) {
+      if(_fields[key] is _LocalModelObject || isCustomObject(_fields[key])) {
+        result['value'][key] = _fields[key]._export(ids);
+      } else {
+        result['value'][key] = {'json': _fields[key]};
+      }
+    }
+
+    return result;
+  }
 }
