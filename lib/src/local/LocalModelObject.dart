@@ -31,6 +31,7 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
 
   _LocalModelObject(_LocalModel this._model) : id = nextId;
 
+  // TODO rename these methods
   // create an emit a _LocalObjectChangedEvent from a list of events
   void _emitEventsAndChanged(List<_LocalUndoableEvent> events) {
     _LocalDocument._verifyDocument(this);
@@ -38,30 +39,24 @@ class _LocalModelObject extends _LocalEventTarget implements CollaborativeObject
 
     // add events to undo history
     _model._undoHistory._addUndoEvents(events);
+    _model.endCompoundOperation();
 
     // create change event
-    var event = new _LocalObjectChangedEvent._(events,this);
     for(int i = 0; i < events.length; i++) {
       // execute events
       _executeEvent(events[i]);
-      // fire actual events
-      _eventStreamControllers[events[i].type].add(events[i]);
     }
-    dispatchObjectChangedEvent(event);
-    _model.endCompoundOperation();
   }
   void _executeAndEmitEvent(_LocalUndoableEvent event) {
-    _model.beginCompoundOperation();
 
     // add events to undo history
     _model._undoHistory._addUndoEvents([event]);
 
     // make change
     _executeEvent(event);
-    // emit event
+  }
+  void _emitEvent(_LocalUndoableEvent event) {
     _eventStreamControllers[event.type].add(event);
-
-    _model.endCompoundOperation();
   }
 
   void _executeEvent(_LocalUndoableEvent event) {}

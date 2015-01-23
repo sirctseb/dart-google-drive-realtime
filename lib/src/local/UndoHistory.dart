@@ -67,6 +67,9 @@ class _UndoHistory {
   void endCompoundOperation() {
     var scope = _COScopes.removeLast();
     if(_COScopes.length == 0) {
+
+      var currentCO = new List.from(_currentCO);
+
       // invert the operations and reverse the order
       var inverseCO = _currentCO.reversed.map((e) {
         return e._inverse;
@@ -84,6 +87,20 @@ class _UndoHistory {
         _history.removeRange(_index, _history.length);
         _history.add(inverseCO);
         _index++;
+      }
+
+      // fire events
+      for(var event in currentCO) {
+        event._target._emitEvent(event);
+      }
+
+      // group by target
+      // TODO take id of object base class
+      var bucketed = bucket(currentCO, (e, index) => e._target.id);
+      // do object changed events
+      for(var id in bucketed.keys) {
+        var event = new _LocalObjectChangedEvent._(bucketed[id], bucketed[id][0]._target);
+        bucketed[id][0]._target.dispatchObjectChangedEvent(event);
       }
     }
   }
@@ -134,14 +151,6 @@ class _UndoHistory {
       e._updateState();
       e._executeAndEmit();
     });
-    // group by target
-    // TODO take id of object base class
-    var bucketed = bucket(_history[_index], (e, index) => e._target.id);
-    // do object changed events
-    for(var id in bucketed.keys) {
-      var event = new _LocalObjectChangedEvent._(bucketed[id], bucketed[id][0]._target);
-      bucketed[id][0]._target.dispatchObjectChangedEvent(event);
-    }
 
     // unset undo scope flag
     endCompoundOperation();
@@ -164,13 +173,6 @@ class _UndoHistory {
       e._updateState();
       e._executeAndEmit();
     });
-    // group by target
-    var bucketed = bucket(_history[_index], (e, index) => e._target.id);
-    // do object changed events
-    for(var id in bucketed.keys) {
-      var event = new _LocalObjectChangedEvent._(bucketed[id], bucketed[id][0]._target);
-      bucketed[id][0]._target.dispatchObjectChangedEvent(event);
-    }
 
     endCompoundOperation();
 

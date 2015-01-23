@@ -158,7 +158,7 @@ onFileLoaded(rt.Document doc) {
       expect(map.keys.indexOf('compound2'), -1);
     });
     test('Compound events', () {
-      // TODO expect(10);
+      // TODO expect(8);
       // TODO implementing with variable, check if built-in
       int count = 0;
       map.clear();
