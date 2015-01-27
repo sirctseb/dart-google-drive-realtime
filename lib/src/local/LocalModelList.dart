@@ -105,7 +105,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
   set length(int l) {
     _LocalDocument._verifyDocument(this);
     if(l > this.length) {
-      throw 'Cannot set the list length to be greater than the current value.';
+      throw new Exception('Cannot set the list length to be greater than the current value.');
     } else {
       this.removeRange(l, this.length);
     }
