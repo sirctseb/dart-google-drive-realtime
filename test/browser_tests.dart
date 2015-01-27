@@ -1046,19 +1046,20 @@ onFileLoaded(rt.Document doc) {
           jsonValue['revision'] = 0;
           jsonValue['appId'] = 0;
           jsonValue = json.stringify(jsonValue);
-          jsonValue = jsonValue.replaceAll(new RegExp('"(id|ref)":"[^"]+"'), '"\1":ID"');
+          jsonValue = jsonValue.replaceAllMapped(new RegExp('"(id|ref)":"[^"]+"'),
+              (match) => '"${match[1]}":"ID"');
           jsonValue = json.parse(jsonValue);
 
-          result = json.parse(result);
           result['revision'] = 0;
           result['appId'] = 0;
           var stringified = json.stringify(result);
-          stringified = stringified.replaceAll(new RegExp('"(id|ref)":"[^"]+"'), '"\1":ID"');
+          stringified = stringified.replaceAllMapped(new RegExp('"(id|ref)":"[^"]+"'),
+              (match) => '"${match[1]}":"ID"');
           result = json.parse(stringified);
 
           expect(result, jsonValue);
-        });
-      });
+        }));
+      }));
     });
   });
 }
