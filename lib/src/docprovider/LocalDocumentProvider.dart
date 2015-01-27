@@ -39,7 +39,7 @@ class LocalDocumentProvider extends DocumentProvider {
     return completer.future;
   }
 
-  Future<String> exportDocument() {
+  Future<Map> exportDocument() {
     return new Future.value((_document.model as _LocalModel)._export());
   }
 

@@ -32,7 +32,7 @@ abstract class DocumentProvider {
    * The json format is undocumented as of 2013-8-15
    */
   // TODO currently GoogleDocProvider gets from server but Local and Persistent get from local object. is this a problem?
-  Future<String> exportDocument();
+  Future<Map> exportDocument();
 
   /**
    * Get a function that can be passed to loadDocument that will initialize the
