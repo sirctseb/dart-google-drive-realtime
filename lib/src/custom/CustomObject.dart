@@ -55,9 +55,8 @@ class CustomObject {
     return _internalCustomObject._export(ids);
   }
   static String _customObjectName(object) {
-    var id = getId(object);
     for(var name in _registeredTypes.keys) {
-      if(_registeredTypes[name]['ids'].contains(id)) {
+      if(_registeredTypes[name]['ids'].contains(object.id)) {
         return name;
       }
     }
