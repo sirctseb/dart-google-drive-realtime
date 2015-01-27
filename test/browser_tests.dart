@@ -371,8 +371,8 @@ onFileLoaded(rt.Document doc) {
     });
     test('operator [](int index)', () {
       expect(list[0], 's1');
-      expect(() => list[-1], throws);
-      expect(() => list[1], throws);
+      expect(() => list[-1], throwsA(predicate((e) => e.message == 'Index: -1, Size: 1')));
+      expect(() => list[1], throwsA(predicate((e) => e.message == 'Index: 1, Size: 1')));
     });
     test('operator []=(int index, E value)', () {
       list[0] = 'new s1';

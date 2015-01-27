@@ -20,6 +20,10 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   E operator[](int index) {
     _LocalDocument._verifyDocument(this);
+
+    if(index < 0 || index >= length) {
+      throw new Exception('Index: $index, Size: 1');
+    }
     return _list[index];
   }
 
@@ -162,6 +166,16 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   void replaceRange(int index, List<E> values) {
     _LocalDocument._verifyDocument(this);
+
+    // match rt error when values is longer than available space
+    if(index + values.length >= length) {
+      throw new Exception('Index: $length, Size: $length');
+    }
+    // match rt error for negative values
+    if(index < 0) {
+      throw new Exception('Index: $index, Size: $length');
+    }
+
     // add event to stream
     var event = new _LocalValuesSetEvent._(index, values, _list.sublist(index, index + values.length), this);
     _emitEventsAndChanged([event]);
