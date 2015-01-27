@@ -1024,8 +1024,8 @@ onFileLoaded(rt.Document doc) {
                    '"09j9Bti4fjEO","type":"Map","value":{"str":{"ref":"3Ozrz4-afjEO"}}}}}}},"string":{"json":1}}},' +
                    '"self":{"ref":"root"},"text":{"id":"eUO6WzdGfioE","type":"EditableString","value":"xxxaaaaaaaaa"}}}}';
       var dp = new rt.LocalDocumentProvider(data);
-      dp.loadDocument().then((doc) {
-        dp.exportDocument().then((result) {
+      dp.loadDocument().then(expectAsync1((doc) {
+        dp.exportDocument().then(expectAsync1((result) {
           // correct value
           var jsonValue = {"appId":"1066816720974","revision":243,"data":{"id":"root","type":"Map",
             "value":{"book":{"id":"XlvCsSlXfioK","type":"Book","value":{"title":{"json":"title"}}},
