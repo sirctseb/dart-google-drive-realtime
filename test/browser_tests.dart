@@ -438,7 +438,7 @@ onFileLoaded(rt.Document doc) {
       var list2 = doc.model.createList([0,1,2]);
       doc.model.root['list2'] = list2;
       list.moveToList(0, list, 2);
-      expect(list.asARray(), [1,0,2]);
+      expect(list.asArray(), [1,0,2]);
       list.moveToList(0, list2, 2);
       expect(list2.asArray(), [0,1,1,2]);
       doc.model.root.remove('list2');
