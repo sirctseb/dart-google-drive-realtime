@@ -108,8 +108,7 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
 
     var result = {
       'ids': id,
-      // TODO need to get type
-      //'type':
+      'type': CustomObject._customObjectName(this),
       'value': {}
     };
 

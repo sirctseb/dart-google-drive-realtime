@@ -54,6 +54,16 @@ class CustomObject {
   _export(Set ids) {
     return _internalCustomObject._export(ids);
   }
+  static String _customObjectName(object) {
+    var id = getId(object);
+    for(var name in _registeredTypes.keys) {
+      if(_registeredTypes[name]['ids'].contains(id)) {
+        return name;
+      }
+    }
+
+    throw new Exception('$object is not a registered custom object type');
+  }
 }
 
 abstract class _InternalCustomObject extends CustomObject {}

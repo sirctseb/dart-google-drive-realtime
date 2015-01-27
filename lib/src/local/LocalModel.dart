@@ -95,6 +95,7 @@ class _LocalModel implements Model {
         //TODO from js
         //rdm.CustomObject.customTypes_[type].onLoadedFn.call(customObject);
       //}
+      CustomObject._registeredTypes[type]['ids'].add(getId(customObject));
       return customObject;
     } else if(object.containsKey('type')) {
       // if there is a type but it is not registered, throw an error
@@ -154,6 +155,8 @@ class _LocalModel implements Model {
     customObject._internalCustomObject = backingObject;
     // store map from id to model
     _LocalCustomObject._customObjectModels[getId(customObject)] = this;
+    // store id in type map
+    CustomObject._registeredTypes[name]['ids'].add(getId(customObject));
     // return custom object subclass
     return customObject;
   }
