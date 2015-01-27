@@ -65,6 +65,13 @@ class _UndoHistory {
   }
 
   void endCompoundOperation() {
+    // check that we are in a compound operation
+    if(_COScopes.length == 0 || _COScopes.last != Scope.CO) {
+      throw new Exception('Not in a compound operation.');
+    }
+    _endCompoundOperationInternal();
+  }
+  void _endCompoundOperationInternal() {
     var scope = _COScopes.removeLast();
     if(_COScopes.length == 0) {
 
@@ -120,7 +127,7 @@ class _UndoHistory {
     // call initialization callback with _initScope set to true
     beginCompoundOperation(Scope.INIT);
     initialize(m);
-    endCompoundOperation();
+    _endCompoundOperationInternal();
   }
 
   // TODO move this (and typedef above) to utils
@@ -152,8 +159,7 @@ class _UndoHistory {
       e._executeAndEmit();
     });
 
-    // unset undo scope flag
-    endCompoundOperation();
+    _endCompoundOperationInternal();
 
     // if undo/redo state changed, send event
     if(_canUndo != canUndo || _canRedo != canRedo) {
@@ -174,7 +180,7 @@ class _UndoHistory {
       e._executeAndEmit();
     });
 
-    endCompoundOperation();
+    _endCompoundOperationInternal();
 
     // increment index
     _index++;
