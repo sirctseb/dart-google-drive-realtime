@@ -1003,7 +1003,64 @@ onFileLoaded(rt.Document doc) {
 
   // TODO Close
 
-  // TODO Local
+  // Local
+  group('Local', () {
+    test('Local document from data', () {
+      var data = '{"appId":"1066816720974","revision":243,"data":{"id":"root","type":"Map","value":{"book":' +
+                   '{"id":"XlvCsSlXfioK","type":"Book","value":{"title":{"json":"title"}}},"filled-list":{"id"' +
+                   ':"KbY54ouZfjDj","type":"List","value":[{"id":"5ojDCWtyfjDj","type":"EditableString","value"' +
+                   ':""},{"json":4}]},"filled-map":{"id":"u162QBQRfjDg","type":"Map","value":{"key1":{"id":' +
+                   '"h8YUGMm-fjDg","type":"EditableString","value":""},"key2":{"json":4}}},"filled-string":{"id"' +
+                   ':"sHwruTA4fjDo","type":"EditableString","value":"content"},"key":{"json":"val"},"list":{"id":' +
+                   '"lDoU1aUnfioJ","type":"List","value":[{"json":3},{"json":4},{"json":7},{"json":8},{"json":10},' +
+                   '{"json":11},{"json":12}]},"map":{"id":"yxOq4amKfioJ","type":"Map","value":{"duplicate1":{"id":' +
+                   '"Ffz9b8VifjEC","type":"EditableString","value":"dupwhatever"},"duplicate2":{"ref":"Ffz9b8VifjEC"}' +
+                   ',"dupmap1":{"id":"jYbvf3qufjEI","type":"Map","value":{"str":{"id":"mdsF6PUlfjEH","type":"EditableString"' +
+                   ',"value":"duphello"}}},"dupmap2":{"id":"3zTkGJRnfjEI","type":"Map","value":{"str":{"ref":"mdsF6PUlfjEH"' +
+                   '}}},"loop":{"id":"3oQwUdslfjET","type":"Map","value":{"map2":{"id":"PBG2cdrhfjET","type":"Map",' +
+                   '"value":{"map1":{"ref":"3oQwUdslfjET"}}},"map2b":{"ref":"PBG2cdrhfjET"},"text":{"json":"text value"}}}' +
+                   ',"mapwithsub":{"id":"Q7VHKEdkfjEO","type":"Map","value":{"str":{"id":"3Ozrz4-afjEO","type":"EditableString"' +
+                   ',"value":"dupsomething"},"submap":{"id":"sNZxu4TdfjEO","type":"Map","value":{"subsubmap":{"id":' +
+                   '"09j9Bti4fjEO","type":"Map","value":{"str":{"ref":"3Ozrz4-afjEO"}}}}}}},"string":{"json":1}}},' +
+                   '"self":{"ref":"root"},"text":{"id":"eUO6WzdGfioE","type":"EditableString","value":"xxxaaaaaaaaa"}}}}';
+      var dp = new rt.LocalDocumentProvider(data);
+      dp.loadDocument().then((doc) {
+        dp.exportDocument().then((result) {
+          // correct value
+          var jsonValue = {"appId":"1066816720974","revision":243,"data":{"id":"root","type":"Map",
+            "value":{"book":{"id":"XlvCsSlXfioK","type":"Book","value":{"title":{"json":"title"}}},
+            "filled-list":{"id":"KbY54ouZfjDj","type":"List","value":[{"id":"5ojDCWtyfjDj","type":"EditableString",
+            "value":""},{"json":4}]},"filled-map":{"id":"u162QBQRfjDg","type":"Map","value":{"key1":{"id":"h8YUGMm-fjDg",
+            "type":"EditableString","value":""},"key2":{"json":4}}},"filled-string":{"id":"sHwruTA4fjDo",
+            "type":"EditableString","value":"content"},"key":{"json":"val"},"list":{"id":"lDoU1aUnfioJ",
+            "type":"List","value":[{"json":3},{"json":4},{"json":7},{"json":8},{"json":10},{"json":11},{"json":12}]},
+            "map":{"id":"yxOq4amKfioJ","type":"Map","value":{"duplicate1":{"id":"Ffz9b8VifjEC","type":"EditableString",
+            "value":"dupwhatever"},"duplicate2":{"ref":"Ffz9b8VifjEC"},"dupmap1":{"id":"jYbvf3qufjEI","type":"Map",
+            "value":{"str":{"id":"mdsF6PUlfjEH","type":"EditableString","value":"duphello"}}},"dupmap2":{"id":"3zTkGJRnfjEI",
+            "type":"Map","value":{"str":{"ref":"mdsF6PUlfjEH"}}},"loop":{"id":"3oQwUdslfjET","type":"Map",
+            "value":{"map2":{"id":"PBG2cdrhfjET","type":"Map","value":{"map1":{"ref":"3oQwUdslfjET"}}},
+            "map2b":{"ref":"PBG2cdrhfjET"},"text":{"json":"text value"}}},"mapwithsub":{"id":"Q7VHKEdkfjEO","type":"Map",
+            "value":{"str":{"id":"3Ozrz4-afjEO","type":"EditableString","value":"dupsomething"},"submap":{"id":"sNZxu4TdfjEO",
+            "type":"Map","value":{"subsubmap":{"id":"09j9Bti4fjEO","type":"Map","value":{"str":{"ref":"3Ozrz4-afjEO"}}}}}}},
+            "string":{"json":1}}},"self":{"ref":"root"},"text":{"id":"eUO6WzdGfioE","type":"EditableString","value":"xxxaaaaaaaaa"}}}};
+          jsonValue['revision'] = 0;
+          jsonValue['appId'] = 0;
+          jsonValue = json.stringify(jsonValue);
+          jsonValue = jsonValue.replaceAll(new RegExp('"(id|ref)":"[^"]+"'), '"\1":ID"');
+          jsonValue = json.parse(jsonValue);
+
+          result = json.parse(result);
+          result['revision'] = 0;
+          result['appId'] = 0;
+          var stringified = json.stringify(result);
+          stringified = stringified.replaceAll(new RegExp('"(id|ref)":"[^"]+"'), '"\1":ID"');
+          result = json.parse(stringified);
+
+          expect(result, jsonValue);
+        });
+      });
+    });
+  });
 }
 
 class Book extends rt.CustomObject {

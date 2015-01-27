@@ -30,6 +30,82 @@ class _LocalModel implements Model {
     }
   }
 
+  /// Initialize the model from existing data
+  _initializeFromJson(String data) {
+    _undoHistory.initializeModel(_createInitializationFunction(data), this);
+  }
+
+  /// Create an initialization function to intialize a model from existing data
+  static _createInitializationFunction(String data) {
+    return (_LocalModel model) {
+      var map = json.parse(data);
+      Map root = map['data']['value'];
+      var refs = {'root': model.root};
+      for(var key in root.keys) {
+        model.root[key] = model._reviveExportedObject(root[key], refs);
+      }
+    };
+  }
+
+  /// Recursivel revive an object from exported data
+  dynamic _reviveExportedObject(Map object, refs) {
+    if(object['type'] == 'List') {
+      // create collaborative list
+      var list = createList();
+      // add to refs
+      refs[object['id']] = list;
+      // revive data in list
+      for(var element in object['value']) {
+        list.push(_reviveExportedObject(element, refs));
+      }
+      return list;
+    } else if(object['type'] == 'Map') {
+      // create collaborative map
+      var map = createMap();
+      // add to refs
+      refs[object['id']] = map;
+      // revive data in map
+      for(var key in object['value'].keys) {
+        map[key] = _reviveExportedObject(object['value'][key], refs);
+      }
+    } else if(object['type'] == 'EditableString') {
+      // create string
+      var string = this.createString(object['value']);
+      // add to refs
+      refs[object['id']] = string;
+      return string;
+    } else if(object.containsKey('json')) {
+      // return native object
+      return object['json'];
+    } else if(_LocalCustomObject._registeredTypes.containsKey(object['type'])) {
+      // revive custom object
+      var type = object['type'];
+      // create custom object
+      var customObject = this.create(type);
+      // add to refs
+      refs[object['id']] = customObject;
+      // set properties
+      for(var key in object['value'].keys) {
+        customObject.set(key, _reviveExportedObject(object['value'][key], refs));
+      }
+      // TODO
+      // check for onLoadedFn function
+      //if(_LocalCustomObject._registeredTypes[type]['onLoadedFn'] != null) {
+        // call onLoadedFn
+        //TODO from js
+        //rdm.CustomObject.customTypes_[type].onLoadedFn.call(customObject);
+      //}
+      return customObject;
+    } else if(object.containsKey('type')) {
+      // if there is a type but it is not registered, throw an error
+      throw new Exception('Cannot create collaborative object with unregistered type: ${object['type']}');
+    } else if(object.containsKey('ref')) {
+      return refs[object['ref']];
+    } else {
+      throw new Exception('Object ${json.stringify(object)} is not a valid exported object');
+    }
+  }
+
   StreamController<_LocalUndoRedoStateChangedEvent> _onUndoRedoStateChanged =
     new StreamController<_LocalUndoRedoStateChangedEvent>.broadcast(sync: true);
 

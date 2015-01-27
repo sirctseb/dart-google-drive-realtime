@@ -97,23 +97,23 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
     return '{${valList.join(',')}}';
   }
 
-  Map _export(Map ids) {
+  Map _export(Set ids) {
     _LocalDocument._verifyDocument(this);
 
-    if(ids[getId(this)]) {
-      return {'ref': getId(this)};
+    if(ids.contains(id)) {
+      return {'ref': id};
     }
 
-    ids[getId(this)] = true;
+    ids.add(id);
 
     var result = {
-      'ids': getId(this),
+      'ids': id,
       // TODO need to get type
       //'type':
       'value': {}
     };
 
-    for(var key in _fields) {
+    for(var key in _fields.keys) {
       if(_fields[key] is _LocalModelObject || isCustomObject(_fields[key])) {
         result['value'][key] = _fields[key]._export(ids);
       } else {

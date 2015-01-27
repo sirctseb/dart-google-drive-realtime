@@ -49,6 +49,11 @@ class CustomObject {
     }
     return new Model._fromProxy(realtimeCustom['getModel'].apply([(this._internalCustomObject as _RealtimeCustomObject).$unsafe]));
   }
+
+  // support export for local custom object
+  _export(Set ids) {
+    return _internalCustomObject._export(ids);
+  }
 }
 
 abstract class _InternalCustomObject extends CustomObject {}

@@ -18,6 +18,7 @@ part of realtime_data_model;
 class LocalDocumentProvider extends DocumentProvider {
   Document get document => _document;
   Document _document;
+  String _initData;
 
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
@@ -25,7 +26,12 @@ class LocalDocumentProvider extends DocumentProvider {
     var model = new _LocalModel();
     // create a document with the model
     var document = new _LocalDocument(model);
-    model._initialize(initializeModel);
+    // initialize with data if provided
+    if(_initData != null) {
+      model._initializeFromJson(_initData);
+    } else {
+      model._initialize(initializeModel);
+    }
     _document = document;
     var completer = new Completer();
     // complete with document
@@ -39,5 +45,9 @@ class LocalDocumentProvider extends DocumentProvider {
 
   static bool _isCustomObject(dynamic object) {
     return object is CustomObject && object._isLocalCustomObject;
+  }
+
+  LocalDocumentProvider([String data]) {
+    _initData = data;
   }
 }
