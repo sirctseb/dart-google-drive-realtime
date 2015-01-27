@@ -414,11 +414,11 @@ onFileLoaded(rt.Document doc) {
         expect(e.values, [0]);
         expect(e.index, [0,1,2][iter]);
         iter++;
-      }));
+      }, count: 3));
       var ssRemove = list.onValuesRemoved.listen(expectAsync1((rt.ValuesRemovedEvent e) {
         expect(e.values, [0]);
         expect(e.index, 0);
-      }));
+      }, count: 3));
       // TODO rt implementation hangs on index = -1
       // list.move(-1, 0);
       // throws(() => list.move(-1, 0));
