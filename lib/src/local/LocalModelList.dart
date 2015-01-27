@@ -121,6 +121,24 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
 
   Stream<ValuesSetEvent> get onValuesSet => _onValuesSet.stream;
 
+  void move(int index, int destinationIndex) {
+    _LocalDocument._verifyDocument(this);
+    // TODO error check index once rt does
+    var value = this[index];
+    var addEvent = new _LocalValuesAddedEvent._(destinationIndex, [value], this);
+    var removeEvent = new _LocalValuesRemovedEvent._(index, [value], this);
+    _emitEventsAndChanged([addEvent, removeEvent]);
+  }
+
+  void moveToList(int index, dynamic destination, int destinationIndex) {
+    _LocalDocument._verifyDocument(this);
+    var value = this[index];
+    var addEvent = new _LocalValuesAddedEvent._(destinationIndex, [value], destination);
+    var removeEvent = new _LocalValuesRemovedEvent._(index, [value], this);
+    destination._emitEventsAndChanged([addEvent]);
+    this._emitEventsAndChanged([removeEvent]);
+  }
+
   int push(E value) {
     _LocalDocument._verifyDocument(this);
     // add event to stream
