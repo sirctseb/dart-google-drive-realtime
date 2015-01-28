@@ -21,7 +21,6 @@ initializeModel(rt.Model model) {
 }
 
 onFileLoaded(rt.Document doc) {
-
   group('isInitialized in onFileLoaded', () {
     test('isInitialized', () {
       expect(doc.model.isInitialized, true);
@@ -37,6 +36,7 @@ onFileLoaded(rt.Document doc) {
       doc.model.root['text'].text = 'redid';
       expect(doc.model.canUndo, true);
       expect(doc.model.canRedo, false);
+      expect(doc.model.root['text'].text, 'redid');
     });
     test('undo state after undo', () {
       doc.model.undo();
@@ -71,6 +71,7 @@ onFileLoaded(rt.Document doc) {
         expect(e.type, rt.EventType.VALUES_ADDED);
       });
       doc.model.root['list'].push('value');
+      doc.model.undo();
       ssVR.cancel();
       ssVA.cancel();
     });
@@ -125,11 +126,11 @@ onFileLoaded(rt.Document doc) {
       orderString = '';
       doc.model.undo();
       expect(list[0], 1);
-      expect(orderString, 'listVS1mapVC');
+      expect(orderString, 'listVS1');
       orderString = '';
       doc.model.redo();
       expect(list[0], 2);
-      expect(orderString, 'mapVClistVS2');
+      expect(orderString, 'listVS2');
       ssVC.cancel();
       ssVS.cancel();
     });
@@ -139,7 +140,7 @@ onFileLoaded(rt.Document doc) {
     rt.CollaborativeMap map = doc.model.root['map'];
     rt.CollaborativeList list = doc.model.root['list'];
     rt.CollaborativeString string = doc.model.root['text'];
-    test('map additions', () {
+    test('Compoun map additions', () {
       map['compound1'] = 'val1';
       map['compound2'] = 'val2';
       doc.model.undo();
@@ -156,8 +157,8 @@ onFileLoaded(rt.Document doc) {
       expect(map.keys.indexOf('compound1'), -1);
       expect(map.keys.indexOf('compound2'), -1);
     });
-    test('events', () {
-      // TODO expect(10);
+    test('Compound events', () {
+      // TODO expect(8);
       // TODO implementing with variable, check if built-in
       int count = 0;
       map.clear();
@@ -184,9 +185,9 @@ onFileLoaded(rt.Document doc) {
       rootOC.cancel();
       mapVC.cancel();
       mapOC.cancel();
-      expect(count, 10);
+      expect(count, 8);
     });
-    test('list, string, map', () {
+    test('Commpound list, string, map', () {
       map.clear();
       map['key1'] = 'val1';
       list.clear();
@@ -242,12 +243,6 @@ onFileLoaded(rt.Document doc) {
       listOC.cancel();
       mapOC.cancel();
     });
-    test('undo not allowed in compound operation', () {
-      // TODO write non-failing test for this
-      doc.model.beginCompoundOperation();
-      expect(doc.model.canUndo, false);
-      doc.model.endCompoundOperation();
-    });
     test('nested compound operations', () {
       map.clear();
       map['key'] = 0;
@@ -268,6 +263,9 @@ onFileLoaded(rt.Document doc) {
       expect(map['key'], 0);
       expect(list[0], 0);
       expect(string.text, '0');
+    });
+    test('unmatched endCompoundOperation', () {
+      expect(() => doc.model.endCompoundOperation(), throwsA(predicate((e) => e.message == 'Not in a compound operation.')));
     });
   });
 
@@ -360,21 +358,31 @@ onFileLoaded(rt.Document doc) {
       expect(list.length, 2);
       list.length = 1;
       expect(list.length, 1);
-      // TODO match specific message?
-      expect(() {list.length = 3;}, throws);
+      expect(() {list.length = 3;}, throwsA(predicate((e) => e.message == 'Cannot set the list length to be greater than the current value.')));
+    });
+    test('asArray()', () {
+      var array = [1,2,3,4];
+      var l = doc.model.createList(array);
+      expect(array, l.asArray());
+    });
+    test('clear()', () {
+      list.clear();
+      expect(list.length, 0);
     });
     test('operator [](int index)', () {
       expect(list[0], 's1');
-      expect(() => list[-1], throws);
-      expect(() => list[1], throws);
+      expect(() => list[-1], throwsA(predicate((e) => e.message == 'Index: -1, Size: 1')));
+      expect(() => list[1], throwsA(predicate((e) => e.message == 'Index: 1, Size: 1')));
     });
     test('operator []=(int index, E value)', () {
       list[0] = 'new s1';
       expect(list[0], 'new s1');
     });
-    test('clear()', () {
+    test('indexOf(value, opt_comparatorFn)', () {
       list.clear();
-      expect(list.length, 0);
+      list.pushAll([1,2,3]);
+      expect(list.indexOf(2), 1);
+      expect(list.indexOf(4), -1);
     });
     test('insert(int index, E value)', () {
       list.insert(0, 's0');
@@ -382,15 +390,108 @@ onFileLoaded(rt.Document doc) {
       expect(list[0], 's0');
       expect(list[1], 's1');
     });
+    test('insertAll(int index, values)', () {
+      list.clear();
+      list.pushAll([0,3]);
+      list.insertAll(1, [1,2]);
+      expect(list.asArray(), [0,1,2,3]);
+    });
+    test('lastIndexOf(value, opt_comparatorFn)', () {
+      list.clear();
+      list.pushAll([1,2,3]);
+      expect(list.lastIndexOf(2), 1);
+      expect(list.lastIndexOf(0), -1);
+    });
+    test('move(index, destinationIndex)', () {
+      // TODO expect(15);
+      list.clear();
+      list.pushAll([0,1,2]);
+      var ssSet = list.onValuesSet.listen(expectAsync1((rt.ValuesSetEvent e) {
+        fail('Set event should not occur');
+      }, count: 0));
+      var iter = 0;
+      var ssAdd = list.onValuesAdded.listen(expectAsync1((rt.ValuesAddedEvent e) {
+        expect(e.values, [0]);
+        expect(e.index, [0,1,2][iter]);
+        iter++;
+      }, count: 3));
+      var ssRemove = list.onValuesRemoved.listen(expectAsync1((rt.ValuesRemovedEvent e) {
+        expect(e.values, [0]);
+        expect(e.index, 0);
+      }, count: 3));
+      // TODO rt implementation hangs on index = -1
+      // list.move(-1, 0);
+      // throws(() => list.move(-1, 0));
+      list.move(0,0);
+      expect(list.asArray(), [0,1,2]);
+      list.move(0,1);
+      expect(list.asArray(), [0,1,2]);
+      list.move(0,2);
+      expect(list.asArray(), [1,0,2]);
+      ssSet.cancel();
+      ssAdd.cancel();
+      ssRemove.cancel();
+    });
+    test('moveToList(index, destination, destinationIndex)', () {
+      list.clear();
+      list.pushAll([0,1,2]);
+      var list2 = doc.model.createList([0,1,2]);
+      doc.model.root['list2'] = list2;
+      list.moveToList(0, list, 2);
+      expect(list.asArray(), [1,0,2]);
+      list.moveToList(0, list2, 2);
+      expect(list2.asArray(), [0,1,1,2]);
+      doc.model.root.remove('list2');
+    });
     test('push(E value)', () {
       expect(list.push('s2'), 2);
       expect(list.length, 2);
       expect(list[0], 's1');
       expect(list[1], 's2');
     });
+    test('pushAll(values)', () {
+      list.clear();
+      list.pushAll([0,1,2]);
+      expect(list.asArray(), [0,1,2]);
+    });
     test('remove(int index)', () {
       list.remove(0);
       expect(list.length, 0);
+    });
+    test('removeRange(startIndex, endIndex)', () {
+      list.clear();
+      list.pushAll([0,1,2,3]);
+      list.removeRange(1,3);
+      expect(list.asArray(), [0,3]);
+    });
+    test('removeValue(value)', () {
+      list.clear();
+      list.pushAll([1,2,3]);
+      list.removeValue(2);
+      expect(list.asArray(), [1,3]);
+    });
+    test('replaceRange(index, values)', () {
+      // TODO expect(6);
+      list.clear();
+      list.pushAll([0,1,2,3]);
+      var ssAdd = list.onValuesAdded.listen(expectAsync1((rt.ValuesAddedEvent e) {
+        // TODO is there a simple ok test?
+        expect(true, true);
+      }, count: 0));
+      var ssRemove = list.onValuesRemoved.listen(expectAsync1((rt.ValuesRemovedEvent e) {
+        expect(true, true);
+      }, count: 0));
+      var ssSet = list.onValuesSet.listen(expectAsync1((rt.ValuesSetEvent e) {
+        expect(e.newValues, [4,5]);
+        expect(e.oldValues, [1,2]);
+      }, count: 1));
+      list.replaceRange(1, [4,5]);
+      expect(list.asArray(), [0,4,5,3]);
+      expect(() => list.replaceRange(3, [6,7]), throws);
+      expect(() => list.replaceRange(-1, [1,2]), throws);
+      ssAdd.cancel();
+      ssRemove.cancel();
+      ssSet.cancel();
     });
     test('onValuesAdded', () {
       StreamSubscription ss;
@@ -497,6 +598,15 @@ onFileLoaded(rt.Document doc) {
     test('clear', () {
       map.clear();
       expect(map.length, 0);
+    });
+    test('keys', () {
+      map.clear();
+      map['a'] = 'a';
+      map['b'] = 'b';
+      map['c'] = 'c';
+      map['d'] = 'd';
+      map['e'] = 'e';
+      expect(map.keys, ['e', 'a', 'c', 'd', 'b']);
     });
     test('addAll', () {
       map.addAll({
@@ -776,7 +886,89 @@ onFileLoaded(rt.Document doc) {
       ssObjChanged2.cancel();
       ssRootChanged.cancel();
     });
+    test('String in map and sub map', () {
+      var str = doc.model.createString('dup');
+      var subsubmap = doc.model.createMap();
+      var submap = doc.model.createMap();
+      var topmap = doc.model.createMap();
+
+      doc.model.root['map']['mapwithsub'] = topmap;
+      doc.model.root['map']['mapwithsub']['submap'] = submap;
+      doc.model.root['map']['mapwithsub']['submap']['subsubmap'] = subsubmap;
+
+      doc.model.root['map']['mapwithsub']['str'] = str;
+      doc.model.root['map']['mapwithsub']['submap']['subsubmap']['str'] = str;
+
+      var ssMap = doc.model.root['map'].onObjectChanged.listen((e) {
+        expect(e.events[0].type, rt.EventType.TEXT_INSERTED);
+      });
+
+      var ssSubMap = doc.model.root['map'].onObjectChanged.listen((e) {
+        expect(e.events[0].type, rt.EventType.TEXT_INSERTED);
+      });
+
+      var ssSubSubMap = doc.model.root['map'].onObjectChanged.listen((e) {
+        expect(e.events[0].type, rt.EventType.TEXT_INSERTED);
+      });
+
+      str.append('something');
+
+      ssMap.cancel();
+      ssSubMap.cancel();
+      ssSubSubMap.cancel();
+    });
+    test('loop length 2', () {
+      var map1 = doc.model.createMap();
+      var map2 = doc.model.createMap();
+      doc.model.root['map']['loop'] = map1;
+      map1['map2'] = map2;
+      map2['map1'] = map1;
+      map1['map2b'] = map2;
+
+      var ssMap1 = map1.onObjectChanged.listen((e) {
+        expect(e.events[0].type, rt.EventType.VALUE_CHANGED);
+      });
+      var ssMap2 = map2.onObjectChanged.listen((e) {
+        expect(e.events[0].type, rt.EventType.VALUE_CHANGED);
+      });
+      var ssMap = doc.model.root['map'].onObjectChanged.listen((e) {
+        expect(e.events[0].type, rt.EventType.VALUE_CHANGED);
+      });
+
+      map1['text'] = 'text value';
+
+      ssMap1.cancel();
+      ssMap2.cancel();
+      ssMap.cancel();
+    });
   });
+
+  group('Weird', () {
+    test('Map in self', () {
+      doc.model.root['self'] = doc.model.root;
+      expect(doc.model.root.id, doc.model.root['self'].id);
+      var ssRoot = doc.model.root.onObjectChanged.listen((e) {
+        expect(e.events[0].type, rt.EventType.VALUE_CHANGED);
+      });
+
+      doc.model.root['self']['key'] = 'val';
+
+      ssRoot.cancel();
+    });
+  });
+
+  group('Identical objects', () {
+    test('In Map', () {
+      var obj = {'a': 'a'};
+      doc.model.root['map']['dup1'] = obj;
+      doc.model.root['map']['dup2'] = obj;
+      expect(doc.model.root['map']['dup1'], isNot(doc.model.root['map']['dup2']));
+      obj['a'] = 'b';
+      expect(doc.model.root['map']['dup1']['a'], 'a');
+    });
+  });
+
+  // TODO export
 
   group('Custom', () {
     test('Book is custom object', () {
@@ -806,6 +998,68 @@ onFileLoaded(rt.Document doc) {
       doc.model.root['list'].clear();
       doc.model.root['map'].clear();
       doc.model.root['book'] = doc.model.create('Book');
+    });
+  });
+
+  // TODO Close
+
+  // Local
+  group('Local', () {
+    test('Local document from data', () {
+      var data = '{"appId":"1066816720974","revision":243,"data":{"id":"root","type":"Map","value":{"book":' +
+                   '{"id":"XlvCsSlXfioK","type":"Book","value":{"title":{"json":"title"}}},"filled-list":{"id"' +
+                   ':"KbY54ouZfjDj","type":"List","value":[{"id":"5ojDCWtyfjDj","type":"EditableString","value"' +
+                   ':""},{"json":4}]},"filled-map":{"id":"u162QBQRfjDg","type":"Map","value":{"key1":{"id":' +
+                   '"h8YUGMm-fjDg","type":"EditableString","value":""},"key2":{"json":4}}},"filled-string":{"id"' +
+                   ':"sHwruTA4fjDo","type":"EditableString","value":"content"},"key":{"json":"val"},"list":{"id":' +
+                   '"lDoU1aUnfioJ","type":"List","value":[{"json":3},{"json":4},{"json":7},{"json":8},{"json":10},' +
+                   '{"json":11},{"json":12}]},"map":{"id":"yxOq4amKfioJ","type":"Map","value":{"duplicate1":{"id":' +
+                   '"Ffz9b8VifjEC","type":"EditableString","value":"dupwhatever"},"duplicate2":{"ref":"Ffz9b8VifjEC"}' +
+                   ',"dupmap1":{"id":"jYbvf3qufjEI","type":"Map","value":{"str":{"id":"mdsF6PUlfjEH","type":"EditableString"' +
+                   ',"value":"duphello"}}},"dupmap2":{"id":"3zTkGJRnfjEI","type":"Map","value":{"str":{"ref":"mdsF6PUlfjEH"' +
+                   '}}},"loop":{"id":"3oQwUdslfjET","type":"Map","value":{"map2":{"id":"PBG2cdrhfjET","type":"Map",' +
+                   '"value":{"map1":{"ref":"3oQwUdslfjET"}}},"map2b":{"ref":"PBG2cdrhfjET"},"text":{"json":"text value"}}}' +
+                   ',"mapwithsub":{"id":"Q7VHKEdkfjEO","type":"Map","value":{"str":{"id":"3Ozrz4-afjEO","type":"EditableString"' +
+                   ',"value":"dupsomething"},"submap":{"id":"sNZxu4TdfjEO","type":"Map","value":{"subsubmap":{"id":' +
+                   '"09j9Bti4fjEO","type":"Map","value":{"str":{"ref":"3Ozrz4-afjEO"}}}}}}},"string":{"json":1}}},' +
+                   '"self":{"ref":"root"},"text":{"id":"eUO6WzdGfioE","type":"EditableString","value":"xxxaaaaaaaaa"}}}}';
+      var dp = new rt.LocalDocumentProvider(data);
+      dp.loadDocument().then(expectAsync1((doc) {
+        dp.exportDocument().then(expectAsync1((result) {
+          // correct value
+          var jsonValue = {"appId":"1066816720974","revision":243,"data":{"id":"root","type":"Map",
+            "value":{"book":{"id":"XlvCsSlXfioK","type":"Book","value":{"title":{"json":"title"}}},
+            "filled-list":{"id":"KbY54ouZfjDj","type":"List","value":[{"id":"5ojDCWtyfjDj","type":"EditableString",
+            "value":""},{"json":4}]},"filled-map":{"id":"u162QBQRfjDg","type":"Map","value":{"key1":{"id":"h8YUGMm-fjDg",
+            "type":"EditableString","value":""},"key2":{"json":4}}},"filled-string":{"id":"sHwruTA4fjDo",
+            "type":"EditableString","value":"content"},"key":{"json":"val"},"list":{"id":"lDoU1aUnfioJ",
+            "type":"List","value":[{"json":3},{"json":4},{"json":7},{"json":8},{"json":10},{"json":11},{"json":12}]},
+            "map":{"id":"yxOq4amKfioJ","type":"Map","value":{"duplicate1":{"id":"Ffz9b8VifjEC","type":"EditableString",
+            "value":"dupwhatever"},"duplicate2":{"ref":"Ffz9b8VifjEC"},"dupmap1":{"id":"jYbvf3qufjEI","type":"Map",
+            "value":{"str":{"id":"mdsF6PUlfjEH","type":"EditableString","value":"duphello"}}},"dupmap2":{"id":"3zTkGJRnfjEI",
+            "type":"Map","value":{"str":{"ref":"mdsF6PUlfjEH"}}},"loop":{"id":"3oQwUdslfjET","type":"Map",
+            "value":{"map2":{"id":"PBG2cdrhfjET","type":"Map","value":{"map1":{"ref":"3oQwUdslfjET"}}},
+            "map2b":{"ref":"PBG2cdrhfjET"},"text":{"json":"text value"}}},"mapwithsub":{"id":"Q7VHKEdkfjEO","type":"Map",
+            "value":{"str":{"id":"3Ozrz4-afjEO","type":"EditableString","value":"dupsomething"},"submap":{"id":"sNZxu4TdfjEO",
+            "type":"Map","value":{"subsubmap":{"id":"09j9Bti4fjEO","type":"Map","value":{"str":{"ref":"3Ozrz4-afjEO"}}}}}}},
+            "string":{"json":1}}},"self":{"ref":"root"},"text":{"id":"eUO6WzdGfioE","type":"EditableString","value":"xxxaaaaaaaaa"}}}};
+          jsonValue['revision'] = 0;
+          jsonValue['appId'] = 0;
+          jsonValue = json.stringify(jsonValue);
+          jsonValue = jsonValue.replaceAllMapped(new RegExp('"(id|ref)":"[^"]+"'),
+              (match) => '"${match[1]}":"ID"');
+          jsonValue = json.parse(jsonValue);
+
+          result['revision'] = 0;
+          result['appId'] = 0;
+          var stringified = json.stringify(result);
+          stringified = stringified.replaceAllMapped(new RegExp('"(id|ref)":"[^"]+"'),
+              (match) => '"${match[1]}":"ID"');
+          result = json.parse(stringified);
+
+          expect(result, jsonValue);
+        }));
+      }));
     });
   });
 }

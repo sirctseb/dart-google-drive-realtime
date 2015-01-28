@@ -14,16 +14,20 @@
 
 part of realtime_data_model;
 
-class _LocalValuesRemovedEvent extends _LocalUndoableEvent implements ValuesRemovedEvent {
-  bool get bubbles => null; // TODO implement this getter
+class LocalCollaborator implements Collaborator {
+  final String color;
+  final String displayName;
+  final bool isAnonymous;
+  final bool isMe;
+  final String photoUrl;
+  final String sessionId;
+  final String userId;
 
-  final int index;
+  final js.JsObject $unsafe = null;
+  dynamic toJs() => null;
 
-  final String type = EventType.VALUES_REMOVED.value;
 
-  final List values;
-
-  _LocalValuesRemovedEvent._(this.index, this.values, _target) : super._(_target);
-
-  _LocalValuesAddedEvent get _inverse => new _LocalValuesAddedEvent._(index, values, _target);
+  LocalCollaborator(String this.color, String this.displayName,
+      bool this.isAnonymous, bool this.isMe, String this.photoUrl,
+      String this.sessionId, String this.userId);
 }

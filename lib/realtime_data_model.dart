@@ -63,8 +63,13 @@ part 'src/realtime/ValuesSetEvent.dart';
 part 'src/realtime/error_type.dart';
 
 // local files
+part 'src/local/LocalCollaborator.dart';
+part 'src/local/LocalCollaboratorJoinedEvent.dart';
+part 'src/local/LocalCollaboratorLeftEvent.dart';
 part 'src/local/LocalDocument.dart';
+part 'src/local/LocalDocumentClosedError.dart';
 part 'src/local/LocalDocumentSaveStateChangedEvent.dart';
+part 'src/local/LocalError.dart';
 part 'src/local/LocalEvent.dart';
 part 'src/local/LocalEventTarget.dart';
 part 'src/local/LocalIndexReference.dart';

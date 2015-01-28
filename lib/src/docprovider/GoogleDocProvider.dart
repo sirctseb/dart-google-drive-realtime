@@ -220,7 +220,7 @@ class GoogleDocProvider extends DocumentProvider {
     return new Future.error(new Exception('Reached unreachable code'));
   }
 
-  Future<String> exportDocument() {
+  Future<Map> exportDocument() {
     _logger.fine('Exporting document');
 
     // use drive.realtime.get to get document export
@@ -235,7 +235,7 @@ class GoogleDocProvider extends DocumentProvider {
       .then((HttpRequest req) {
         _logger.finest('Got exported document text: ${req.responseText}');
         // TODO error handling
-        return req.responseText;
+        return json.parse(req.responseText);
       });
   }
 

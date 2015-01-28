@@ -25,5 +25,5 @@ class _LocalTextDeletedEvent extends _LocalUndoableEvent implements TextDeletedE
 
   _LocalTextDeletedEvent._(this.index, this.text, _target) : super._(_target);
 
-  _LocalTextInsertedEvent get inverse => new _LocalTextInsertedEvent._(index, text, _target);
+  _LocalTextInsertedEvent get _inverse => new _LocalTextInsertedEvent._(index, text, _target);
 }

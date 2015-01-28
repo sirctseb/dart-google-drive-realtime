@@ -32,7 +32,7 @@ class _LocalValueChangedEvent extends _LocalUndoableEvent implements ValueChange
 
   _LocalValueChangedEvent._(this.newValue, this._oldValue, this.property, _target) : super._(_target);
 
-  _LocalValueChangedEvent get inverse => new _LocalValueChangedEvent._(oldValue, newValue, property, _target);
+  _LocalValueChangedEvent get _inverse => new _LocalValueChangedEvent._(oldValue, newValue, property, _target);
 
   @override
   void _updateState() {
