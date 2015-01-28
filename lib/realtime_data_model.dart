@@ -22,9 +22,8 @@ import 'dart:js' as js;
 
 import 'package:json/json.dart' as json;
 import 'package:logging/logging.dart';
-import 'package:google_oauth2_client/google_oauth2_browser.dart';
-import 'package:google_drive_v2_api/drive_v2_api_browser.dart' as dcbrowser;
-import 'package:google_drive_v2_api/drive_v2_api_client.dart' as dc;
+import 'package:googleapis_auth/auth_browser.dart' as auth;
+import 'package:googleapis/drive/v2.dart' as drive;
 
 import 'src/utils.dart';
 

@@ -1087,7 +1087,7 @@ main() {
   useHtmlConfiguration();
 
   // set clientId
-  rt.GoogleDocProvider.clientId = 'INSERT CLIENT ID HERE';
+  rt.GoogleDocProvider.setClientId('INSERT CLIENT ID HERE');
 
 //  var docProvider = new rt.GoogleDocProvider('0B0OUnldiyG0hSEU0U3VnalQ1a1U');
 ////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
