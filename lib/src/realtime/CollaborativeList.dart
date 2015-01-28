@@ -28,15 +28,24 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
 
   /*@override*/ int get length => $unsafe['length'];
   set length(int l) {
-    $unsafe['length'] = l;
+    // TODO workaround for passing exceptions through from js side
+    if(l > this.length) {
+          throw new Exception('Cannot set the list length to be greater than the current value.');
+    } else {
+      $unsafe['length'] = l;
+    }
   }
 
   /*@override*/ E operator [](int index) {
-    if (index < 0 || index >= this.length) throw new RangeError.value(index);
+    if(index < 0 || index >= length) {
+      throw new Exception('Index: $index, Size: 1');
+    }
     return _fromJs($unsafe.callMethod('get', [index]));
   }
   /*@override*/ void operator []=(int index, E value) {
-    if (index < 0 || index >= this.length) throw new RangeError.value(index);
+    if (index < 0 || index >= this.length) {
+      throw new Exception('Index: $index, Size: 1');
+    }
     $unsafe.callMethod('set', [index, _toJs(value)]);
   }
 
