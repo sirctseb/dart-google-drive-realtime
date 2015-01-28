@@ -806,6 +806,18 @@ onFileLoaded(rt.Document doc) {
     });
   });
 
+  group('Events', () {
+    // TODO Object Change Bubbling
+    test('Execution order', () {
+      doc.model.root['text'].text = 'abc';
+      var td = doc.model.root['text'].onTextDeleted.listen(expectAsync1((_) {
+        expect(doc.model.root['text'].text, 'def');
+      }));
+      doc.model.root['text'].text = 'def';
+      td.cancel();
+    });
+  });
+
   group('Native Objects', () {
     test('map', () {
       doc.model.root['native-map'] = {'map': {'key': 'val'}, 'list': [1,2,3], 'string': 'value'};
