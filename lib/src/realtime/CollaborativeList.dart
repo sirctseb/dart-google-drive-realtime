@@ -53,6 +53,8 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
   /// Deprecated : use `xxx[index]` instead
   @deprecated E get(int index) => this[index];
   void insert(int index, E value) { $unsafe.callMethod('insert', [index, _toJs(value)]); }
+  void move(int index, int destinationIndex) { $unsafe.callMethod('move', [index, destinationIndex]); }
+  void moveToList(int index, destination, int destinationIndex) { $unsafe.callMethod('moveToList', [index, _toJs(destination), destinationIndex]); }
   int push(E value) => $unsafe.callMethod('push', [_toJs(value)]);
   IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.callMethod('registerReference', [index, canBeDeleted]));
   void remove(int index) { $unsafe.callMethod('remove', [index]); }
