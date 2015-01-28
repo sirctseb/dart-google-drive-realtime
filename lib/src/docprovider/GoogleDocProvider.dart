@@ -71,7 +71,6 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   /// The client ID of the application. Must be set before creating a [GoogleDocProvider]
-  //static String clientId;
   static auth.ClientId identifier;
   static void setClientId(String id) {
     identifier = new auth.ClientId(id, null);
@@ -117,9 +116,12 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   // drive client object, set on authorization
+  static auth.AutoRefreshingAuthClient authClient;
   static drive.DriveApi driveApi;
   /// Create a drive api object
   static void _loadDrive(auth.AutoRefreshingAuthClient client) {
+    // store client
+    authClient = client;
     _logger.fine('Loading drive if not already loaded');
     if(driveApi != null) return;
     _logger.finer('Drive not yet loaded, creating client');
@@ -180,18 +182,6 @@ class GoogleDocProvider extends DocumentProvider {
             //});
           }, test: (error) => error is auth.UserConsentException);
     });
-
-    // function to install gapi.auth.getToken and continue with createAndLoadFile
-    /*var onTokenLoad = (Token t) {
-      _logger.fine('Got onTokenLoad callback, storing on js side');
-      // TODO this is not reliable and we may have to switch to js-side authorization
-      // overwrite gapi.auth.getToken with a function that
-      // returns an object with valid data in access_token
-      // TODO are both of the jsify's necessary?
-      js.context['gapi']['auth'] = new js.JsObject.jsify({'getToken':
-          () => new js.JsObject.jsify({'access_token': t.data})
-      });
-    };*/
   }
 
   Future<Map> exportDocument() {
@@ -199,21 +189,21 @@ class GoogleDocProvider extends DocumentProvider {
 
     // use drive.realtime.get to get document export
 //    drive.realtime.get(fileId).then((js) => json.stringify(js));
-    driveApi.realtime.get(fileId).then((response) {
+    /*return driveApi.realtime.get(fileId).then((response) {
       return json.parse(response);
-    });
+    });*/
 
     // TODO workaround for bug in client library
     // http://stackoverflow.com/questions/18001043/why-is-the-response-to-gapi-client-drive-realtime-get-empty
-    /*_logger.finer('Using HttpRequest.request workaround for realtime.get bug');
+    _logger.finer('Using HttpRequest.request workaround for realtime.get bug');
     return HttpRequest.request('https://www.googleapis.com/drive/v2/files/${fileId}/realtime',
       method: 'GET',
-      requestHeaders: {'Authorization': 'Bearer ${auth.token.data}'})
+      requestHeaders: {'Authorization': 'Bearer ${authClient.credentials.accessToken.data}'})
       .then((HttpRequest req) {
         _logger.finest('Got exported document text: ${req.responseText}');
         // TODO error handling
         return json.parse(req.responseText);
-      });*/
+      });
   }
 
   static bool _isCustomObject(dynamic object) {
