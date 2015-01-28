@@ -946,7 +946,7 @@ onFileLoaded(rt.Document doc) {
   group('Weird', () {
     test('Map in self', () {
       doc.model.root['self'] = doc.model.root;
-      expect(doc.model.root, doc.model.root);
+      expect(doc.model.root.id, doc.model.root['self'].id);
       var ssRoot = doc.model.root.onObjectChanged.listen((e) {
         expect(e.events[0].type, rt.EventType.VALUE_CHANGED);
       });
