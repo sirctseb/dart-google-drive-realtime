@@ -26,7 +26,14 @@ class Model extends EventTarget {
   bool get canRedo => $unsafe['canRedo'];
 
   void beginCreationCompoundOperation() { $unsafe.callMethod('beginCreationCompoundOperation'); }
-  void endCompoundOperation() { $unsafe.callMethod('endCompoundOperation'); }
+  void endCompoundOperation() {
+    try {
+      $unsafe.callMethod('endCompoundOperation');
+    } catch (e) {
+      // TODO workaround for passing exceptions through from js
+      throw new Exception('Not in a compound operation.');
+    }
+  }
   CollaborativeMap get root => new CollaborativeMap._fromProxy($unsafe.callMethod('getRoot'));
   bool get isInitialized => $unsafe.callMethod('isInitialized');
 

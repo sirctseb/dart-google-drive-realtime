@@ -49,6 +49,20 @@ class CustomObject {
     }
     return new Model._fromProxy(realtimeCustom['getModel'].apply([(this._internalCustomObject as _RealtimeCustomObject).$unsafe]));
   }
+
+  // support export for local custom object
+  _export(Set ids) {
+    return _internalCustomObject._export(ids);
+  }
+  static String _customObjectName(object) {
+    for(var name in _registeredTypes.keys) {
+      if(_registeredTypes[name]['ids'].contains(object.id)) {
+        return name;
+      }
+    }
+
+    throw new Exception('$object is not a registered custom object type');
+  }
 }
 
 abstract class _InternalCustomObject extends CustomObject {}

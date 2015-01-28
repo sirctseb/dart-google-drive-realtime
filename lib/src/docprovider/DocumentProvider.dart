@@ -32,7 +32,7 @@ abstract class DocumentProvider {
    * The json format is undocumented as of 2013-8-15
    */
   // TODO currently GoogleDocProvider gets from server but Local and Persistent get from local object. is this a problem?
-  Future<String> exportDocument();
+  Future<Map> exportDocument();
 
   /**
    * Get a function that can be passed to loadDocument that will initialize the
@@ -51,7 +51,7 @@ abstract class DocumentProvider {
    */
   static Function getModelCloner(exportedDocument) {
     if(exportedDocument is String) {
-      exportedDocument = json.parse(exportedDocument);
+      exportedDocument = JSON.decode(exportedDocument);
     }
     return (Model model) {
       for(var key in exportedDocument['data']['value'].keys) {

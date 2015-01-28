@@ -19,10 +19,91 @@ class _LocalModel implements Model {
 
   /// Create a local model with a callback
   _LocalModel([initialize]) {
+    // TODO js doesn't use createMap for this
     _root = createMap();
     _undoHistory = new _UndoHistory(this);
-    if(initialize != null) {
-      _undoHistory.initializeModel(initialize, this);
+  }
+
+  _initialize(opt_initializerFn) {
+    if(opt_initializerFn != null) {
+      _undoHistory.initializeModel(opt_initializerFn, this);
+    }
+  }
+
+  /// Initialize the model from existing data
+  _initializeFromJson(String data) {
+    _undoHistory.initializeModel(_createInitializationFunction(data), this);
+  }
+
+  /// Create an initialization function to intialize a model from existing data
+  static _createInitializationFunction(String data) {
+    return (_LocalModel model) {
+      var map = JSON.decode(data);
+      Map root = map['data']['value'];
+      var refs = {'root': model.root};
+      for(var key in root.keys) {
+        model.root[key] = model._reviveExportedObject(root[key], refs);
+      }
+    };
+  }
+
+  /// Recursivel revive an object from exported data
+  dynamic _reviveExportedObject(Map object, refs) {
+    if(object['type'] == 'List') {
+      // create collaborative list
+      var list = createList();
+      // add to refs
+      refs[object['id']] = list;
+      // revive data in list
+      for(var element in object['value']) {
+        list.push(_reviveExportedObject(element, refs));
+      }
+      return list;
+    } else if(object['type'] == 'Map') {
+      // create collaborative map
+      var map = createMap();
+      // add to refs
+      refs[object['id']] = map;
+      // revive data in map
+      for(var key in object['value'].keys) {
+        map[key] = _reviveExportedObject(object['value'][key], refs);
+      }
+    } else if(object['type'] == 'EditableString') {
+      // create string
+      var string = this.createString(object['value']);
+      // add to refs
+      refs[object['id']] = string;
+      return string;
+    } else if(object.containsKey('json')) {
+      // return native object
+      return object['json'];
+    } else if(_LocalCustomObject._registeredTypes.containsKey(object['type'])) {
+      // revive custom object
+      var type = object['type'];
+      // create custom object
+      var customObject = this.create(type);
+      // add to refs
+      refs[object['id']] = customObject;
+      // set properties
+      for(var key in object['value'].keys) {
+        customObject.set(key, _reviveExportedObject(object['value'][key], refs));
+      }
+      // TODO
+      // check for onLoadedFn function
+      //if(_LocalCustomObject._registeredTypes[type]['onLoadedFn'] != null) {
+        // call onLoadedFn
+        //TODO from js
+        //rdm.CustomObject.customTypes_[type].onLoadedFn.call(customObject);
+      //}
+      CustomObject._registeredTypes[type]['ids'].add(getId(customObject));
+      return customObject;
+    } else if(object.containsKey('type')) {
+      // if there is a type but it is not registered, throw an error
+      throw new Exception('Cannot create collaborative object with unregistered type: ${object['type']}');
+    } else if(object.containsKey('ref')) {
+      return refs[object['ref']];
+    } else {
+      throw new Exception('Object ${JSON.encode(object)} is not a valid exported object');
     }
   }
 
@@ -32,26 +113,41 @@ class _LocalModel implements Model {
   // TODO is this ever true?
   bool get isReadOnly => false;
 
-  bool get canUndo => _undoHistory.canUndo;
-  bool get canRedo => _undoHistory.canRedo;
+  bool get canUndo {
+    _LocalDocument._verifyDocument(this);
+    return _undoHistory.canUndo;
+  }
+  bool get canRedo {
+    _LocalDocument._verifyDocument(this);
+    return _undoHistory.canRedo;
+  }
 
   void endCompoundOperation() {
+    _LocalDocument._verifyDocument(this);
     _undoHistory.endCompoundOperation();
   }
 
   // TODO can't be final because we need to pass this to constructor
   _LocalModelMap _root;
-  _LocalModelMap get root => _root;
+  _LocalModelMap get root {
+    _LocalDocument._verifyDocument(this);
+    return _root;
+  }
 
   // TODO is this ever false?
   // TODO we should probably provide the same initialization callback method as realtime
-  bool get isInitialized => true;
+  bool get isInitialized {
+    _LocalDocument._verifyDocument(this);
+    return true;
+  }
 
   void beginCompoundOperation([String name]) {
+    _LocalDocument._verifyDocument(this);
     _undoHistory.beginCompoundOperation(Scope.CO);
   }
 
   CustomObject create(String name) {
+    _LocalDocument._verifyDocument(this);
     var backingObject = new _LocalCustomObject(this, name);
     // make CustomObject to return
     var customObject = new CustomObject._byName(name);
@@ -59,25 +155,32 @@ class _LocalModel implements Model {
     customObject._internalCustomObject = backingObject;
     // store map from id to model
     _LocalCustomObject._customObjectModels[getId(customObject)] = this;
+    // store id in type map
+    CustomObject._registeredTypes[name]['ids'].add(getId(customObject));
     // return custom object subclass
     return customObject;
   }
   _LocalModelList createList([List initialValue]) {
+    _LocalDocument._verifyDocument(this);
     return new _LocalModelList(this, initialValue);
   }
   _LocalModelMap createMap([Map initialValue]) {
+    _LocalDocument._verifyDocument(this);
     return new _LocalModelMap(this, initialValue);
   }
   _LocalModelString createString([String initialValue]) {
+    _LocalDocument._verifyDocument(this);
     return new _LocalModelString(this, initialValue);
   }
 
   void undo() {
+    _LocalDocument._verifyDocument(this);
     // TODO check canUndo
     // undo events
     _undoHistory.undo();
   }
   void redo() {
+    _LocalDocument._verifyDocument(this);
     // TODO check canRedo
     // redo events
     _undoHistory.redo();
@@ -92,11 +195,11 @@ class _LocalModel implements Model {
   dynamic toJs() => null;
 
   /// JSON serialized data
-  Map toJSON() {
+  Map _export() {
     return {
-      "appId": "", // TODO
-      "revision": 0, // TODO
-      "data": root.toJSON()
+      "appId": "local", // TODO
+      "revision": 1, // TODO
+      "data": root._export(new Set())
     };
   }
 }

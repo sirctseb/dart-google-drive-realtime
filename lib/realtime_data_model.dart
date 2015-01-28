@@ -19,12 +19,11 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:mirrors';
 import 'dart:js' as js;
+import 'dart:convert';
 
-import 'package:json/json.dart' as json;
 import 'package:logging/logging.dart';
-import 'package:google_oauth2_client/google_oauth2_browser.dart';
-import 'package:google_drive_v2_api/drive_v2_api_browser.dart' as dcbrowser;
-import 'package:google_drive_v2_api/drive_v2_api_client.dart' as dc;
+import 'package:googleapis_auth/auth_browser.dart' as auth;
+import 'package:googleapis/drive/v2.dart' as drive;
 
 import 'src/utils.dart';
 
@@ -63,8 +62,13 @@ part 'src/realtime/ValuesSetEvent.dart';
 part 'src/realtime/error_type.dart';
 
 // local files
+part 'src/local/LocalCollaborator.dart';
+part 'src/local/LocalCollaboratorJoinedEvent.dart';
+part 'src/local/LocalCollaboratorLeftEvent.dart';
 part 'src/local/LocalDocument.dart';
+part 'src/local/LocalDocumentClosedError.dart';
 part 'src/local/LocalDocumentSaveStateChangedEvent.dart';
+part 'src/local/LocalError.dart';
 part 'src/local/LocalEvent.dart';
 part 'src/local/LocalEventTarget.dart';
 part 'src/local/LocalIndexReference.dart';

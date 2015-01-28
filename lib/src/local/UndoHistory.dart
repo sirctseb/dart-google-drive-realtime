@@ -18,7 +18,7 @@ part of realtime_data_model;
 // TODO put in it's own file?
 abstract class _LocalUndoableEvent extends _LocalEvent {
   // create an event that performs the opposite of this
-  _LocalUndoableEvent get inverse;
+  _LocalUndoableEvent get _inverse;
 
   _LocalUndoableEvent._(_target) : super._(_target);
 
@@ -65,11 +65,21 @@ class _UndoHistory {
   }
 
   void endCompoundOperation() {
+    // check that we are in a compound operation
+    if(_COScopes.length == 0 || _COScopes.last != Scope.CO) {
+      throw new Exception('Not in a compound operation.');
+    }
+    _endCompoundOperationInternal();
+  }
+  void _endCompoundOperationInternal() {
     var scope = _COScopes.removeLast();
     if(_COScopes.length == 0) {
+
+      var currentCO = new List.from(_currentCO);
+
       // invert the operations and reverse the order
       var inverseCO = _currentCO.reversed.map((e) {
-        return e.inverse;
+        return e._inverse;
       }).toList(growable: false);
       // clear current CO
       _currentCO = null;
@@ -84,6 +94,20 @@ class _UndoHistory {
         _history.removeRange(_index, _history.length);
         _history.add(inverseCO);
         _index++;
+      }
+
+      // fire events
+      for(var event in currentCO) {
+        event._target._emitEvent(event);
+      }
+
+      // group by target
+      // TODO take id of object base class
+      var bucketed = bucket(currentCO, (e, index) => e._target.id);
+      // do object changed events
+      for(var id in bucketed.keys) {
+        var event = new _LocalObjectChangedEvent._(bucketed[id], bucketed[id][0]._target);
+        bucketed[id][0]._target.dispatchObjectChangedEvent(event);
       }
     }
   }
@@ -103,7 +127,7 @@ class _UndoHistory {
     // call initialization callback with _initScope set to true
     beginCompoundOperation(Scope.INIT);
     initialize(m);
-    endCompoundOperation();
+    _endCompoundOperationInternal();
   }
 
   // TODO move this (and typedef above) to utils
@@ -134,17 +158,8 @@ class _UndoHistory {
       e._updateState();
       e._executeAndEmit();
     });
-    // group by target
-    // TODO take id of object base class
-    var bucketed = bucket(_history[_index], (e, index) => e._target.id);
-    // do object changed events
-    for(var id in bucketed.keys) {
-      var event = new _LocalObjectChangedEvent._(bucketed[id], bucketed[id][0]._target);
-      bucketed[id][0]._target.dispatchObjectChangedEvent(event);
-    }
 
-    // unset undo scope flag
-    endCompoundOperation();
+    _endCompoundOperationInternal();
 
     // if undo/redo state changed, send event
     if(_canUndo != canUndo || _canRedo != canRedo) {
@@ -164,15 +179,8 @@ class _UndoHistory {
       e._updateState();
       e._executeAndEmit();
     });
-    // group by target
-    var bucketed = bucket(_history[_index], (e, index) => e._target.id);
-    // do object changed events
-    for(var id in bucketed.keys) {
-      var event = new _LocalObjectChangedEvent._(bucketed[id], bucketed[id][0]._target);
-      bucketed[id][0]._target.dispatchObjectChangedEvent(event);
-    }
 
-    endCompoundOperation();
+    _endCompoundOperationInternal();
 
     // increment index
     _index++;

@@ -36,9 +36,9 @@ class GoogleDocProvider extends DocumentProvider {
       if(_fileId == null) {
         _logger.fine('no fileId yet, need to insert file');
         // insert file
-        return drive.files.insert(
-          new dc.File.fromJson({'mimetype': 'application/vnd.google-apps.drive-sdk', 'title': _newTitle})
-        ).then((dc.File file) {
+        return driveApi.files.insert(
+          new drive.File.fromJson({'mimetype': 'application/vnd.google-apps.drive-sdk', 'title': _newTitle})
+        ).then((drive.File file) {
           _logger.fine('Got newly inserted file object, storing id');
           // store fileId
           this._fileId = file.id;
@@ -71,7 +71,17 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   /// The client ID of the application. Must be set before creating a [GoogleDocProvider]
-  static String clientId;
+  static auth.ClientId identifier;
+  static void setClientId(String id) {
+    identifier = new auth.ClientId(id, null);
+  }
+
+  // TODO what scopes? allow them to be supplied as parameters?
+  static final scopes = [drive.DriveApi.DriveFileScope];
+  // TODO old scopes used:
+  /*final scopes = ['https://www.googleapis.com/auth/drive.install',
+                  'https://www.googleapis.com/auth/drive.file',
+                  'openid'];*/
 
   String _fileId;
   /// The fileId of the provided document
@@ -93,9 +103,9 @@ class GoogleDocProvider extends DocumentProvider {
     if(_globallySetup) return new Future.value(true);
 
     _logger.finer('Doing global setup: authenticate first');
-    return authenticate().then((auth) {
+    return authenticate().then((authClient) {
       _logger.finer('Global setup: authenticated, load drive');
-      _loadDrive();
+      _loadDrive(authClient);
       _logger.finer('Global setup: loaded drive, load realtime api');
       return _loadRealtimeApi();
     }).then((realtime) {
@@ -106,17 +116,18 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   // drive client object, set on authorization
-  static dcbrowser.Drive drive;
+  static auth.AutoRefreshingAuthClient authClient;
+  static drive.DriveApi driveApi;
   /// Create a drive api object
-  static void _loadDrive() {
+  static void _loadDrive(auth.AutoRefreshingAuthClient client) {
+    // store client
+    authClient = client;
     _logger.fine('Loading drive if not already loaded');
-    if(drive != null) return;
+    if(driveApi != null) return;
     _logger.finer('Drive not yet loaded, creating client');
     // create drive client object
-    drive = new dcbrowser.Drive(auth);
-    // allow it to make authorized requests (TODO I guess. I got it from the examples)
-    drive.makeAuthRequests = true;
-    _logger.finer('Drive client created: $drive');
+    driveApi = new drive.DriveApi(client);
+    _logger.finer('Drive client created: $driveApi');
   }
 
   // true if the realtime api is loaded
@@ -142,12 +153,6 @@ class GoogleDocProvider extends DocumentProvider {
     return completer.future;
   }
 
-  /** Authorization object used in GoogleDocProviders
-   * If not set using e.e.
-   *     GoogleDocProvider.auth = myAuth;
-   * then [GoogleDocProvider] will attempt an immediate authentication using GoogleDocProvider.Authenticate
-   */
-  static GoogleOAuth2 auth;
   /**
    * Establish authorization for GoogleDocProviders
    * The resulting authorization object is stored in GoogleDocProvider.auth
@@ -159,82 +164,45 @@ class GoogleDocProvider extends DocumentProvider {
    */
   // TODO make private?
   // TODO if not private, document that clientId must be set or allow it to be passed
-  static Future<OAuth2> authenticate({bool immediate}) {
+  static Future<auth.AutoRefreshingAuthClient> authenticate({bool immediate}) {
     _logger.fine('Authenticating with immediate: $immediate');
 
-    if(clientId == null) {
+    if(identifier == null) {
       _logger.warning('GoogleDocProvider.clientId not set, unable to authenticate');
       return new Future.error(new Exception("GoogleDocProvider.clientId must be set before authenticating"));
     }
 
-    if(auth != null && auth.token != null) {
-      _logger.fine('Already authenticated with token: ${auth.token}, returning existing auth object');
-      return new Future.value(auth);
-    }
-
-    // function to install gapi.auth.getToken and continue with createAndLoadFile
-    var onTokenLoad = (Token t) {
-      _logger.fine('Got onTokenLoad callback, storing on js side');
-      // TODO this is not reliable and we may have to switch to js-side authorization
-      // overwrite gapi.auth.getToken with a function that
-      // returns an object with valid data in access_token
-      // TODO are both of the jsify's necessary?
-      js.context['gapi']['auth'] = new js.JsObject.jsify({'getToken':
-          () => new js.JsObject.jsify({'access_token': t.data})
-      });
-    };
-
-    var localAuth = auth;
-    if(auth == null) {
-      _logger.fine('Auth object not yet set, creating GoogleOAuth2');
-      // create auth object
-      localAuth = new GoogleOAuth2(
-          clientId,
-          // TODO what scopes? allow them to be supplied as parameters?
-          ['https://www.googleapis.com/auth/drive.install',
-           'https://www.googleapis.com/auth/drive.file',
-           'openid'],
-           // TODO this calls login but doesn't let the exception through
-           // so we have to do it with login calls below
-           autoLogin: false,
-           tokenLoaded: onTokenLoad
-      );
-      // use separate name for GoogleOAuth to eliminate compiler warnings
-      auth = localAuth;
-      _logger.fine('Auth object $auth created and stored in GoogleDocProvider.auth');
-    }
-    if(immediate == null) {
-      _logger.fine('immediate not set, try silent login first');
-      // try silent login
-      return localAuth.login(immediate: true).then((ignored) => auth).catchError((obj) {
-        _logger.fine('Silent login failed, try popup login', obj);
-        // if no immediate auth, show window to get auth
-        // let errors here propogate up
-        return localAuth.login(immediate: false).then((ignored) => auth);
-      });
-    } else {
-      _logger.fine('Try login with immediate: $immediate');
-      // try only with immediacy specified by argument
-      return localAuth.login(immediate: immediate).then((ignored) => auth);
-    }
-    return new Future.error(new Exception('Reached unreachable code'));
+    return auth.createImplicitBrowserFlow(identifier, scopes)
+        .then((auth.BrowserOAuth2Flow flow) {
+          return flow.clientViaUserConsent(immediate: true).catchError((_) {
+            // TODO make button give pop up auth
+            //loginButton.text = '';
+            //return loginButotn.onClick.first.then((_) {
+            //  return flow.clientViaUserConsent(immediate: false);
+            //});
+          }, test: (error) => error is auth.UserConsentException);
+    });
   }
 
-  Future<String> exportDocument() {
+  Future<Map> exportDocument() {
     _logger.fine('Exporting document');
 
     // use drive.realtime.get to get document export
 //    drive.realtime.get(fileId).then((js) => json.stringify(js));
+    /*return driveApi.realtime.get(fileId).then((response) {
+      return json.parse(response);
+    });*/
 
     // TODO workaround for bug in client library
     // http://stackoverflow.com/questions/18001043/why-is-the-response-to-gapi-client-drive-realtime-get-empty
     _logger.finer('Using HttpRequest.request workaround for realtime.get bug');
-    return HttpRequest.request('https://www.googleapis.com/drive/v2/files/${fileId}/realtime?access_token=${auth.token}',
-      method: 'POST')
+    return HttpRequest.request('https://www.googleapis.com/drive/v2/files/${fileId}/realtime',
+      method: 'GET',
+      requestHeaders: {'Authorization': 'Bearer ${authClient.credentials.accessToken.data}'})
       .then((HttpRequest req) {
         _logger.finest('Got exported document text: ${req.responseText}');
         // TODO error handling
-        return req.responseText;
+        return JSON.decode(req.responseText);
       });
   }
 

@@ -36,7 +36,7 @@ final realtimeCustom = realtime['custom'];
  */
 void registerType(Type type, String name) {
   // store dart type
-  CustomObject._registeredTypes[name] = {'dart-type': type};
+  CustomObject._registeredTypes[name] = {'dart-type': type, 'ids': []};
 
   // do google registration
   if(GoogleDocProvider._globallySetup) {

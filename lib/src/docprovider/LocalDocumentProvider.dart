@@ -18,13 +18,20 @@ part of realtime_data_model;
 class LocalDocumentProvider extends DocumentProvider {
   Document get document => _document;
   Document _document;
+  String _initData;
 
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
   Future<Document> loadDocument([initializeModel(Model)]) {
-    var model = new _LocalModel(initializeModel);
+    var model = new _LocalModel();
     // create a document with the model
     var document = new _LocalDocument(model);
+    // initialize with data if provided
+    if(_initData != null) {
+      model._initializeFromJson(_initData);
+    } else {
+      model._initialize(initializeModel);
+    }
     _document = document;
     var completer = new Completer();
     // complete with document
@@ -32,11 +39,15 @@ class LocalDocumentProvider extends DocumentProvider {
     return completer.future;
   }
 
-  Future<String> exportDocument() {
-    return new Future.value(json.stringify((_document.model as _LocalModel).toJSON()));
+  Future<Map> exportDocument() {
+    return new Future.value((_document.model as _LocalModel)._export());
   }
 
   static bool _isCustomObject(dynamic object) {
     return object is CustomObject && object._isLocalCustomObject;
+  }
+
+  LocalDocumentProvider([String data]) {
+    _initData = data;
   }
 }

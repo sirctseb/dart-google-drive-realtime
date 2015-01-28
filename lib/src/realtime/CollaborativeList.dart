@@ -28,15 +28,24 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
 
   /*@override*/ int get length => $unsafe['length'];
   set length(int l) {
-    $unsafe['length'] = l;
+    // TODO workaround for passing exceptions through from js side
+    if(l > this.length) {
+          throw new Exception('Cannot set the list length to be greater than the current value.');
+    } else {
+      $unsafe['length'] = l;
+    }
   }
 
   /*@override*/ E operator [](int index) {
-    if (index < 0 || index >= this.length) throw new RangeError.value(index);
+    if(index < 0 || index >= length) {
+      throw new Exception('Index: $index, Size: 1');
+    }
     return _fromJs($unsafe.callMethod('get', [index]));
   }
   /*@override*/ void operator []=(int index, E value) {
-    if (index < 0 || index >= this.length) throw new RangeError.value(index);
+    if (index < 0 || index >= this.length) {
+      throw new Exception('Index: $index, Size: 1');
+    }
     $unsafe.callMethod('set', [index, _toJs(value)]);
   }
 
@@ -44,6 +53,8 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
   /// Deprecated : use `xxx[index]` instead
   @deprecated E get(int index) => this[index];
   void insert(int index, E value) { $unsafe.callMethod('insert', [index, _toJs(value)]); }
+  void move(int index, int destinationIndex) { $unsafe.callMethod('move', [index, destinationIndex]); }
+  void moveToList(int index, destination, int destinationIndex) { $unsafe.callMethod('moveToList', [index, _toJs(destination), destinationIndex]); }
   int push(E value) => $unsafe.callMethod('push', [_toJs(value)]);
   IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.callMethod('registerReference', [index, canBeDeleted]));
   void remove(int index) { $unsafe.callMethod('remove', [index]); }

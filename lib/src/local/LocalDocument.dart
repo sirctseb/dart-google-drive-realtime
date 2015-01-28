@@ -15,14 +15,23 @@
 part of realtime_data_model;
 
 class _LocalDocument implements Document {
+  // TODO this accessor verifies document in js. make accessor?
   final _LocalModel model;
 
-  void close() {}
-  List<Collaborator> get collaborators => [];
+  void close() {
+    // remove document from set of open documents
+    _openRootIDs.remove(model.root.id);
+  }
+  List<Collaborator> get collaborators {
+    _LocalDocument._verifyDocument(this);
+    return [];
+  }
+
+  static Map _openRootIDs = {};
 
   void exportDocument(void successFn([dynamic _]), void failureFn([dynamic _])) {
     try {
-      successFn(json.stringify(model.root));
+      successFn(JSON.encode(model.root));
     } catch(e) {
       // TODO is anything passed to the failure function? the exception?
       failureFn(e);
@@ -42,7 +51,26 @@ class _LocalDocument implements Document {
   Stream<CollaboratorJoinedEvent> get onCollaboratorJoined => _onCollaboratorJoined.stream;
   Stream<DocumentSaveStateChangedEvent> get onDocumentSaveStateChanged => _onDocumentSaveStateChanged.stream;
 
-  _LocalDocument(_LocalModel this.model);
+  _LocalDocument(_LocalModel this.model) {
+    _openRootIDs[model.root.id] = true;
+  }
+
+  static _verifyDocument(object) {
+    var model;
+    // if object is derived from a collaborative object, it is a map, string, or list
+    if(object is _LocalModelObject) {
+      model = object._model;
+    } else if(isCustomObject(object)) {
+      // otherwise test if it is a custom object
+      model = getModel(object);
+    } else {
+      model = object;
+    }
+
+    if(_openRootIDs.containsKey(model) && _openRootIDs[model]) {
+      throw new _LocalDocumentClosedError();
+    }
+  }
 
   /// Local document has no proxy
   final js.JsObject $unsafe = null;

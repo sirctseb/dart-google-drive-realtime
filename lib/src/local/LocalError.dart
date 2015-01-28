@@ -14,16 +14,10 @@
 
 part of realtime_data_model;
 
-class _LocalValuesRemovedEvent extends _LocalUndoableEvent implements ValuesRemovedEvent {
-  bool get bubbles => null; // TODO implement this getter
+class LocalError implements Error {
+  LocalError(bool this.isFatal, String this.message, ErrorType this.type);
 
-  final int index;
-
-  final String type = EventType.VALUES_REMOVED.value;
-
-  final List values;
-
-  _LocalValuesRemovedEvent._(this.index, this.values, _target) : super._(_target);
-
-  _LocalValuesAddedEvent get _inverse => new _LocalValuesAddedEvent._(index, values, _target);
+  final bool isFatal;
+  final String message;
+  final ErrorType type;
 }

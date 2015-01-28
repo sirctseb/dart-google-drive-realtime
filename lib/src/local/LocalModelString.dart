@@ -21,19 +21,28 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
   StreamController<_LocalTextDeletedEvent> _onTextDeleted
     = new StreamController<_LocalTextDeletedEvent>.broadcast(sync: true);
 
-  int get length => _string.length;
+  int get length {
+    _LocalDocument._verifyDocument(this);
+    return _string.length;
+  }
 
   void append(String text) {
+    _LocalDocument._verifyDocument(this);
     // add event to stream
     var insertEvent = new _LocalTextInsertedEvent._(_string.length, text, this);
     _emitEventsAndChanged([insertEvent]);
   }
-  String get text => _string;
+  String get text {
+    _LocalDocument._verifyDocument(this);
+    return _string;
+  }
   void insertString(int index, String text) {
+    _LocalDocument._verifyDocument(this);
     var insertEvent = new _LocalTextInsertedEvent._(index, text, this);
     _emitEventsAndChanged([insertEvent]);
   }
   void removeRange(int startIndex, int endIndex) {
+    _LocalDocument._verifyDocument(this);
     // get removed text for event
     var removed = _string.substring(startIndex, endIndex);
     // add event to stream
@@ -41,6 +50,7 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
     _emitEventsAndChanged([deleteEvent]);
   }
   void set text(String text) {
+    _LocalDocument._verifyDocument(this);
     // trivial edit decomposition algorithm
     // add event to stream
     var deleteEvent = new _LocalTextDeletedEvent._(0, _string, this);
@@ -48,6 +58,18 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
     _emitEventsAndChanged([deleteEvent, insertEvent]);
   }
   String toString() {
+    _LocalDocument._verifyDocument(this);
+    return this._string;
+  }
+  String _toStringHelper(Set ids) {
+    _LocalDocument._verifyDocument(this);
+
+    if(ids.contains(this.id)) {
+      return '<EditableString: ${this.id}>';
+    }
+
+    ids.add(this.id);
+
     return this._string;
   }
 
@@ -67,6 +89,7 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
   }
 
   void _executeEvent(_LocalUndoableEvent event_in) {
+    _LocalDocument._verifyDocument(this);
     // handle insert and delete events
     if(event_in.type == EventType.TEXT_DELETED.value) {
       var event = event_in as _LocalTextDeletedEvent;
@@ -89,7 +112,15 @@ class _LocalModelString extends _LocalIndexReferenceContainer implements Collabo
   String _string = "";
 
   /// JSON serialized data
-  Map toJSON() {
+  Map _export(Set ids) {
+    _LocalDocument._verifyDocument(this);
+
+    if(ids.contains(this.id)) {
+      return {'ref': this.id};
+    }
+
+    ids.add(this.id);
+
     return {
       "id": this.id,
       "type": "EditableString",
