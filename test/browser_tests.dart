@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:realtime_data_model/realtime_data_model.dart' as rt;
 import 'package:logging_handlers/logging_handlers_shared.dart';
-import 'package:json/json.dart' as json;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
 import 'package:logging/logging.dart';
@@ -336,7 +336,7 @@ onFileLoaded(rt.Document doc) {
       string.text = 'redid';
       ssOC.cancel();
       var jsonString = '[{"type":"text_deleted","text":"Hello R","index":0},{"type":"text_inserted","text":"r","index":0},{"type":"text_deleted","text":"alt","index":2},{"type":"text_inserted","text":"d","index":2},{"type":"text_deleted","text":"me World!","index":4},{"type":"text_inserted","text":"d","index":4}]';
-      expect(events, equals(json.parse(jsonString)));
+      expect(events, equals(JSON.decode(jsonString)));
     });
     test('toString', () {
       string.text = 'stringValue';
@@ -1045,17 +1045,17 @@ onFileLoaded(rt.Document doc) {
             "string":{"json":1}}},"self":{"ref":"root"},"text":{"id":"eUO6WzdGfioE","type":"EditableString","value":"xxxaaaaaaaaa"}}}};
           jsonValue['revision'] = 0;
           jsonValue['appId'] = 0;
-          jsonValue = json.stringify(jsonValue);
+          jsonValue = JSON.encode(jsonValue);
           jsonValue = jsonValue.replaceAllMapped(new RegExp('"(id|ref)":"[^"]+"'),
               (match) => '"${match[1]}":"ID"');
-          jsonValue = json.parse(jsonValue);
+          jsonValue = JSON.decode(jsonValue);
 
           result['revision'] = 0;
           result['appId'] = 0;
-          var stringified = json.stringify(result);
+          var stringified = JSON.encode(result);
           stringified = stringified.replaceAllMapped(new RegExp('"(id|ref)":"[^"]+"'),
               (match) => '"${match[1]}":"ID"');
-          result = json.parse(stringified);
+          result = JSON.decode(stringified);
 
           expect(result, jsonValue);
         }));

@@ -218,7 +218,7 @@ class _LocalModelList<E> extends _LocalIndexReferenceContainer implements Collab
       if(e is _LocalModelObject || isCustomObject(e)) {
         return e._toStringHelper(ids);
       } else {
-        return '[JsonValue ${json.stringify(e)}]';
+        return '[JsonValue ${JSON.encode(e)}]';
       }
     }).join(', ') +
     ']';

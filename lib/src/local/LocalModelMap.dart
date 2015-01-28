@@ -122,7 +122,7 @@ class _LocalModelMap<V> extends _LocalModelObject implements CollaborativeMap<V>
       return '$key: ' +
           ((_map[key] is _LocalModelObject || isCustomObject(_map[key])) ?
           _map[key]._toStringHelper(ids) :
-          '[JsonValue ${json.stringify(_map[key])}]');
+          '[JsonValue ${JSON.encode(_map[key])}]');
     });
     return '{${valList.join(", ")}}';
   }

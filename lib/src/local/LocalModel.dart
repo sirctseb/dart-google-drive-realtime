@@ -38,7 +38,7 @@ class _LocalModel implements Model {
   /// Create an initialization function to intialize a model from existing data
   static _createInitializationFunction(String data) {
     return (_LocalModel model) {
-      var map = json.parse(data);
+      var map = JSON.decode(data);
       Map root = map['data']['value'];
       var refs = {'root': model.root};
       for(var key in root.keys) {
@@ -103,7 +103,7 @@ class _LocalModel implements Model {
     } else if(object.containsKey('ref')) {
       return refs[object['ref']];
     } else {
-      throw new Exception('Object ${json.stringify(object)} is not a valid exported object');
+      throw new Exception('Object ${JSON.encode(object)} is not a valid exported object');
     }
   }
 

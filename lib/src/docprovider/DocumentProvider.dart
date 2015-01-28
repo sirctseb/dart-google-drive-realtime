@@ -51,7 +51,7 @@ abstract class DocumentProvider {
    */
   static Function getModelCloner(exportedDocument) {
     if(exportedDocument is String) {
-      exportedDocument = json.parse(exportedDocument);
+      exportedDocument = JSON.decode(exportedDocument);
     }
     return (Model model) {
       for(var key in exportedDocument['data']['value'].keys) {

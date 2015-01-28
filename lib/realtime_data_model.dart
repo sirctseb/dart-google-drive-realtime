@@ -19,8 +19,8 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:mirrors';
 import 'dart:js' as js;
+import 'dart:convert';
 
-import 'package:json/json.dart' as json;
 import 'package:logging/logging.dart';
 import 'package:googleapis_auth/auth_browser.dart' as auth;
 import 'package:googleapis/drive/v2.dart' as drive;

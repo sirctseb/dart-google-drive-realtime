@@ -90,7 +90,7 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
       if(_fields[key] is _LocalModelObject || isCustomObject(_fields[key])) {
         valString = _fields[key]._toStringHelper(ids);
       } else {
-        valString = '[JsonValue ${json.stringify(_fields[key])}]';
+        valString = '[JsonValue ${JSON.encode(_fields[key])}]';
       }
       valList.add('$key: $valString');
     }

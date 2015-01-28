@@ -31,7 +31,7 @@ class _LocalDocument implements Document {
 
   void exportDocument(void successFn([dynamic _]), void failureFn([dynamic _])) {
     try {
-      successFn(json.stringify(model.root));
+      successFn(JSON.encode(model.root));
     } catch(e) {
       // TODO is anything passed to the failure function? the exception?
       failureFn(e);

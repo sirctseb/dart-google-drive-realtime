@@ -112,7 +112,7 @@ class CollaborativeObjectTranslator<E> extends Translator<E> {
       //} else if(object.instanceof(js.context['Array'])
                  //|| object.instanceof(js.context['Object'])) {
       } else if(type == 'JsonValue') {
-        return json.parse(js.context['JSON']['stringify'].apply([object]));
+        return JSON.decode(js.context['JSON']['stringify'].apply([object]));
       }
     }
     // string, bool, numbers all get the correct type automatically
