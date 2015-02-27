@@ -267,6 +267,24 @@ onFileLoaded(rt.Document doc) {
     test('unmatched endCompoundOperation', () {
       expect(() => doc.model.endCompoundOperation(), throwsA(predicate((e) => e.message == 'Not in a compound operation.')));
     });
+    test('Empty Compound Operation', () {
+      var count = 0;
+
+      string.append('append');
+      var ssDeleted = string.onTextDeleted.listen((event) {
+        count++;
+        expect(event.text, 'append');
+      });
+
+      doc.model.beginCompoundOperation();
+      doc.model.endCompoundOperation();
+
+      doc.model.undo();
+
+      ssDeleted.cancel();
+
+      expect(count, 1);
+    });
   });
 
   group('CollaborativeString', () {
