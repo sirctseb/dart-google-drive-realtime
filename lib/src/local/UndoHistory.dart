@@ -77,6 +77,11 @@ class _UndoHistory {
 
       var currentCO = new List.from(_currentCO);
 
+      // If compound operation is empty, don't add anything ot undo history
+      if(currentCO.length == 0) {
+        return;
+      }
+
       // invert the operations and reverse the order
       var inverseCO = _currentCO.reversed.map((e) {
         return e._inverse;
