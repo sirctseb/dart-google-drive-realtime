@@ -1035,6 +1035,7 @@ onFileLoaded(rt.Document doc) {
 
   // Local
   group('Local', () {
+    // TODO fix missing fields from Book custom object in this test
     test('Local document from data', () {
       var data = '{"appId":"1066816720974","revision":243,"data":{"id":"root","type":"Map","value":{"book":' +
                    '{"id":"XlvCsSlXfioK","type":"Book","value":{"title":{"json":"title"}}},"filled-list":{"id"' +
