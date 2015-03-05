@@ -18,7 +18,7 @@ class _LocalModel implements Model {
   _UndoHistory _undoHistory;
 
   /// Create a local model with a callback
-  _LocalModel([initialize]) {
+  _LocalModel() {
     // TODO js doesn't use createMap for this
     _root = createMap();
     _undoHistory = new _UndoHistory(this);
