@@ -17,7 +17,7 @@ part of realtime_data_model;
 /// A class to create local documents with no persistence
 abstract class RemoteDocumentProvider extends LocalDocumentProvider {
 
-  static final Logger _logger = new Logger('remote-document-provider')..level = Level.FINE;
+  static final Logger _logger = new Logger('remote-document-provider');
 
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
