@@ -28,7 +28,7 @@ class LocalDocumentProvider extends DocumentProvider {
     var document = new _LocalDocument(model);
     // initialize with data if provided
     if(_initData != null) {
-      model._initializeFromJson(_initData);
+      model._initialize(DocumentProvider.getModelCloner(_initData));
     } else {
       model._initialize(initializeModel);
     }

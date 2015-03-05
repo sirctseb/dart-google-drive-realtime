@@ -107,7 +107,7 @@ class _LocalCustomObject extends _LocalModelObject implements _InternalCustomObj
     ids.add(id);
 
     var result = {
-      'ids': id,
+      'id': id,
       'type': CustomObject._customObjectName(this),
       'value': {}
     };

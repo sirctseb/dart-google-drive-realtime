@@ -17,6 +17,8 @@ part of realtime_data_model;
 /// A class to create local documents with no persistence
 abstract class RemoteDocumentProvider extends LocalDocumentProvider {
 
+  static final Logger _logger = new Logger('remote-document-provider')..level = Level.FINE;
+
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
   Future<Document> loadDocument([initializeModel(Model)]) {
@@ -25,9 +27,11 @@ abstract class RemoteDocumentProvider extends LocalDocumentProvider {
       var model;
       // if retrieved doc is empty, pass normal initializeModel
       if(retrievedDoc == "") {
+        _logger.fine('Got document from subclass, empty');
         // TODO only do initializeModel if document has never been loaded (where is this recorded)?
         model = new _LocalModel(initializeModel);
       } else {
+        _logger.fine('Got document from subclass: $retrievedDoc');
         // otherwise, initialize with json data
         model = new _LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
       }

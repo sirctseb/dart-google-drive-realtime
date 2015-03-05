@@ -53,35 +53,73 @@ abstract class DocumentProvider {
     if(exportedDocument is String) {
       exportedDocument = JSON.decode(exportedDocument);
     }
-    return (Model model) {
-      for(var key in exportedDocument['data']['value'].keys) {
-        model.root[key] = _parseJSON(model, exportedDocument['data']['value'][key]);
+    return (_LocalModel model) {
+      Map root = exportedDocument['data']['value'];
+      var refs = {'root': model.root};
+      for(var key in root.keys) {
+        model.root[key] = _reviveExportedObject(model, root[key], refs);
       }
     };
   }
 
-  // recursively construct a model object from an json export map
-  static dynamic _parseJSON(Model model, Map json) {
-    if(json.containsKey('json')) {
-      return json['json'];
-    } else {
-      if(json['type'] == 'Map') {
-        var ret = model.createMap();
-        for(var key in json['value'].keys) {
-          ret[key] = _parseJSON(model, json['value'][key]);
-        }
-        return ret;
-      } else if(json['type'] == 'List') {
-        var ret = model.createList();
-        for(var element in json['value']) {
-          ret.push(_parseJSON(model, element));
-        }
-        return ret;
-      } else if(json['type'] == 'EditableString') {
-        return model.createString(json['value']);
-      } else {
-        throw new Exception('Unsupported json structure ${json}');
+  /// Recursively revive an object from exported data
+  static dynamic _reviveExportedObject(Model model, Map object, refs) {
+    if(object['type'] == 'List') {
+      // create collaborative list
+      var list = model.createList();
+      // add to refs
+      refs[object['id']] = list;
+      // revive data in list
+      for(var element in object['value']) {
+        list.push(_reviveExportedObject(model, element, refs));
       }
+      return list;
+    } else if(object['type'] == 'Map') {
+      // create collaborative map
+      var map = model.createMap();
+      // add to refs
+      refs[object['id']] = map;
+      // revive data in map
+      for(var key in object['value'].keys) {
+        map[key] = _reviveExportedObject(model, object['value'][key], refs);
+      }
+      return map;
+    } else if(object['type'] == 'EditableString') {
+      // create string
+      var string = model.createString(object['value']);
+      // add to refs
+      refs[object['id']] = string;
+      return string;
+    } else if(object.containsKey('json')) {
+      // return native object
+      return object['json'];
+    } else if(_LocalCustomObject._registeredTypes.containsKey(object['type'])) {
+      // revive custom object
+      var type = object['type'];
+      // create custom object
+      var customObject = model.create(type);
+      // add to refs
+      refs[object['id']] = customObject;
+      // set properties
+      for(var key in object['value'].keys) {
+        customObject.set(key, _reviveExportedObject(model, object['value'][key], refs));
+      }
+      // TODO
+      // check for onLoadedFn function
+      //if(_LocalCustomObject._registeredTypes[type]['onLoadedFn'] != null) {
+        // call onLoadedFn
+        //TODO from js
+        //rdm.CustomObject.customTypes_[type].onLoadedFn.call(customObject);
+      //}
+      CustomObject._registeredTypes[type]['ids'].add(getId(customObject));
+      return customObject;
+    } else if(object.containsKey('type')) {
+      // if there is a type but it is not registered, throw an error
+      throw new Exception('Cannot create collaborative object with unregistered type: ${object['type']}');
+    } else if(object.containsKey('ref')) {
+      return refs[object['ref']];
+    } else {
+      throw new Exception('Object ${JSON.encode(object)} is not a valid exported object');
     }
   }
 }
