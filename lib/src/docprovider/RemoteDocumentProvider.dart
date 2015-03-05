@@ -24,19 +24,21 @@ abstract class RemoteDocumentProvider extends LocalDocumentProvider {
   Future<Document> loadDocument([initializeModel(Model)]) {
     // get document from peristent storage
     return getDocument().then((retrievedDoc) {
-      var model;
+      // create the model
+      var model = new _LocalModel();
+      // create a document with the model
+      _document = new _LocalDocument(model);
+
       // if retrieved doc is empty, pass normal initializeModel
       if(retrievedDoc == "") {
         _logger.fine('Got document from subclass, empty');
+        model._initialize(initializeModel);
         // TODO only do initializeModel if document has never been loaded (where is this recorded)?
-        model = new _LocalModel(initializeModel);
       } else {
         _logger.fine('Got document from subclass: $retrievedDoc');
         // otherwise, initialize with json data
-        model = new _LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
+        model._initialize(DocumentProvider.getModelCloner(retrievedDoc));
       }
-      // create a document with the model
-      _document = new _LocalDocument(model);
       return _document;
     });
   }

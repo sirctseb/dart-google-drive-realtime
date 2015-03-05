@@ -100,22 +100,24 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
     bool doInitialSave = false;
     // get document from peristent storage
     return getDocument().then((retrievedDoc) {
-      var model;
+      // create the model
+      var model = new _LocalModel();
+      // create a document with the model
+      _document = new _LocalDocument(model);
+
       // if retrieved doc is empty, pass normal initializeModel
       if(retrievedDoc == "") {
         // TODO only do initializeModel if document has never been loaded (where is this recorded)?
-        model = new _LocalModel(initializeModel);
+        model._initialize(initializeModel);
         doInitialSave = true;
       } else {
         // otherwise, initialize with json data
-        model = new _LocalModel(DocumentProvider.getModelCloner(retrievedDoc));
+        model._initialize(DocumentProvider.getModelCloner(retrievedDoc));
       }
       // listen for changes on model
       model.root.onObjectChanged.listen(_onDocumentChange);
       // create batch strategy
       batchStrategy = new DelayStrategy(model, const Duration(seconds: 1));
-      // create a document with the model
-      _document = new _LocalDocument(model);
       // if document had not been loaded before, do initial save
       if(doInitialSave) {
         saveDocument();
