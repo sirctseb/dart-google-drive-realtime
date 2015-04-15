@@ -73,8 +73,7 @@ Model getModel(dynamic obj) {
 }
 
 bool isCustomObject(dynamic obj) {
-  return LocalDocumentProvider._isCustomObject(obj) ||
-      (GoogleDocProvider._globallySetup && GoogleDocProvider._isCustomObject(obj));
+  return (GoogleDocProvider._globallySetup && GoogleDocProvider._isCustomObject(obj));
 }
 
 // TODO have subclasses just override methods instead of registration (why doesn't that work on js side also?)

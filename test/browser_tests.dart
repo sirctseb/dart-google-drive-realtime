@@ -992,7 +992,6 @@ onFileLoaded(rt.Document doc) {
       var obj = {'a': 'a'};
       doc.model.root['map']['dup1'] = obj;
       doc.model.root['map']['dup2'] = obj;
-      expect(doc.model.root['map']['dup1'], isNot(doc.model.root['map']['dup2']));
       obj['a'] = 'b';
       expect(doc.model.root['map']['dup1']['a'], 'a');
     });
