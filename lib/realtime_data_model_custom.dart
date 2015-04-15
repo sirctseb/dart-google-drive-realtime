@@ -48,9 +48,6 @@ void registerType(Type type, String name) {
     // do the js-side registration
     realtimeCustom['registerType'].apply([_RealtimeCustomObject._registeredTypes[name]["js-type"], name]);
   }
-
-  // do local registration
-  _LocalCustomObject._registeredTypes[name] = {'fields': []};
 }
 
 void collaborativeField(String name, String field) {
@@ -59,17 +56,11 @@ void collaborativeField(String name, String field) {
     _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'].apply([field]);
     _RealtimeCustomObject._registeredTypes[name]['fields'].add(field);
   }
-
-  // add field locally
-  _LocalCustomObject._registeredTypes[name]['fields'].add(field);
 }
 
 String getId(dynamic obj) {
   if(GoogleDocProvider._globallySetup && GoogleDocProvider._isCustomObject(obj)) {
     return realtimeCustom['getId'].apply([obj.toJs()]);
-  } else if(LocalDocumentProvider._isCustomObject(obj)) {
-    // TODO should refactor so id accessor is not in custom object
-    return obj._internalCustomObject.id;
   }
   throw new Exception('Object $obj is not a custom object');
 }
@@ -92,9 +83,6 @@ void setInitializer(String name, Function initialize) {
   if(GoogleDocProvider._globallySetup) {
     realtimeCustom.setInitializer(name, initialize);
   }
-
-  // store on local side
-  _LocalCustomObject._registeredTypes[name]['initializerFn'] = initialize;
 }
 
 void setOnLoaded(String name, [Function onLoaded]) {
@@ -102,7 +90,4 @@ void setOnLoaded(String name, [Function onLoaded]) {
   if(GoogleDocProvider._globallySetup) {
     realtimeCustom.setOnLoaded(name, onLoaded);
   }
-
-  // store on local side
-  _LocalCustomObject._registeredTypes[name]['onLoadedFn'] = onLoaded;
 }

@@ -1118,18 +1118,21 @@ main() {
   useHtmlConfiguration();
 
   // set clientId
-  rt.GoogleDocProvider.setClientId('INSERT CLIENT ID HERE');
+  rt.GoogleDocProvider.setClientId('1066816720974.apps.googleusercontent.com');
 
-//  var docProvider = new rt.GoogleDocProvider('0B0OUnldiyG0hSEU0U3VnalQ1a1U');
-////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
-  var docProvider = new rt.LocalDocumentProvider();
+  rt.GoogleDocProvider.globalSetup().then((val) {
 
-  rt.registerType(Book, Book.NAME);
-  rt.collaborativeField(Book.NAME, "title");
-  rt.collaborativeField(Book.NAME, "author");
-  rt.collaborativeField(Book.NAME, "isbn");
-  rt.collaborativeField(Book.NAME, "isCheckedOut");
-  rt.collaborativeField(Book.NAME, "reviews");
+  //  var docProvider = new rt.GoogleDocProvider('0B0OUnldiyG0hSEU0U3VnalQ1a1U');
+  ////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
+    var docProvider = new rt.LocalDocumentProvider();
 
-  docProvider.loadDocument(initializeModel).then(onFileLoaded);
+    rt.registerType(Book, Book.NAME);
+    rt.collaborativeField(Book.NAME, "title");
+    rt.collaborativeField(Book.NAME, "author");
+    rt.collaborativeField(Book.NAME, "isbn");
+    rt.collaborativeField(Book.NAME, "isCheckedOut");
+    rt.collaborativeField(Book.NAME, "reviews");
+
+    docProvider.loadDocument(initializeModel).then(onFileLoaded);
+  });
 }
