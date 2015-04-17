@@ -45,29 +45,23 @@ class Model extends EventTarget {
     // store id to type association
     // TODO call to getId fails with dart2js
     _storeIdType(realtime['custom']['getId'].apply([unsafeCustom]), name);
-    // make realtime backing object
-    var backingObject = new _RealtimeCustomObject._fromProxy(unsafeCustom);
-    // make CustomObject to return
-    var customObject = new CustomObject._byName(name);
-    // set internal object
-    customObject._internalCustomObject = backingObject;
+    // make CustomObject
+    var customObject = new CustomObject._byName(name, unsafeCustom);
+    // store id in type map
+    CustomObject._registeredTypes[name]['ids'].add(getId(customObject));
     // return custom object subclass
     return customObject;
   }
   void _storeIdType(String id, String name) {
     // make sure map exists
     // TODO can we do this during initialization?
-    if(!root.containsKey(_RealtimeCustomObject._idToTypeProperty)) {
-      root[_RealtimeCustomObject._idToTypeProperty] = createMap();
+    if(!root.containsKey(CustomObject._idToTypeProperty)) {
+      root[CustomObject._idToTypeProperty] = createMap();
     }
     // store id to name
-    // TODO try to removed these from map when they are removed from the model?
-    root[_RealtimeCustomObject._idToTypeProperty][id] = name;
+    // TODO try to remove these from map when they are removed from the model?
+    root[CustomObject._idToTypeProperty][id] = name;
   }
-  /*CollaborativeObject create(dynamic/*function(*)|string*/ ref, [List args = const []]) {
-    final params = [ref]..addAll(args);
-    return new CollaborativeObject._fromProxy($unsafe['create'].apply($unsafe, js.array(params)));
-  }*/
   CollaborativeList createList([List initialValue]) => new CollaborativeList._fromProxy($unsafe.callMethod('createList', [initialValue == null ? null : ListToJsArrayAdapter(initialValue, CollaborativeObject._realtimeTranslator.toJs)]));
   CollaborativeMap createMap([Map initialValue]) => new CollaborativeMap._fromProxy($unsafe.callMethod('createMap', [initialValue == null ? null : MapToJsObjectAdapter(initialValue, CollaborativeObject._realtimeTranslator.toJs)]));
   CollaborativeString createString([String initialValue]) => new CollaborativeString._fromProxy($unsafe.callMethod('createString', [initialValue]));

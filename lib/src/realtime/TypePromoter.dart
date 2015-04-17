@@ -91,13 +91,8 @@ class CollaborativeObjectTranslator<E> extends Translator<E> {
     if(object is js.JsObject) {
       var type = typeof(object);
       if(realtimeCustom['isCustomObject'].apply([object])) {
-        // TODO do backing object assignment in the CustomObject constructor
-        // make realtime backing object
-        var backingObject = new _RealtimeCustomObject._fromProxy(object);
         // make CustomObject to return
-        var customObject = new CustomObject._byName(_RealtimeCustomObject._findTypeName(object));
-        // set internal object
-        customObject._internalCustomObject = backingObject;
+        var customObject = new CustomObject._byName(CustomObject._findTypeName(object), object);
         // return custom object subclass
         return customObject;
       //} else if(object.instanceof(realtime['CollaborativeMap'])) {

@@ -24,7 +24,7 @@ part of realtime_data_model;
 
 /// base class to wrap a [Proxy] in a strong typed object.
 class TypedProxy {
-  final js.JsObject $unsafe;
+  js.JsObject $unsafe;
 
   TypedProxy.fromProxy(this.$unsafe);
 

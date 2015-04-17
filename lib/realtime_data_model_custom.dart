@@ -16,8 +16,6 @@ part of realtime_data_model;
 
 final realtimeCustom = realtime['custom'];
 
-// TODO registration can now be in one place since we register on both
-
 /**
  * Register a custom object type. Must be called before [DocumentProvider.loadDocument].
  * Type must be a subclass of [CustomObject].
@@ -41,26 +39,26 @@ void registerType(Type type, String name) {
   // do google registration
   if(GoogleDocProvider._globallySetup) {
     // store the js type and fields
-    _RealtimeCustomObject._registeredTypes[name] = {
-                              // TODO is this the best way to just create a js function?
-                             'js-type': new js.JsFunction.withThis((p) {}),
-                             'fields': []};
+    CustomObject._registeredTypes[name]['js-type'] = new js.JsFunction.withThis((p) {});
+    CustomObject._registeredTypes[name]['fields'] = [];
     // do the js-side registration
-    realtimeCustom['registerType'].apply([_RealtimeCustomObject._registeredTypes[name]["js-type"], name]);
+    realtimeCustom['registerType'].apply([CustomObject._registeredTypes[name]["js-type"], name]);
   }
 }
 
 void collaborativeField(String name, String field) {
   // add field google-side
   if(GoogleDocProvider._globallySetup) {
-    _RealtimeCustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'].apply([field]);
-    _RealtimeCustomObject._registeredTypes[name]['fields'].add(field);
+    CustomObject._registeredTypes[name]['js-type']['prototype'][field] = realtimeCustom['collaborativeField'].apply([field]);
+    CustomObject._registeredTypes[name]['fields'].add(field);
   }
 }
 
 String getId(dynamic obj) {
-  if(GoogleDocProvider._globallySetup && GoogleDocProvider._isCustomObject(obj)) {
-    return realtimeCustom['getId'].apply([obj.toJs()]);
+  // TODO should really only be dart wrappers except from type promoter
+  obj = obj is js.JsObject ? obj : obj.$unsafe;
+  if(GoogleDocProvider._globallySetup && isCustomObject(obj)) {
+    return realtimeCustom['getId'].apply([obj]);
   }
   throw new Exception('Object $obj is not a custom object');
 }
@@ -73,7 +71,9 @@ Model getModel(dynamic obj) {
 }
 
 bool isCustomObject(dynamic obj) {
-  return (GoogleDocProvider._globallySetup && GoogleDocProvider._isCustomObject(obj));
+  // TODO should really only be dart wrappers except from type promoter
+  obj = obj is js.JsObject ? obj : obj.$unsafe;
+  return (GoogleDocProvider._globallySetup && realtimeCustom['isCustomObject'].apply([obj]));
 }
 
 // TODO have subclasses just override methods instead of registration (why doesn't that work on js side also?)

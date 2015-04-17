@@ -14,51 +14,66 @@
 
 part of realtime_data_model;
 
-class CustomObject {
+class CustomObject extends CollaborativeContainer {
   // information on the custom types registered
   static Map _registeredTypes = {};
 
   // look up CustomObject subclass by name and return a new instance
-  factory CustomObject._byName(String name) {
-    return reflectClass(_registeredTypes[name]['dart-type']).newInstance(new Symbol(""), []).reflectee;
+  factory CustomObject._byName(String name, js.JsObject proxy) {
+    var result = reflectClass(_registeredTypes[name]['dart-type']).newInstance(new Symbol(""), []).reflectee;
+    // TODO had to make $unsafe not final just for this line
+    result.$unsafe = proxy;
+    return result;
   }
-  CustomObject() {}
 
-  String toString() => _internalCustomObject.toString();
+  CustomObject._fromProxy(js.JsObject proxy) : super._fromProxy(proxy) {}
 
-  Stream<ObjectChangedEvent> get onObjectChanged => _internalCustomObject.onObjectChanged;
-  Stream<ValueChangedEvent> get onValueChanged => _internalCustomObject.onValueChanged;
+  // TODO shouldn't exist but need to in order to allow subclasses
+  CustomObject() : super._fromProxy(null);
 
-  dynamic get(String field) => _internalCustomObject.get(field);
-  set(String field, dynamic value) => _internalCustomObject.set(field, value);
+  static String _findTypeName(js.JsObject proxy) {
+    // get reference to id->name map
+    var idToType = new Model._fromProxy(realtime['custom']['getModel'].apply([proxy])).root[_idToTypeProperty];
+    return idToType[realtime['custom']['getId'].apply([proxy])];
+  }
 
-  @override
-  dynamic noSuchMethod(Invocation invocation) => _internalCustomObject.noSuchMethod(invocation);
+  dynamic get(String field) => $unsafe[field];
+  void set(String field, dynamic value) {
+    $unsafe[field] = _toJs(value);
+  }
 
-  // internal custom object implementation
-  _InternalCustomObject _internalCustomObject;
-
-  dynamic toJs() => (_internalCustomObject as _RealtimeCustomObject).$unsafe;
-
-  bool get _isRealtimeCustomObject => _internalCustomObject is _RealtimeCustomObject;
+  dynamic toJs() => $unsafe;
 
   Model get _model {
-    return new Model._fromProxy(realtimeCustom['getModel'].apply([(this._internalCustomObject as _RealtimeCustomObject).$unsafe]));
+    return new Model._fromProxy(realtimeCustom['getModel'].apply([$unsafe]));
   }
 
-  // support export for local custom object
-  _export(Set ids) {
-    return _internalCustomObject._export(ids);
-  }
   static String _customObjectName(object) {
     for(var name in _registeredTypes.keys) {
-      if(_registeredTypes[name]['ids'].contains(object.id)) {
+      if(_registeredTypes[name]['ids'].contains(getId(object))) {
         return name;
       }
     }
 
     throw new Exception('$object is not a registered custom object type');
   }
-}
 
-abstract class _InternalCustomObject extends CustomObject {}
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    var name = MirrorSystem.getName(invocation.memberName);
+    if(CustomObject._registeredTypes[_findTypeName(this.$unsafe)]['fields'].contains(name)) {
+      return get(name);
+    }
+    if(CustomObject._registeredTypes[_findTypeName(this.$unsafe)]['fields'].contains(name.substring(0, name.length - 1))
+        && name.endsWith('=')) {
+      set(name.substring(0, name.length - 1), invocation.positionalArguments[0]);
+      return invocation.positionalArguments[0];
+    }
+    throw new NoSuchMethodError(this,
+                                invocation.memberName,
+                                invocation.positionalArguments,
+                                invocation.namedArguments);
+  }
+
+  static final String _idToTypeProperty = '_idToType';
+}
