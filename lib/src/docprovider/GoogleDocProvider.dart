@@ -206,15 +206,16 @@ class GoogleDocProvider extends DocumentProvider {
       });
   }
 
-  void debug() {
+  static void debug() {
     realtime['debug'].apply();
   }
 
-  void enableTestMode() {
+  static void enableTestMode() {
     realtime['enableTestMode'].apply();
   }
 
   Document loadFromJson(String json, [opt_errorFn]) {
+    // TODO set the document on this provider?
     return new Document._fromProxy(realtime['loadFromJson'].apply([json, opt_errorFn]));
   }
 }
