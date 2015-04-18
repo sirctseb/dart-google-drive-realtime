@@ -205,8 +205,4 @@ class GoogleDocProvider extends DocumentProvider {
         return JSON.decode(req.responseText);
       });
   }
-
-  static bool _isCustomObject(dynamic object) {
-    return object is CustomObject && object._isRealtimeCustomObject;
-  }
 }
