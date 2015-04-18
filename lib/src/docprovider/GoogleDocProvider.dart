@@ -207,11 +207,11 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   static void debug() {
-    realtime['debug'].apply();
+    realtime['debug'].apply([]);
   }
 
   static void enableTestMode() {
-    realtime['enableTestMode'].apply();
+    realtime['enableTestMode'].apply([]);
   }
 
   Document loadFromJson(String json, [opt_errorFn]) {
