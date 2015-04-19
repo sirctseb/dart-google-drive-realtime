@@ -1013,9 +1013,6 @@ onFileLoaded(rt.Document doc) {
       expect(rt.isCustomObject(doc.model.root['book']), true);
       expect(rt.isCustomObject(doc.model.root['text']), false);
     });
-    test('type', () {
-      expect(doc.model.root['book'].type(), 'Book');
-    });
     test('Set title', () {
       expect(doc.model.root['book'].title, null);
       doc.model.root['book'].onObjectChanged.listen((e) {
