@@ -38,6 +38,7 @@ part 'src/realtime/CollaborativeList.dart';
 part 'src/realtime/CollaborativeMap.dart';
 part 'src/realtime/CollaborativeObject.dart';
 part 'src/realtime/CollaborativeString.dart';
+part 'src/realtime/CollaborativeTypes.dart';
 part 'src/realtime/Collaborator.dart';
 part 'src/realtime/CollaboratorJoinedEvent.dart';
 part 'src/realtime/CollaboratorLeftEvent.dart';
