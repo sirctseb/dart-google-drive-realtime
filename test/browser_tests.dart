@@ -292,6 +292,9 @@ onFileLoaded(rt.Document doc) {
     setUp((){
       string.text = 'unittest';
     });
+    test('type', () {
+      expect(string.type, rt.CollaborativeTypes.COLLABORATIVE_STRING.value);
+    });
     test('get length', () {
       expect(string.length, 8);
     });
@@ -367,6 +370,9 @@ onFileLoaded(rt.Document doc) {
     setUp((){
       list.clear();
       list.push('s1');
+    });
+    test('type', () {
+      expect(list.type, rt.CollaborativeTypes.COLLABORATIVE_LIST.value);
     });
     test('get length', () {
       expect(list.length, 1);
@@ -579,6 +585,9 @@ onFileLoaded(rt.Document doc) {
     setUp(() {
       map.clear();
       map['key1'] = 4;
+    });
+    test('type', () {
+      expect(map.type, rt.CollaborativeTypes.COLLABORATIVE_MAP.value);
     });
     test('absent key', () {
       expect(map['absent'], null);
@@ -1003,6 +1012,9 @@ onFileLoaded(rt.Document doc) {
     test('Book is custom object', () {
       expect(rt.isCustomObject(doc.model.root['book']), true);
       expect(rt.isCustomObject(doc.model.root['text']), false);
+    });
+    test('type', () {
+      expect(doc.model.root['book'].type(), 'Book');
     });
     test('Set title', () {
       expect(doc.model.root['book'].title, null);

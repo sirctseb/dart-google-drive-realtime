@@ -33,6 +33,8 @@ class CollaborativeObject extends EventTarget {
 
   String toString() => $unsafe.toString();
 
+  String get type => $unsafe['type'];
+
   Stream<ObjectChangedEvent> get onObjectChanged => _onObjectChanged.stream;
   Stream<ValueChangedEvent> get onValueChanged => _onValueChanged.stream;
 }
