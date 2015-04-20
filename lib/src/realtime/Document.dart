@@ -28,6 +28,11 @@ class Document extends EventTarget {
   void close() { $unsafe.callMethod('close'); }
   List<Collaborator> get collaborators => JsArrayToListAdapter($unsafe.callMethod('getCollaborators'), Collaborator._cast);
   Model get model => new Model._fromProxy($unsafe.callMethod('getModel'));
+  bool get isClosed => $unsafe['isClosed'];
+  int get saveDelay => $unsafe['saveDelay'];
+  void saveAs(String fileId) {
+    $unsafe.callMethod('saveAs', [fileId]);
+  }
 
   Stream<CollaboratorLeftEvent> get onCollaboratorLeft => _onCollaboratorLeft.stream;
   Stream<CollaboratorJoinedEvent> get onCollaboratorJoined => _onCollaboratorJoined.stream;
