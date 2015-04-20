@@ -16,4 +16,6 @@ part of realtime_data_model;
 
 class DocumentClosedError extends TypedProxy {
   DocumentClosedError._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
+
+  String get name => $unsafe['name'];
 }
