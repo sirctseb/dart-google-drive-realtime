@@ -21,4 +21,6 @@ class DocumentSaveStateChangedEvent extends TypedProxy {
 
   bool get isPending => $unsafe['isPending'];
   bool get isSaving => $unsafe['isSaving'];
+  Document get target => new Document._fromProxy($unsafe['targer']);
+  String get type => $unsafe['type'];
 }
