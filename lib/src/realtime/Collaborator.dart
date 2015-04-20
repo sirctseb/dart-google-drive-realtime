@@ -23,6 +23,7 @@ class Collaborator extends TypedProxy {
   String get displayName => $unsafe['displayName'];
   bool get isAnonymous => $unsafe['isAnonymous'];
   bool get isMe => $unsafe['isMe'];
+  String get permissionId => $unsafe['permissionId'];
   String get photoUrl => $unsafe['photoUrl'];
   String get sessionId => $unsafe['sessionId'];
   String get userId => $unsafe['userId'];
