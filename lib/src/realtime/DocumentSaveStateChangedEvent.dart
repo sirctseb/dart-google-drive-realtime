@@ -19,6 +19,7 @@ class DocumentSaveStateChangedEvent extends TypedProxy {
 
   DocumentSaveStateChangedEvent._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
+  @deprecated
   bool get isPending => $unsafe['isPending'];
   bool get isSaving => $unsafe['isSaving'];
   Document get target => new Document._fromProxy($unsafe['targer']);
