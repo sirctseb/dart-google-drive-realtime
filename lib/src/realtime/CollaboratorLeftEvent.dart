@@ -20,4 +20,6 @@ class CollaboratorLeftEvent extends TypedProxy {
   CollaboratorLeftEvent._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
   Collaborator get collaborator => new Collaborator._fromProxy($unsafe['collaborator']);
+  Document get target => new Document._fromProxy($unsafe['target']);
+  String get type => $unsafe['type'];
 }
