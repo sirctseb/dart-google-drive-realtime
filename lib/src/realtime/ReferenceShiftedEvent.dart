@@ -20,5 +20,9 @@ class ReferenceShiftedEvent extends BaseModelEvent {
   ReferenceShiftedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
   int get newIndex => $unsafe['newIndex'];
+  CollaborativeObject get newObject =>
+      CollaborativeObjectTranslator._fromJs($unsafe['newObject']);
   int get oldIndex => $unsafe['oldIndex'];
+  CollaborativeObject get oldObject =>
+      CollaborativeObjectTranslator._fromJs($unsafe['oldObject']);
 }
