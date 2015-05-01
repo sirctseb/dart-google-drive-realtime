@@ -19,6 +19,6 @@ class ObjectChangedEvent extends BaseModelEvent {
 
   ObjectChangedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
-  List<String> get compoundOperationEvents => ($unsafe['compoundOperationNames'] as js.JsArray).toList();
+  List<String> get compoundOperationNames => ($unsafe['compoundOperationNames'] as js.JsArray).toList();
   List<BaseModelEvent> get events => JsArrayToListAdapter($unsafe['events'], EventTranslator._fromJs);
 }
