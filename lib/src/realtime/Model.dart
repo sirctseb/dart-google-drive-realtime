@@ -21,6 +21,12 @@ class Model extends EventTarget {
     _onUndoRedoStateChanged = _getStreamProviderFor(EventType.UNDO_REDO_STATE_CHANGED, UndoRedoStateChangedEvent._cast);
   }
 
+  static CollaborativeObject getObject(String id) {
+    return CollaborativeObjectTranslator._fromJs(realtime['Model'].callMethod('getObject', [id]));
+  }
+
+  int get bytesUsed => $unsafe['bytesUsed'];
+
   bool get isReadOnly => $unsafe['isReadOnly'];
   bool get canUndo => $unsafe['canUndo'];
   bool get canRedo => $unsafe['canRedo'];
@@ -37,7 +43,8 @@ class Model extends EventTarget {
   CollaborativeMap get root => new CollaborativeMap._fromProxy($unsafe.callMethod('getRoot'));
   bool get isInitialized => $unsafe.callMethod('isInitialized');
 
-  void beginCompoundOperation([String name]) => $unsafe.callMethod('beginCompoundOperation',[name]);
+  void beginCompoundOperation([String name, String undoable]) =>
+      $unsafe.callMethod('beginCompoundOperation',[name, undoable]);
   // TODO args? see below old version
   CustomObject create(String name) {
     // create custom object on js side
@@ -68,6 +75,11 @@ class Model extends EventTarget {
 
   void undo() { $unsafe.callMethod('undo'); }
   void redo() { $unsafe.callMethod('redo'); }
+
+  int get serverRevision => $unsafe.callMethod('serverRevision');
+  String toJson([String appId, int revision]) {
+    return $unsafe.callMethod('toJson', [appId, revision]);
+  }
 
   Stream<UndoRedoStateChangedEvent> get onUndoRedoStateChanged => _onUndoRedoStateChanged.stream;
 }
