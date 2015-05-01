@@ -36,7 +36,12 @@ class BaseModelEvent extends TypedProxy {
 
   bool get bubbles => $unsafe['bubbles'];
   bool get isLocal => $unsafe['isLocal'];
+  bool get isRedo => $unsafe['isRedo'];
+  bool get isUndo => $unsafe['isUndo'];
   String get sessionId => $unsafe['sessionId'];
   String get type => $unsafe['type'];
   String get userId => $unsafe['userId'];
+  CollaborativeObject get target => CollaborativeObjectTranslator._fromJs($unsafe['target']);
+
+  void stopPropagation() => $unsafe.callMethod('stopPropagation');
 }
