@@ -214,8 +214,7 @@ class GoogleDocProvider extends DocumentProvider {
     realtime['enableTestMode'].apply([]);
   }
 
-  Document loadFromJson(String json, [opt_errorFn]) {
-    // TODO set the document on this provider?
+  static Document loadFromJson(String json, [opt_errorFn]) {
     return new Document._fromProxy(realtime['loadFromJson'].apply([json, opt_errorFn]));
   }
 }
