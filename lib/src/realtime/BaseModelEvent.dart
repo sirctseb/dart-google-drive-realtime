@@ -35,6 +35,7 @@ class BaseModelEvent extends TypedProxy {
   BaseModelEvent._fromProxy(js.JsObject proxy) : super.fromProxy(proxy);
 
   bool get bubbles => $unsafe['bubbles'];
+  List<String> get compoundOperationNames => ($unsafe['compoundOperationNames'] as js.JsArray).toList();
   bool get isLocal => $unsafe['isLocal'];
   bool get isRedo => $unsafe['isRedo'];
   bool get isUndo => $unsafe['isUndo'];
@@ -42,6 +43,5 @@ class BaseModelEvent extends TypedProxy {
   String get type => $unsafe['type'];
   String get userId => $unsafe['userId'];
   CollaborativeObject get target => CollaborativeObjectTranslator._fromJs($unsafe['target']);
-
   void stopPropagation() => $unsafe.callMethod('stopPropagation');
 }
