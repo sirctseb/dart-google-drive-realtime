@@ -20,5 +20,8 @@ class ValuesAddedEvent extends BaseModelEvent {
   ValuesAddedEvent._fromProxy(js.JsObject proxy) : super._fromProxy(proxy);
 
   int get index => $unsafe['index'];
+  int get movedFromIndex => $unsafe['movedFromIndex'];
+  CollaborativeList get movedFromList =>
+      $unsafe['movedFromList'] == null ? null : new CollaborativeList._fromProxy($unsafe['movedFromList']);
   List<dynamic> get values => JsArrayToListAdapter($unsafe['values'], CollaborativeObject._realtimeTranslator.fromJs);
 }
