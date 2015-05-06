@@ -206,7 +206,15 @@ class GoogleDocProvider extends DocumentProvider {
       });
   }
 
-  static bool _isCustomObject(dynamic object) {
-    return object is CustomObject && object._isRealtimeCustomObject;
+  static void debug() {
+    realtime['debug'].apply([]);
+  }
+
+  static void enableTestMode() {
+    realtime['enableTestMode'].apply([]);
+  }
+
+  static Document loadFromJson(String json, [opt_errorFn]) {
+    return new Document._fromProxy(realtime['loadFromJson'].apply([json, opt_errorFn]));
   }
 }

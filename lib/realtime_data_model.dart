@@ -38,6 +38,7 @@ part 'src/realtime/CollaborativeList.dart';
 part 'src/realtime/CollaborativeMap.dart';
 part 'src/realtime/CollaborativeObject.dart';
 part 'src/realtime/CollaborativeString.dart';
+part 'src/realtime/CollaborativeTypes.dart';
 part 'src/realtime/Collaborator.dart';
 part 'src/realtime/CollaboratorJoinedEvent.dart';
 part 'src/realtime/CollaboratorLeftEvent.dart';
@@ -61,38 +62,8 @@ part 'src/realtime/ValuesRemovedEvent.dart';
 part 'src/realtime/ValuesSetEvent.dart';
 part 'src/realtime/error_type.dart';
 
-// local files
-part 'src/local/LocalCollaborator.dart';
-part 'src/local/LocalCollaboratorJoinedEvent.dart';
-part 'src/local/LocalCollaboratorLeftEvent.dart';
-part 'src/local/LocalDocument.dart';
-part 'src/local/LocalDocumentClosedError.dart';
-part 'src/local/LocalDocumentSaveStateChangedEvent.dart';
-part 'src/local/LocalError.dart';
-part 'src/local/LocalEvent.dart';
-part 'src/local/LocalEventTarget.dart';
-part 'src/local/LocalIndexReference.dart';
-part 'src/local/LocalIndexReferenceContainer.dart';
-part 'src/local/LocalModel.dart';
-part 'src/local/LocalModelList.dart';
-part 'src/local/LocalModelMap.dart';
-part 'src/local/LocalModelObject.dart';
-part 'src/local/LocalModelString.dart';
-part 'src/local/LocalObjectChangedEvent.dart';
-part 'src/local/LocalReferenceShiftedEvent.dart';
-part 'src/local/LocalTextDeletedEvent.dart';
-part 'src/local/LocalTextInsertedEvent.dart';
-part 'src/local/LocalUndoRedoStateChangedEvent.dart';
-part 'src/local/LocalValueChangedEvent.dart';
-part 'src/local/LocalValuesAddedEvent.dart';
-part 'src/local/LocalValuesRemovedEvent.dart';
-part 'src/local/LocalValuesSetEvent.dart';
-part 'src/local/UndoHistory.dart';
-
 part 'realtime_data_model_custom.dart';
 part 'src/custom/CustomObject.dart';
-part 'src/custom/LocalCustomObject.dart';
-part 'src/custom/RealtimeCustomObject.dart';
 
 // js.Proxy for "gapi.drive.realtime"
 final realtime = js.context['gapi']['drive']['realtime'];

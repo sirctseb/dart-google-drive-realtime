@@ -134,6 +134,65 @@ onFileLoaded(rt.Document doc) {
       ssVC.cancel();
       ssVS.cancel();
     });
+    test('isUndo', () {
+      var map = doc.model.root['map'];
+      map.clear();
+      var ssNotUndo = map.onValueChanged.listen((e) {
+        expect(e.isUndo, false);
+      });
+      map['key'] = 'value';
+      ssNotUndo.cancel();
+      var ssUndo = map.onValueChanged.listen((e) {
+        expect(e.isUndo, true);
+      });
+      doc.model.undo();
+      ssUndo.cancel();
+    });
+    test('isRedo', () {
+      var map = doc.model.root['map'];
+      map.clear();
+      var ssNotRedo = map.onValueChanged.listen((e) {
+        expect(e.isRedo, false);
+      });
+      map['key'] = 'value';
+      doc.model.undo();
+      ssNotRedo.cancel();
+      var ssRedo = map.onValueChanged.listen((e) {
+        expect(e.isRedo, true);
+      });
+      doc.model.redo();
+      ssRedo.cancel();
+    });
+    test('target', () {
+      var map = doc.model.root['map'];
+      map.clear();
+      var ssVC = map.onValueChanged.listen((e) {
+        expect(e.target.id, map.id);
+      });
+      var ssRoot = doc.model.root.onObjectChanged.listen((e) {
+        expect(e.events[0].target.id, map.id);
+      });
+      map['key'] = 'blah';
+      ssVC.cancel();
+      ssRoot.cancel();
+    });
+    test('stopPropagation', () {
+      var map = doc.model.root['map'];
+      map.clear();
+      // TODO I think this should be object changed
+      var ssVC = map.onObjectChanged.listen((e) {
+        expect(e.target.id, map.id);
+        e.stopPropagation();
+      });
+      var ssRoot = doc.model.root.onObjectChanged.listen((e) {
+        // TODO how to assert something doesn't happen?
+        expect(true, false);
+      });
+      map['key'] = 'value';
+      ssVC.cancel();
+      ssRoot.cancel();
+    });
+    // TODO compoundOperationNames
   });
 
   group('Compound Operations', () {
@@ -292,6 +351,9 @@ onFileLoaded(rt.Document doc) {
     setUp((){
       string.text = 'unittest';
     });
+    test('type', () {
+      expect(string.type, rt.CollaborativeTypes.COLLABORATIVE_STRING.value);
+    });
     test('get length', () {
       expect(string.length, 8);
     });
@@ -368,6 +430,9 @@ onFileLoaded(rt.Document doc) {
       list.clear();
       list.push('s1');
     });
+    test('type', () {
+      expect(list.type, rt.CollaborativeTypes.COLLABORATIVE_LIST.value);
+    });
     test('get length', () {
       expect(list.length, 1);
     });
@@ -431,6 +496,7 @@ onFileLoaded(rt.Document doc) {
       var ssAdd = list.onValuesAdded.listen(expectAsync1((rt.ValuesAddedEvent e) {
         expect(e.values, [0]);
         expect(e.index, [0,1,2][iter]);
+        expect(e.movedFromIndex, 0);
         iter++;
       }, count: 3));
       var ssRemove = list.onValuesRemoved.listen(expectAsync1((rt.ValuesRemovedEvent e) {
@@ -455,9 +521,15 @@ onFileLoaded(rt.Document doc) {
       list.pushAll([0,1,2]);
       var list2 = doc.model.createList([0,1,2]);
       doc.model.root['list2'] = list2;
+      var toList = list;
+      var ssList = list.onValuesRemoved.listen((e) {
+        expect(e.movedToList.id, toList.id);
+      });
       list.moveToList(0, list, 2);
       expect(list.asArray(), [1,0,2]);
+      toList = list2;
       list.moveToList(0, list2, 2);
+      ssList.cancel();
       expect(list2.asArray(), [0,1,1,2]);
       doc.model.root.remove('list2');
     });
@@ -579,6 +651,9 @@ onFileLoaded(rt.Document doc) {
     setUp(() {
       map.clear();
       map['key1'] = 4;
+    });
+    test('type', () {
+      expect(map.type, rt.CollaborativeTypes.COLLABORATIVE_MAP.value);
     });
     test('absent key', () {
       expect(map['absent'], null);
@@ -765,6 +840,7 @@ onFileLoaded(rt.Document doc) {
       list.removeRange(4, 6);
       expect(ref.index, -1);
     });
+    // TODO newObject and oldObject
     test('RealtimeString Reference Events', () {
       string.text = "aaaaaaaaaa";
       rt.IndexReference ref = string.registerReference(5, true);
@@ -804,6 +880,16 @@ onFileLoaded(rt.Document doc) {
     test('referencedObject', () {
       var ref = string.registerReference(2, false);
       expect(ref.referencedObject.text, string.text);
+    });
+    test('type', () {
+      var ref = string.registerReference(2, false);
+      expect(ref.type, rt.CollaborativeTypes.INDEX_REFERENCE.value);
+    });
+    test('DeleteMode', () {
+      var ref = string.registerReference(2, true);
+      expect(ref.deleteMode, rt.IndexReference.DeleteMode.SHIFT_TO_INVALID);
+      var ref2 = string.registerReference(2, false);
+      expect(ref2.deleteMode, rt.IndexReference.DeleteMode.SHIFT_AFTER_DELETE);
     });
   });
 
@@ -992,7 +1078,6 @@ onFileLoaded(rt.Document doc) {
       var obj = {'a': 'a'};
       doc.model.root['map']['dup1'] = obj;
       doc.model.root['map']['dup2'] = obj;
-      expect(doc.model.root['map']['dup1'], isNot(doc.model.root['map']['dup2']));
       obj['a'] = 'b';
       expect(doc.model.root['map']['dup1']['a'], 'a');
     });
@@ -1031,7 +1116,16 @@ onFileLoaded(rt.Document doc) {
     });
   });
 
-  // TODO Close
+  group('Model', () {
+    // TODO I think this wasn't intended to be public
+//    test('getObject', () {
+//      expect(doc.model.root.id, rt.Model.getObject(doc.model, doc.model.root.id).id);
+//    });
+    test('serverRevision', () {
+      expect(doc.model.serverRevision, greaterThan(0));
+    });
+    // TODO toJson
+  });
 
   // Local
   group('Local', () {
@@ -1054,7 +1148,9 @@ onFileLoaded(rt.Document doc) {
                    ',"value":"dupsomething"},"submap":{"id":"sNZxu4TdfjEO","type":"Map","value":{"subsubmap":{"id":' +
                    '"09j9Bti4fjEO","type":"Map","value":{"str":{"ref":"3Ozrz4-afjEO"}}}}}}},"string":{"json":1}}},' +
                    '"self":{"ref":"root"},"text":{"id":"eUO6WzdGfioE","type":"EditableString","value":"xxxaaaaaaaaa"}}}}';
-      var dp = new rt.LocalDocumentProvider(data);
+      rt.Document localDoc = rt.GoogleDocProvider.loadFromJson(data);
+      expect(localDoc, isNotNull);
+      /*var dp = new rt.LocalDocumentProvider(data);
       dp.loadDocument().then(expectAsync1((doc) {
         dp.exportDocument().then(expectAsync1((result) {
           // correct value
@@ -1090,7 +1186,79 @@ onFileLoaded(rt.Document doc) {
 
           expect(result, jsonValue);
         }));
-      }));
+      }));*/
+    });
+  });
+
+  group('Collaborator', () {
+    // TODO collaborators doesn't include this instance
+    test('Properties', () {
+      var collab = doc.collaborators[0];
+      expect(collab, isNotNull);
+      expect(collab.displayName, isNotNull);
+      expect(collab.isAnonymous, false);
+      expect(collab.isMe, true);
+      expect(collab.permissionId, isNotNull);
+      expect(collab.photoUrl, isNotNull);
+      expect(collab.sessionId, isNotNull);
+      expect(collab.userId,isNotNull);
+    });
+    // TODO can't test events without collaborators joining/leaving
+  });
+
+  group('Enums', () {
+    test('CollaborativeTypes', () {
+      expect(rt.CollaborativeTypes.COLLABORATIVE_LIST.value, 'List');
+      expect(rt.CollaborativeTypes.COLLABORATIVE_MAP.value, 'Map');
+      expect(rt.CollaborativeTypes.COLLABORATIVE_STRING.value, 'EditableString');
+      expect(rt.CollaborativeTypes.INDEX_REFERENCE.value, 'IndexReference');
+    });
+    test('ErrorType', () {
+      expect(rt.ErrorType.CONCURRENT_CREATION.value, 'concurrent_creation');
+      expect(rt.ErrorType.INVALID_COMPOUND_OPERATION.value, 'invalid_compound_operation');
+      expect(rt.ErrorType.INVALID_JSON_SYNTAX.value, 'invalid_json_syntax');
+      expect(rt.ErrorType.MISSING_PROPERTY.value, 'missing_property');
+      expect(rt.ErrorType.NOT_FOUND.value, 'not_found');
+      expect(rt.ErrorType.FORBIDDEN.value, 'forbidden');
+      expect(rt.ErrorType.SERVER_ERROR.value, 'server_error');
+      expect(rt.ErrorType.CLIENT_ERROR.value, 'client_error');
+      expect(rt.ErrorType.TOKEN_REFRESH_REQUIRED.value, 'token_refresh_required');
+      expect(rt.ErrorType.INVALID_ELEMENT_TYPE.value, 'invalid_element_type');
+      expect(rt.ErrorType.NO_WRITE_PERMISSION.value, 'no_write_permission');
+    });
+    test('EventType', () {
+      expect(rt.EventType.OBJECT_CHANGED.value, 'object_changed');
+      expect(rt.EventType.VALUES_SET.value, 'values_set');
+      expect(rt.EventType.VALUES_ADDED.value, 'values_added');
+      expect(rt.EventType.VALUES_REMOVED.value, 'values_removed');
+      expect(rt.EventType.VALUE_CHANGED.value, 'value_changed');
+      expect(rt.EventType.TEXT_INSERTED.value, 'text_inserted');
+      expect(rt.EventType.TEXT_DELETED.value, 'text_deleted');
+      expect(rt.EventType.COLLABORATOR_JOINED.value, 'collaborator_joined');
+      expect(rt.EventType.COLLABORATOR_LEFT.value, 'collaborator_left');
+      expect(rt.EventType.REFERENCE_SHIFTED.value, 'reference_shifted');
+      expect(rt.EventType.DOCUMENT_SAVE_STATE_CHANGED.value, 'document_save_state_changed');
+      expect(rt.EventType.UNDO_REDO_STATE_CHANGED.value, 'undo_redo_state_changed');
+      expect(rt.EventType.ATTRIBUTE_CHANGED.value, 'attribute_changed');
+    });
+  });
+
+  // Document
+  // TODO saveAs test
+  group('Document', () {
+    test('isClosed while open', () {
+      expect(doc.isClosed, false);
+    });
+    test('isClosed when closed', () {
+      doc.close();
+      expect(doc.isClosed, true);
+    });
+    test('is closed error', () {
+      try {
+        doc.collaborators;
+      } catch (e) {
+        expect(e, 'DocumentClosedError: Document is closed.');
+      }
     });
   });
 }
@@ -1118,18 +1286,21 @@ main() {
   useHtmlConfiguration();
 
   // set clientId
-  rt.GoogleDocProvider.setClientId('INSERT CLIENT ID HERE');
+  rt.GoogleDocProvider.setClientId('1066816720974.apps.googleusercontent.com');
 
-//  var docProvider = new rt.GoogleDocProvider('0B0OUnldiyG0hSEU0U3VnalQ1a1U');
-////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
-  var docProvider = new rt.LocalDocumentProvider();
+  rt.GoogleDocProvider.globalSetup().then((val) {
 
-  rt.registerType(Book, Book.NAME);
-  rt.collaborativeField(Book.NAME, "title");
-  rt.collaborativeField(Book.NAME, "author");
-  rt.collaborativeField(Book.NAME, "isbn");
-  rt.collaborativeField(Book.NAME, "isCheckedOut");
-  rt.collaborativeField(Book.NAME, "reviews");
+  //  var docProvider = new rt.GoogleDocProvider('0B0OUnldiyG0hSEU0U3VnalQ1a1U');
+  ////  var docProvider = new rt.GoogleDocProvider.newDoc('rdm test doc');
+    var docProvider = new rt.LocalDocumentProvider();
 
-  docProvider.loadDocument(initializeModel).then(onFileLoaded);
+    rt.registerType(Book, Book.NAME);
+    rt.collaborativeField(Book.NAME, "title");
+    rt.collaborativeField(Book.NAME, "author");
+    rt.collaborativeField(Book.NAME, "isbn");
+    rt.collaborativeField(Book.NAME, "isCheckedOut");
+    rt.collaborativeField(Book.NAME, "reviews");
+
+    docProvider.loadDocument(initializeModel).then(onFileLoaded);
+  });
 }

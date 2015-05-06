@@ -23,24 +23,30 @@ class LocalDocumentProvider extends DocumentProvider {
   /// Create a local [Document] which is provided to the returned [Future]
   /// initializeModel is called before the future completes
   Future<Document> loadDocument([initializeModel(Model)]) {
-    var model = new _LocalModel();
-    // create a document with the model
-    var document = new _LocalDocument(model);
-    // initialize with data if provided
-    if(_initData != null) {
-      model._initialize(DocumentProvider.getModelCloner(_initData));
-    } else {
-      model._initialize(initializeModel);
-    }
-    _document = document;
+    // TODO this now depends on having realtime api loaded
+    // TODO _initData != null case, use loadFromJson
     var completer = new Completer();
-    // complete with document
-    completer.complete(document);
+
+    //if(_initData != null) {
+      //model._initialize(DocumentProvider.getModelCloner(_initData));
+    //} else {
+      realtime['newInMemoryDocument'].apply([
+        // complete future on file loaded
+        (p) {
+          completer.complete(_document = new Document._fromProxy(p));
+        },
+        // pass initializeModel through if supplied
+        initializeModel == null ? null : (p) => initializeModel(new Model._fromProxy(p)),
+        // throw dart error on error
+        (p) => throw new Error._fromProxy(p)]);
+    //}
     return completer.future;
   }
 
   Future<Map> exportDocument() {
-    return new Future.value((_document.model as _LocalModel)._export());
+    // TODO
+    return new Future.value(null);
+    //return new Future.value(_document.model.toJson());
   }
 
   static bool _isCustomObject(dynamic object) {

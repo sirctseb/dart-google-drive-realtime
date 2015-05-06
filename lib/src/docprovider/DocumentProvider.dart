@@ -53,7 +53,7 @@ abstract class DocumentProvider {
     if(exportedDocument is String) {
       exportedDocument = JSON.decode(exportedDocument);
     }
-    return (_LocalModel model) {
+    return (Model model) {
       Map root = exportedDocument['data']['value'];
       var refs = {'root': model.root};
       for(var key in root.keys) {

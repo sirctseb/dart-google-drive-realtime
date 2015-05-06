@@ -15,15 +15,22 @@
 part of realtime_data_model;
 
 class ErrorType extends IsEnum<String> {
-  static final CLIENT_ERROR = new ErrorType._(realtime['ErrorType']['CLIENT_ERROR']);
   static final CONCURRENT_CREATION = new ErrorType._(realtime['ErrorType']['CONCURRENT_CREATION']);
-  static final FORBIDDEN = new ErrorType._(realtime['ErrorType']['FORBIDDEN']);
   static final INVALID_COMPOUND_OPERATION = new ErrorType._(realtime['ErrorType']['INVALID_COMPOUND_OPERATION']);
+  static final INVALID_JSON_SYNTAX = new ErrorType._(realtime['ErrorType']['INVALID_JSON_SYNTAX']);
+  static final MISSING_PROPERTY = new ErrorType._(realtime['ErrorType']['MISSING_PROPERTY']);
   static final NOT_FOUND = new ErrorType._(realtime['ErrorType']['NOT_FOUND']);
+  static final FORBIDDEN = new ErrorType._(realtime['ErrorType']['FORBIDDEN']);
   static final SERVER_ERROR = new ErrorType._(realtime['ErrorType']['SERVER_ERROR']);
+  static final CLIENT_ERROR = new ErrorType._(realtime['ErrorType']['CLIENT_ERROR']);
   static final TOKEN_REFRESH_REQUIRED = new ErrorType._(realtime['ErrorType']['TOKEN_REFRESH_REQUIRED']);
+  static final INVALID_ELEMENT_TYPE = new ErrorType._(realtime['ErrorType']['INVALID_ELEMENT_TYPE']);
+  static final NO_WRITE_PERMISSION = new ErrorType._(realtime['ErrorType']['NO_WRITE_PERMISSION']);
 
-  static final _INSTANCES = [CLIENT_ERROR, CONCURRENT_CREATION, FORBIDDEN, INVALID_COMPOUND_OPERATION, NOT_FOUND, SERVER_ERROR, TOKEN_REFRESH_REQUIRED];
+  static final _INSTANCES = [CONCURRENT_CREATION, INVALID_COMPOUND_OPERATION,
+    INVALID_JSON_SYNTAX, MISSING_PROPERTY, NOT_FOUND, FORBIDDEN, SERVER_ERROR,
+    CLIENT_ERROR, TOKEN_REFRESH_REQUIRED, INVALID_ELEMENT_TYPE,
+    NO_WRITE_PERMISSION];
 
   static ErrorType find(Object o) => findIn(_INSTANCES, o);
 
