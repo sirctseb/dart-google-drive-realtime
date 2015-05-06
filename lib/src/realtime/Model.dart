@@ -21,9 +21,11 @@ class Model extends EventTarget {
     _onUndoRedoStateChanged = _getStreamProviderFor(EventType.UNDO_REDO_STATE_CHANGED, UndoRedoStateChangedEvent._cast);
   }
 
-  static CollaborativeObject getObject(String id) {
-    return CollaborativeObjectTranslator._fromJs(realtime['Model'].callMethod('getObject', [id]));
-  }
+  // TODO I don't think this was supposed to be public on js side
+  /*static CollaborativeObject getObject(Model model, String id) {
+    print(realtime['Model']);
+    return CollaborativeObjectTranslator._fromJs(realtime['Model'].callMethod('getObject', [model.toJs(), id]));
+  }*/
 
   int get bytesUsed => $unsafe['bytesUsed'];
 
@@ -43,7 +45,7 @@ class Model extends EventTarget {
   CollaborativeMap get root => new CollaborativeMap._fromProxy($unsafe.callMethod('getRoot'));
   bool get isInitialized => $unsafe.callMethod('isInitialized');
 
-  void beginCompoundOperation([String name, String undoable]) =>
+  void beginCompoundOperation([String name = '', bool undoable = true]) =>
       $unsafe.callMethod('beginCompoundOperation',[name, undoable]);
   // TODO args? see below old version
   CustomObject create(String name) {
@@ -76,7 +78,7 @@ class Model extends EventTarget {
   void undo() { $unsafe.callMethod('undo'); }
   void redo() { $unsafe.callMethod('redo'); }
 
-  int get serverRevision => $unsafe.callMethod('serverRevision');
+  int get serverRevision => $unsafe['serverRevision'];
   String toJson([String appId, int revision]) {
     return $unsafe.callMethod('toJson', [appId, revision]);
   }
