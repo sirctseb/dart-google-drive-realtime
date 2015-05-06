@@ -27,19 +27,23 @@ class LocalDocumentProvider extends DocumentProvider {
     // TODO _initData != null case, use loadFromJson
     var completer = new Completer();
 
-    //if(_initData != null) {
-      //model._initialize(DocumentProvider.getModelCloner(_initData));
-    //} else {
-      realtime['newInMemoryDocument'].apply([
-        // complete future on file loaded
-        (p) {
-          completer.complete(_document = new Document._fromProxy(p));
-        },
-        // pass initializeModel through if supplied
-        initializeModel == null ? null : (p) => initializeModel(new Model._fromProxy(p)),
-        // throw dart error on error
-        (p) => throw new Error._fromProxy(p)]);
-    //}
+    // TODO we don't actually need to authenticate. We should be able to plug in
+    // at the api load level
+    GoogleDocProvider.globalSetup().then((result) {
+      //if(_initData != null) {
+        //model._initialize(DocumentProvider.getModelCloner(_initData));
+      //} else {
+        realtime['newInMemoryDocument'].apply([
+          // complete future on file loaded
+          (p) {
+            completer.complete(_document = new Document._fromProxy(p));
+          },
+          // pass initializeModel through if supplied
+          initializeModel == null ? null : (p) => initializeModel(new Model._fromProxy(p)),
+          // throw dart error on error
+          (p) => throw new Error._fromProxy(p)]);
+      //}
+    });
     return completer.future;
   }
 
