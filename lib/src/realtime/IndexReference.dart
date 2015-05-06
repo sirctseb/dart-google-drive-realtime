@@ -28,9 +28,9 @@ class IndexReference extends CollaborativeObject {
     _onReferenceShifted = _getStreamProviderFor(EventType.REFERENCE_SHIFTED, ReferenceShiftedEvent._cast);
   }
 
-  static DeleteModeType DeleteMode;
+  static DeleteModeType DeleteMode = new DeleteModeType();
 
-  String get deleteMode => $unsafe.callMethod('deleteMode');
+  String get deleteMode => $unsafe['deleteMode'];
   bool get canBeDeleted => $unsafe['canBeDeleted'];
   int get index => $unsafe['index'];
   set index(int i) => $unsafe['index'] = i;
