@@ -344,6 +344,25 @@ onFileLoaded(rt.Document doc) {
 
       expect(count, 1);
     });
+    test('Compound Operation Names', () {
+      var count = 0;
+      doc.model.beginCompoundOperation('outer');
+      doc.model.beginCompoundOperation('inner');
+      var ssAdd = list.onValuesAdded.listen((e) {
+        expect(e.compoundOperationNames, ['outer', 'inner']);
+        count++;
+      });
+      var ssObj = list.onObjectChanged.listen((e) {
+        expect(e.compoundOperationNames, ['outer', 'inner']);
+        count++;
+      });
+      list.push(0);
+      doc.model.endCompoundOperation();
+      doc.model.endCompoundOperation();
+      ssAdd.cancel();
+      ssObj.cancel();
+      expect(count, 2);
+    });
   });
 
   group('CollaborativeString', () {
