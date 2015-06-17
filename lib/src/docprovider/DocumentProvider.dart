@@ -54,7 +54,7 @@ abstract class DocumentProvider {
       exportedDocument = JSON.decode(exportedDocument);
     }
     return (Model model) {
-      Map root = exportedDocument['data']['value'];
+      Map root = exportedDocument['value'];
       var refs = {'root': model.root};
       for(var key in root.keys) {
         model.root[key] = _reviveExportedObject(model, root[key], refs);

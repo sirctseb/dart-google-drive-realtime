@@ -48,9 +48,7 @@ class LocalDocumentProvider extends DocumentProvider {
   }
 
   Future<Map> exportDocument() {
-    // TODO
-    return new Future.value(null);
-    //return new Future.value(_document.model.toJson());
+    return new Future.value(_document.model.toJson());
   }
 
   static bool _isCustomObject(dynamic object) {
