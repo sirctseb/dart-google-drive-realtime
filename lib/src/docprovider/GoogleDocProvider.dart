@@ -175,6 +175,7 @@ class GoogleDocProvider extends DocumentProvider {
     return auth.createImplicitBrowserFlow(identifier, scopes)
         .then((auth.BrowserOAuth2Flow flow) {
           return flow.clientViaUserConsent(immediate: true).catchError((_) {
+            return flow.clientViaUserConsent(immediate: false);
             // TODO make button give pop up auth
             //loginButton.text = '';
             //return loginButotn.onClick.first.then((_) {
