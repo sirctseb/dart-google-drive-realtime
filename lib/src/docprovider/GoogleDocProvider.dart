@@ -153,6 +153,8 @@ class GoogleDocProvider extends DocumentProvider {
     return completer.future;
   }
 
+
+  static auth.BrowserOAuth2Flow _flow;
   /**
    * Establish authorization for GoogleDocProviders
    * The resulting authorization object is stored in GoogleDocProvider.auth
@@ -172,17 +174,16 @@ class GoogleDocProvider extends DocumentProvider {
       return new Future.error(new Exception("GoogleDocProvider.clientId must be set before authenticating"));
     }
 
-    return auth.createImplicitBrowserFlow(identifier, scopes)
-        .then((auth.BrowserOAuth2Flow flow) {
-          return flow.clientViaUserConsent(immediate: true).catchError((_) {
-            return flow.clientViaUserConsent(immediate: false);
-            // TODO make button give pop up auth
-            //loginButton.text = '';
-            //return loginButotn.onClick.first.then((_) {
-            //  return flow.clientViaUserConsent(immediate: false);
-            //});
-          }, test: (error) => error is auth.UserConsentException);
-    });
+    if (_flow == null) {
+      return auth.createImplicitBrowserFlow(identifier, scopes)
+            .then((auth.BrowserOAuth2Flow flow) {
+            // store flow
+            _flow = flow;
+            return flow.clientViaUserConsent(immediate: immediate);
+      });
+    } else {
+      return _flow.clientViaUserConsent(immediate: immediate);
+    }
   }
 
   Future<Map> exportDocument() {
