@@ -166,7 +166,7 @@ class GoogleDocProvider extends DocumentProvider {
    */
   // TODO make private?
   // TODO if not private, document that clientId must be set or allow it to be passed
-  static Future<auth.AutoRefreshingAuthClient> authenticate({bool immediate}) {
+  static Future<auth.AutoRefreshingAuthClient> authenticate({bool immediate: true}) {
     _logger.fine('Authenticating with immediate: $immediate');
 
     if(identifier == null) {
