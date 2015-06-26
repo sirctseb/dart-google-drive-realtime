@@ -51,10 +51,6 @@ class LocalDocumentProvider extends DocumentProvider {
     return new Future.value(_document.model.toJson());
   }
 
-  static bool _isCustomObject(dynamic object) {
-    return object is CustomObject && object._isLocalCustomObject;
-  }
-
   LocalDocumentProvider([String data]) {
     _initData = data;
   }
