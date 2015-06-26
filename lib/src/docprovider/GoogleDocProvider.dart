@@ -107,7 +107,7 @@ class GoogleDocProvider extends DocumentProvider {
       _logger.finer('Global setup: authenticated, load drive');
       _loadDrive(authClient);
       _logger.finer('Global setup: loaded drive, load realtime api');
-      return _loadRealtimeApi();
+      return loadRealtimeApi();
     }).then((realtime) {
       _logger.finer('Global setup: realtime loaded, returning success');
       _globallySetup = true;
@@ -133,7 +133,7 @@ class GoogleDocProvider extends DocumentProvider {
   // true if the realtime api is loaded
   static js.JsObject realtime;
   /// Load the realtime api
-  static Future<js.JsObject> _loadRealtimeApi() {
+  static Future<js.JsObject> loadRealtimeApi() {
     _logger.fine('Loading realtime api');
     var completer = new Completer();
 
@@ -166,7 +166,7 @@ class GoogleDocProvider extends DocumentProvider {
    */
   // TODO make private?
   // TODO if not private, document that clientId must be set or allow it to be passed
-  static Future<auth.AutoRefreshingAuthClient> authenticate({bool immediate}) {
+  static Future<auth.AutoRefreshingAuthClient> authenticate({bool immediate: true}) {
     _logger.fine('Authenticating with immediate: $immediate');
 
     if(identifier == null) {
