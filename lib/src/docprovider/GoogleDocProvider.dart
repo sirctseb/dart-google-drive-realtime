@@ -107,7 +107,7 @@ class GoogleDocProvider extends DocumentProvider {
       _logger.finer('Global setup: authenticated, load drive');
       _loadDrive(authClient);
       _logger.finer('Global setup: loaded drive, load realtime api');
-      return _loadRealtimeApi();
+      return loadRealtimeApi();
     }).then((realtime) {
       _logger.finer('Global setup: realtime loaded, returning success');
       _globallySetup = true;
@@ -133,7 +133,7 @@ class GoogleDocProvider extends DocumentProvider {
   // true if the realtime api is loaded
   static js.JsObject realtime;
   /// Load the realtime api
-  static Future<js.JsObject> _loadRealtimeApi() {
+  static Future<js.JsObject> loadRealtimeApi() {
     _logger.fine('Loading realtime api');
     var completer = new Completer();
 

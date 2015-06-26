@@ -27,9 +27,8 @@ class LocalDocumentProvider extends DocumentProvider {
     // TODO _initData != null case, use loadFromJson
     var completer = new Completer();
 
-    // TODO we don't actually need to authenticate. We should be able to plug in
-    // at the api load level
-    GoogleDocProvider.globalSetup().then((result) {
+    // ensure realtime api is loaded and use in-memory document
+    GoogleDocProvider.loadRealtimeApi().then((realtime) {
       //if(_initData != null) {
         //model._initialize(DocumentProvider.getModelCloner(_initData));
       //} else {
