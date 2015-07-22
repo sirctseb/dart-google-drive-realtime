@@ -217,6 +217,7 @@ class GoogleDocProvider extends DocumentProvider {
   }
 
   static Document loadFromJson(String json, [opt_errorFn]) {
+    // TODO should make dart side Error from js side before calling opt_errorFn
     return new Document._fromProxy(realtime['loadFromJson'].apply([json, opt_errorFn]));
   }
 }
