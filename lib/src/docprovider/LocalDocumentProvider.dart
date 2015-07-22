@@ -47,7 +47,7 @@ class LocalDocumentProvider extends DocumentProvider {
   }
 
   Future<Map> exportDocument() {
-    return new Future.value(_document.model.toJson());
+    return new Future.value(JSON.decode(_document.model.toJson()));
   }
 
   LocalDocumentProvider([String data]) {
