@@ -26,10 +26,11 @@ abstract class RemoteDocumentProvider extends LocalDocumentProvider {
     return getDocument().then((retrievedDoc) {
       // ensure realtime api is loaded and us in-memory document
       return GoogleDocProvider.loadRealtimeApi().then((realtime) {
-        return GoogleDocProvider.loadFromJson(retrievedDoc,
+        _document = GoogleDocProvider.loadFromJson(retrievedDoc,
           (error) {
             throw new Error._fromProxy(error);
             });
+        return _document;
       });
       // TODO old implementation checked for empty string retrievedDoc
     });
