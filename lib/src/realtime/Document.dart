@@ -29,6 +29,7 @@ class Document extends EventTarget {
   List<Collaborator> get collaborators => JsArrayToListAdapter($unsafe.callMethod('getCollaborators'), Collaborator._cast);
   Model get model => new Model._fromProxy($unsafe.callMethod('getModel'));
   bool get isClosed => $unsafe['isClosed'];
+  bool get isInGoogleDrive => $unsafe['isInGoogleDrive'];
   int get saveDelay => $unsafe['saveDelay'];
   void saveAs(String fileId) {
     $unsafe.callMethod('saveAs', [fileId]);

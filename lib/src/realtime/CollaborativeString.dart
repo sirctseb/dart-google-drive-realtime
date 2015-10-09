@@ -28,7 +28,7 @@ class CollaborativeString extends CollaborativeObject {
   void append(String text) { $unsafe.callMethod('append', [text]); }
   String get text => $unsafe.callMethod('getText');
   void insertString(int index, String text) { $unsafe.callMethod('insertString', [index, text]); }
-  IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.callMethod('registerReference', [index, canBeDeleted]));
+  IndexReference registerReference(int index, String deleteMode) => new IndexReference._fromProxy($unsafe.callMethod('registerReference', [index, deleteMode]));
   void removeRange(int startIndex, int endIndex) { $unsafe.callMethod('removeRange', [startIndex, endIndex]); }
   void set text(String text) { $unsafe.callMethod('setText', [text]); }
 
