@@ -44,47 +44,7 @@ class CollaborativeObjectTranslator<E> extends Translator<E> {
   // returns the type of an object contained in a model
   // Map, List, EditableString, JsonValue, or <CustomObjectName>
   static String typeof(dynamic object) {
-    if(object.hasProperty('clear') &&
-        object.hasProperty('delete') &&
-        object.hasProperty('get') &&
-        object.hasProperty('has') &&
-        object.hasProperty('isEmpty') &&
-        object.hasProperty('items') &&
-        object.hasProperty('keys') &&
-        object.hasProperty('set') &&
-        object.hasProperty('values')) {
-      return 'Map';
-    } else if(object.hasProperty('asArray') &&
-        object.hasProperty('clear') &&
-        object.hasProperty('get') &&
-        object.hasProperty('indexOf') &&
-        object.hasProperty('insert') &&
-        object.hasProperty('insertAll') &&
-        object.hasProperty('lastIndexOf') &&
-        object.hasProperty('move') &&
-        object.hasProperty('moveToList') &&
-        object.hasProperty('push') &&
-        object.hasProperty('pushAll') &&
-        object.hasProperty('registerReference') &&
-        object.hasProperty('remove') &&
-        object.hasProperty('removeRange') &&
-        object.hasProperty('removeValue') &&
-        object.hasProperty('replaceRange') &&
-        object.hasProperty('set')) {
-      return 'List';
-    } else if(object.hasProperty('append') &&
-        object.hasProperty('getText') &&
-        object.hasProperty('insertString') &&
-        object.hasProperty('registerReference') &&
-        object.hasProperty('removeRange') &&
-        object.hasProperty('setText')) {
-      return 'EditableString';
-    } else if(isCustomObject(object)) {
-      return CustomObject._customObjectName(object);
-    } else if(object.instanceof(js.context['Array']) || object.instanceof(js.context['Object'])) {
-      return 'JsonValue';
-    }
-    return 'native';
+    return object['type'];
   }
 
   static dynamic _fromJs(dynamic object) {
@@ -106,7 +66,9 @@ class CollaborativeObjectTranslator<E> extends Translator<E> {
         return new CollaborativeString._fromProxy(object);
       //} else if(object.instanceof(js.context['Array'])
                  //|| object.instanceof(js.context['Object'])) {
-      } else if(type == 'JsonValue') {
+      } else if(type == 'IndexReference') {
+        return new IndexReference._fromProxy(object);
+      }else if(type == 'JsonValue') {
         return JSON.decode(js.context['JSON']['stringify'].apply([object]));
       }
     }

@@ -56,7 +56,7 @@ class CollaborativeList<E> extends CollaborativeContainer /* with ListMixin<E> *
   void move(int index, int destinationIndex) { $unsafe.callMethod('move', [index, destinationIndex]); }
   void moveToList(int index, destination, int destinationIndex) { $unsafe.callMethod('moveToList', [index, _toJs(destination), destinationIndex]); }
   int push(E value) => $unsafe.callMethod('push', [_toJs(value)]);
-  IndexReference registerReference(int index, bool canBeDeleted) => new IndexReference._fromProxy($unsafe.callMethod('registerReference', [index, canBeDeleted]));
+  IndexReference registerReference(int index, String deleteMode) => new IndexReference._fromProxy($unsafe.callMethod('registerReference', [index, deleteMode]));
   void remove(int index) { $unsafe.callMethod('remove', [index]); }
   void removeRange(int startIndex, int endIndex) { $unsafe.callMethod('removeRange', [startIndex, endIndex]); }
   bool removeValue(E value) => $unsafe.callMethod('removeValue', [_toJs(value)]);
