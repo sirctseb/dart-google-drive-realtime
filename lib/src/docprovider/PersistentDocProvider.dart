@@ -97,41 +97,19 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
 
   /// Create a [Document] which is provided to the returned [Future]
   Future<Document> loadDocument([initializeModel(Model)]) {
-    bool doInitialSave = false;
     // get document from peristent storage
     return getDocument().then((retrievedDoc) {
-      // create the model
-      var model = new _LocalModel();
-      // create a document with the model
-      _document = new _LocalDocument(model);
-
-      // if retrieved doc is empty, pass normal initializeModel
-      if(retrievedDoc == "") {
-        // TODO only do initializeModel if document has never been loaded (where is this recorded)?
-        model._initialize(initializeModel);
-        doInitialSave = true;
-      } else {
-        // otherwise, initialize with json data
-        model._initialize(DocumentProvider.getModelCloner(retrievedDoc));
-      }
-      // listen for changes on model
-      model.root.onObjectChanged.listen(_onDocumentChange);
-      // create batch strategy
-      batchStrategy = new DelayStrategy(model, const Duration(seconds: 1));
-      // if document had not been loaded before, do initial save
-      if(doInitialSave) {
-        saveDocument();
-      }
-      return _document;
+      // ensure realtime api is loaded and us in-memory document
+      return GoogleDocProvider.loadRealtimeApi().then((realtime) {
+        _document = GoogleDocProvider.loadFromJson(retrievedDoc,
+          (error) {
+            throw new Error._fromProxy(error);
+            });
+        batchStrategy = new DelayStrategy(_document.model, const Duration(seconds: 1));
+        return _document;
+      });
     });
   }
-
-  /**
-   * If true, the client has mutations that have not yet been sent to the server.
-   * If false, all mutations have been sent to the server, but some may not yet have been acked.
-   */
-  bool get isPending => _isPending;
-  bool _isPending = false;
 
   /**
    * If true, the document is in the process of saving.
@@ -140,24 +118,12 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
   bool get isSaving => _isSaving;
   bool _isSaving = false;
 
-  // handles document change events and calls saveDocument based on buffering strategy
-  // TODO save state changed events
-  void _onDocumentChange(ObjectChangedEvent e) {
-    bool lastIsPending = isPending;
-    _isPending = true;
-    // if pending has changed, send change event
-    if(lastIsPending != _isPending) {
-      (_document as _LocalDocument)._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
-    }
-  }
-
   void _saveDocument(bool save) {
     // if already saving, return false
     if(_isSaving) return;
-    _isPending = false;
     _isSaving = true;
     // send state changed event. don't have to make separate check because _isSaving had to be false
-    (_document as _LocalDocument)._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
+    _document._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isSaving, _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
     saveDocument().then((bool saved) {
       if(!saved) {
         // TODO save error?
@@ -166,14 +132,14 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
         var lastIsSaving = isSaving;
         _isSaving = false;
         if(lastIsSaving != isSaving) {
-          (_document as _LocalDocument)._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isPending, isSaving, null));
+          _document._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isSaving, _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
         }
       }
     });
   }
 
   Future<Map> exportDocument() {
-    return new Future.value((_document.model as _LocalModel)._export());
+    return new Future.value(JSON.decode(_document.model.toJson()));
   }
 
   /**
