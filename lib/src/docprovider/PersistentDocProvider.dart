@@ -86,6 +86,23 @@ class DelayStrategy extends BatchStrategy {
   Timer _sinceLastModification;
 }
 
+/// Like DocumentSaveStateChangedEvent but with isPending, when changes have
+/// been made to the document but not sent to the server
+class PersistentDocumentSaveStateChangedEvent
+    implements DocumentSaveStateChangedEvent {
+  final bool isPending;
+  final bool isSaving;
+  final Document target;
+  final String type;
+
+  PersistentDocumentSaveStateChangedEvent(
+      this.isPending, this.isSaving, this.target, this.type);
+
+  // define js-backed fields for the analyzer
+  js.JsObject $unsafe;
+  toJs() => null;
+}
+
 /// A class to provide non Google Drive documents with persistence
 abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
   /// The strategy to determine when document changes should be saved
@@ -112,12 +129,24 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
         _document = GoogleDocProvider.loadFromJson(retrievedDoc, (error) {
           throw new Error._fromProxy(error);
         });
+        _document.model.root.onObjectChanged.listen((event) {
+          _isPending = true;
+          _document._onDocumentSaveStateChanged.add(
+              new PersistentDocumentSaveStateChangedEvent(isPending, isSaving,
+                  _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
+        });
         batchStrategy =
             new DelayStrategy(_document.model, const Duration(seconds: 10));
         return _document;
       });
     });
   }
+
+  /**
+   * If true, the document has changes that have not been sent to the server
+   **/
+  bool get isPending => _isPending;
+  bool _isPending = false;
 
   /**
    * If true, the document is in the process of saving.
@@ -130,10 +159,11 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
     // if already saving, return false
     if (_isSaving) return;
     _isSaving = true;
+    _isPending = false;
     // send state changed event. don't have to make separate check because _isSaving had to be false
     _document._onDocumentSaveStateChanged.add(
-        new _LocalDocumentSaveStateChangedEvent(
-            isSaving, _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
+        new PersistentDocumentSaveStateChangedEvent(isPending, isSaving,
+            _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
     saveDocument().then((bool saved) {
       if (!saved) {
         // TODO save error?
@@ -143,8 +173,8 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
         _isSaving = false;
         if (lastIsSaving != isSaving) {
           _document._onDocumentSaveStateChanged.add(
-              new _LocalDocumentSaveStateChangedEvent(
-                  isSaving, _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
+              new PersistentDocumentSaveStateChangedEvent(isPending, isSaving,
+                  _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
         }
       }
     });
