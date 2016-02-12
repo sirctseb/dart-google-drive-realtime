@@ -44,42 +44,50 @@ abstract class BatchStrategy {
   Stream<bool> get saveStream => _saveStreamController.stream;
   StreamController<bool> _saveStreamController = new StreamController<bool>();
 }
+
 /// A strategy class to save immediately on every modification
 class ImmediateStrategy extends BatchStrategy {
   ImmediateStrategy(Model model) : super(model);
   // save on every change
   void modelChanged(e) => save();
 }
+
 /// A strategy class that waits for a given duration after the last modification to save
 class DelayStrategy extends BatchStrategy {
   /// The duration of time to wait after the last modification
   Duration duration;
+
+  bool _modelChangedDuringSave = false;
 
   /// Create a strategy with a given delay duration
   DelayStrategy(Model model, this.duration) : super(model);
 
   /// Save after a given amount of time has passed since the last modification
   void modelChanged(ObjectChangedEvent event) {
-    // TODO a better model for this whole thing might be to have a repeating timer
-    // TODO that checks if enough time has passed since last event instead of creating new timers every event
-
-    // if there is already a timer running, cancel it
-    if(_sinceLastModification != null) {
-      _sinceLastModification.cancel();
+    if (_sinceLastModification == null) {
+      _sinceLastModification = new Timer(duration, _onSaveTimer);
+    } else {
+      _modelChangedDuringSave = true;
     }
-
-    // start a timer for the modification
-    _sinceLastModification = new Timer(duration, () {
-      save();
-    });
   }
+
+  void _onSaveTimer() {
+    if (_modelChangedDuringSave) {
+      _modelChangedDuringSave = false;
+      // start a new save timer
+      _sinceLastModification = new Timer(duration, _onSaveTimer);
+    } else {
+      _sinceLastModification = null;
+      save();
+    }
+  }
+
   // the timer that counts since the last modification
   Timer _sinceLastModification;
 }
 
 /// A class to provide non Google Drive documents with persistence
 abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
-
   /// The strategy to determine when document changes should be saved
   BatchStrategy get batchStrategy => _batchStrategy;
   BatchStrategy _batchStrategy;
@@ -87,7 +95,7 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
   // TODO should let strategies construct without a model so clients can set strategies more easily
   void set batchStrategy(BatchStrategy bs) {
     // cancel save stream subscription on old strategy
-    if(_batchSubscription != null) {
+    if (_batchSubscription != null) {
       _batchSubscription.cancel();
     }
     // TODO actually tell old strategy to stop listening to changes
@@ -101,11 +109,11 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
     return getDocument().then((retrievedDoc) {
       // ensure realtime api is loaded and us in-memory document
       return GoogleDocProvider.loadRealtimeApi().then((realtime) {
-        _document = GoogleDocProvider.loadFromJson(retrievedDoc,
-          (error) {
-            throw new Error._fromProxy(error);
-            });
-        batchStrategy = new DelayStrategy(_document.model, const Duration(seconds: 1));
+        _document = GoogleDocProvider.loadFromJson(retrievedDoc, (error) {
+          throw new Error._fromProxy(error);
+        });
+        batchStrategy =
+            new DelayStrategy(_document.model, const Duration(seconds: 10));
         return _document;
       });
     });
@@ -120,19 +128,23 @@ abstract class PersistentDocumentProvider extends RemoteDocumentProvider {
 
   void _saveDocument(bool save) {
     // if already saving, return false
-    if(_isSaving) return;
+    if (_isSaving) return;
     _isSaving = true;
     // send state changed event. don't have to make separate check because _isSaving had to be false
-    _document._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isSaving, _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
+    _document._onDocumentSaveStateChanged.add(
+        new _LocalDocumentSaveStateChangedEvent(
+            isSaving, _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
     saveDocument().then((bool saved) {
-      if(!saved) {
+      if (!saved) {
         // TODO save error?
       } else {
         // TODO this should always be true. what if it's not?
         var lastIsSaving = isSaving;
         _isSaving = false;
-        if(lastIsSaving != isSaving) {
-          _document._onDocumentSaveStateChanged.add(new _LocalDocumentSaveStateChangedEvent(isSaving, _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
+        if (lastIsSaving != isSaving) {
+          _document._onDocumentSaveStateChanged.add(
+              new _LocalDocumentSaveStateChangedEvent(
+                  isSaving, _document, EventType.DOCUMENT_SAVE_STATE_CHANGED));
         }
       }
     });
