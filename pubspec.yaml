@@ -1,5 +1,5 @@
 name: realtime_data_model
-version: 0.0.22-dev
+version: 0.0.22
 author: Christopher Best <bestchris@gmail.com>
 description: |-
   Use Google Drive Realtime API with drive documents and locally with the same interface.
